@@ -1,5 +1,5 @@
 # EMCon: Emergency Connection
-A gateway to connect patients with hospitals under urgent scenarios.
+A gateway to connect patients with hospitals during emergency scenarios.
 
 CS 370 Spring 2025 Project
 
