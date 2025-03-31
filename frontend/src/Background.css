@@ -1,0 +1,349 @@
+/* RESET STYLES */
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Arial', sans-serif;
+  }
+  
+  /* APP CONTAINER */
+  .App {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
+  
+  /* HEADER / NAVBAR */
+  /* HEADER / NAVBAR */
+  .header {
+    position: relative;
+    background-color: #fff;
+    padding: 1rem 5%;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    z-index: 1; 
+  }
+  
+  /* Align logo and navbar links to the left */
+  .logo-and-nav {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* Align everything to the left */
+    gap: 1rem; /* Space between logo and nav links */
+    padding-left: 0; /* Remove extra padding */
+  }
+  
+  /* Increase logo size and align to the left */
+  .logo {
+    margin-left: 0; /* Remove any margin */
+    padding-left: 0; /* Ensure it's fully left-aligned */
+  }
+  
+  /* Adjust logo size and positioning */
+  .logo-img {
+    width: 120px; /* Adjust size */
+    height: auto;
+    display: block;
+    margin-left: 0; /* Ensures no extra spacing */
+  }
+  
+  /* Navigation links aligned to the left */
+  .nav-links {
+    display: flex;
+    gap: 2rem; /* Space between links */
+  }
+  
+  .nav-links a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .nav-links a:hover {
+    color:rgb(22, 171, 187);
+  }
+  
+  .svg-shape {
+    position: absolute;
+    z-index: 2; /* Ensures it's above the navbar */
+    width: 400px; /* Adjust width as needed */
+    height: auto;
+    opacity: 0.8; /* Makes it more visible */
+  }
+  
+  /* Position it over the navbar on the right side */
+  .svg-top-right {
+    top: -100px; /* Moves it above the navbar */
+    right: -150px; /* Aligns it to the right */
+    transform: rotate(20deg); /* Slight tilt */
+  }
+  
+  /* MAIN CONTENT */
+  .main-content {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    padding: 4rem 2rem;
+    background-color: #f5f7fa;
+    overflow: hidden;
+  }
+  
+  
+  /* BACKGROUND SHAPES */
+  .shape {
+    position: absolute;
+    z-index: -1;
+    width: 300px;
+    height: 300px;
+    border-radius: 20px;
+  }
+  
+  .shape-left {
+    background-color: #87c5d6;
+    top: -50px;
+    left: -100px;
+    width: 450px;
+    height: 450px;
+    transform: rotate(-30deg);
+  }
+  
+  .shape-right {
+    background-color: #f4a87a;
+    top: 50px;
+    right: -50px;
+    width: 250px;
+    height: 250px;
+    transform: rotate(20deg);
+  }
+  
+  .svg-bottom-left {
+    bottom: 200px; /* Moves it lower */
+    left: -50px; /* Aligns to left */
+    transform: rotate(0deg); /* Adjust rotation if needed */
+    width: 300px; /* Adjust width (Increase or Decrease) */
+    height: auto; /* Maintains aspect ratio */
+  }
+  
+  /* Position Third SVG (New Bottom-Right Orange Shape) */
+  .svg-bottom-right {
+    bottom: 0px; /* Aligns it to bottom */
+    right: 0px; /* Aligns to right */
+    transform: rotate(-10deg); /* Slight tilt */
+    z-index: -1; /* Keeps it behind the form */
+  }
+  
+  .svg-large-left {
+    position: absolute;
+    z-index: 2; /* Keeps it behind other elements */
+    width: 500px; /* Adjust size as needed */
+    height: auto;
+    opacity: 0.7; /* Transparency */
+    left: -50px; /* Position towards the left */
+    top: 400px; /* Adjust height */
+    transform: rotate(0deg); /* No rotation */
+  }
+  
+  /* Fifth SVG Shape - Orange on Right */
+  .svg-orange-right {
+    position: absolute;
+    z-index: 2; /* Keeps it behind other elements */
+    width: 250px; /* Adjust size as needed */
+    height: auto;
+    opacity: 0.9; /* Transparency */
+    right: -50px; /* Position towards the right */
+    bottom: 300px; /* Adjust height */
+    transform: rotate(17deg); /* No rotation */
+  }
+  
+  /* Ensure the main-content allows absolute positioning */
+  .main-content {
+    position: relative; /* Enables absolute positioning for children */
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f5f7fa;
+    overflow: hidden; /* Ensures the SVG doesn't overflow */
+  }
+  
+  
+  .main-content {
+    position: relative; /* Ensures absolute elements stay within */
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 2rem;
+    background-color: #f5f7fa;
+    overflow: hidden; /* Prevents SVG from being cut off */
+  }
+  /* BACK ARROW */
+  /* BACK ARROW */
+  /* BACK ARROW */
+  .back-arrow {
+    position: absolute;
+    top: 0rem;
+    left: 3rem;
+    z-index: 1;
+  }
+  
+  /* Default arrow style */
+  .arrow {
+    font-size: 2.5rem; /* Increased size */
+    font-weight: normal; /* Default weight */
+    color: #333;
+    cursor: pointer;
+    transition: color 0.3s ease-in-out, font-weight 0.3s ease-in-out, font-size 0.3s ease-in-out;
+  }
+  
+  /* Hover effect: Bigger, Bold, and Orange */
+  .arrow:hover {
+    color: #ff9800; /* Orange color */
+    font-weight: bold;
+    font-size: 2.8rem; /* Slightly larger on hover */
+  }
+  
+  /* SIGN-IN CONTAINER */
+  .signin-container {
+    background-color: #fff;
+    padding: 2rem;
+    border-radius: 8px;
+    z-index: 1;
+    max-width: 400px;
+    width: 100%;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+    text-align: center;
+  }
+  
+  .signin-logo {
+    width: 200px; /* Increase size */
+    height: auto;
+    margin-bottom: 1rem;
+  }
+  
+  .signin-container h2 {
+    color:rgb(16, 134, 128);
+    margin-bottom: 1.5rem;
+    font-size: 1.5rem;
+  }
+  
+  /* SIGN-IN FORM */
+  .signin-form {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .signin-form label {
+    display: block; 
+    text-align: left; 
+    margin-bottom: 0.3rem;
+    font-weight: 500;
+    color: #333;
+    width: 100%; 
+  }
+  
+  .signin-form input {
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+  }
+  
+  .signin-form input:focus {
+    outline: none;
+    border-color: #007bff;
+  }
+  
+  .admin-link {
+    text-align: left; /* Moves text to the left */
+    margin-top: -0.5rem;
+  }
+  
+  /* Ensure link styling remains intact */
+  .admin-link a {
+    text-decoration: none;
+    color:rgb(8, 174, 186);
+    font-size: 0.9rem;
+  }
+  
+  .admin-link a:hover {
+    text-decoration: underline;
+  }
+  
+  /* SUBMIT BUTTON */
+  .submit-btn {
+    padding: 0.75rem;
+    background-color:#0694A2;
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    border-radius: 12px;
+    margin-top: 1rem; /* Moves the button down */
+  }
+  
+  .submit-btn:hover {
+    background-color: #15aacf;
+  }
+  
+  /* FOOTER */
+  .footer {
+    background-color: #2a9fa7;
+    color: #fff;
+    padding: 2rem 5%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%; /* Ensures the footer spans the full width */
+    position: relative; /* Keeps it at the bottom while being part of the document */
+  }
+  
+  /* Ensure the whole page stretches, keeping the footer at the bottom */
+  .App {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Makes sure the page fills the screen */
+  }
+  
+  .main-content {
+    flex: 1; /* Pushes the footer to the bottom */
+  }
+  
+  /* Left-aligned EMCON text */
+  .footer-left {
+    text-align: left;
+  }
+  
+  .footer-left h1 {
+    font-size: 1.8rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .footer-left p {
+    font-size: 1rem;
+  }
+  
+  /* Right-aligned links */
+  .footer-right {
+    text-align: right;
+  }
+  
+  .footer-links {
+    display: flex;
+    gap: 1rem; /* Space between links */
+  }
+  
+  .footer-links a {
+    text-decoration: none;
+    color: #fff;
+  }
+  
+  .footer-links a:hover {
+    text-decoration: underline;
+    }
+  

@@ -1,0 +1,112 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;800&family=VT323&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+
+/* body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+} */
+
+/* navbar */
+nav {
+  display: flex;
+  align-items: center;
+}
+nav a {
+  margin-left: 10px;
+}
+nav button {
+  background: #fff;
+  color: var(--primary);
+  border: 2px solid var(--primary);
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-family: "Poppins";
+  cursor: pointer;
+  font-size: 1em;
+}
+
+/* auth forms */
+form.signup, form.login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 20px;
+  background: #fff;
+  border-radius: 4px;
+}
+
+
+
+
+/* adding extra code */
+/* Auth Forms - Updated */
+form.signup, form.login {
+  max-width: 400px;
+  margin: 40px auto;
+  padding: 30px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+form.signup h2, form.login h2 {
+  text-align: center;
+  margin-bottom: 20px;
+  color: #333;
+  font-family: 'Poppins', sans-serif;
+}
+
+form.signup label, form.login label {
+  display: block;
+  margin: 20px 0 8px;
+  color: #555;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+}
+
+form.signup input, form.login input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  box-sizing: border-box;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+}
+
+form.signup button, form.login button {
+  width: 100%;
+  padding: 12px;
+  margin-top: 20px;
+  background: #4a6bff;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+form.signup button:hover, form.login button:hover {
+  background: #3a5bef;
+}
+
+.error {
+  color: #ff4d4d;
+  margin-top: 10px;
+  font-size: 14px;
+  text-align: center;
+}
