@@ -14,7 +14,7 @@ const Navbar = () => {
     <header className="bg-white p-4 md:p-6 flex justify-start items-center"> 
       <img src="/kk.png" alt="EMCON Logo" className="w-24 h-auto mr-6" />
       <nav className="flex space-x-6">
-        <a href="#home" className="hover:text-[#15aacf]">Home</a>
+        <a href="/" className="hover:text-[#15aacf]">Home</a>
         <a href="/hospitals" className="hover:text-[#15aacf]">Find Hospitals</a>
         <a href="#insurance" className="hover:text-[#15aacf]">Insurance</a>
         <a href="#donations" className="hover:text-[#15aacf]">Donations</a>

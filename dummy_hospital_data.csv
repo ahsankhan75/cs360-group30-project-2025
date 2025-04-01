@@ -1,0 +1,101 @@
+﻿_id,name,city,address,rating,wait_time,last_updated,contact_phone,insurance_accepted,num_beds,num_doctors
+58197761eed1bf65ae5208da,Faisalabad City Hospital,Faisalabad,"114 Sarwar Road, Faisalabad",4.1,48,2025-04-01T20:29:53+00:00,0319-7960571,"Beta Insurance, Epsilon Assurance",118,58
+721ac2f96f9615dd86790078,Multan Central Hospital,Multan,"97 Zamzama Street, Multan",3.8,12,2025-04-01T18:01:52+00:00,0310-5295542,"Delta Care, Beta Insurance",210,62
+b2adfddf8621cbdde0d58167,Hyderabad Central Clinic,Hyderabad,"86 Saddar Road, Hyderabad",4.7,44,2025-04-01T12:28:27+00:00,0329-2611564,"Alpha Insurance, Gamma Health",499,49
+69eeb39fdd9c18c3668c72ac,Islamabad City Medical Center,Islamabad,"19 Canal Bank Road, Islamabad",3.7,82,2025-04-01T21:16:31+00:00,0371-4831484,"Delta Care, Gamma Health",327,24
+a86c1ca772f3a1b6d022c034,Mardan Regional Hospital,Mardan,"192 University Road, Mardan",3.6,74,2025-04-01T21:03:30+00:00,0318-6479516,"Gamma Health, Alpha Insurance",359,42
+6e6478f3654de3db4f9c5383,Peshawar Central Medical Center,Peshawar,"64 Model Town C Block, Peshawar",3.6,66,2025-04-01T00:51:51+00:00,0356-4760974,"Beta Insurance, Gamma Health",370,65
+ae29b68429506e4ddd2f2a66,Peshawar Regional Clinic,Peshawar,"141 DHA Phase 6, Peshawar",4.4,10,2025-04-01T11:54:52+00:00,0371-4771267,"Beta Insurance, Alpha Insurance",390,42
+6a025c5128ca8bd46e5f4010,Bahawalpur City Medical Center,Bahawalpur,"170 Johar Town Main Road, Bahawalpur",4.1,58,2025-04-01T09:07:31+00:00,0398-8234559,"Epsilon Assurance, Beta Insurance",474,35
+e3d93981b2d30bbb4403153e,Larkana National Medical Center,Larkana,"47 M. M. Alam Road, Larkana",4.1,83,2025-04-01T06:23:08+00:00,0377-9785974,"Gamma Health, Alpha Insurance",261,19
+bdcca0170c94f92a2b85e301,Sialkot City Hospital,Sialkot,"121 Model Town C Block, Sialkot",4.1,36,2025-04-01T04:30:22+00:00,0382-1655813,"Alpha Insurance, Epsilon Assurance",360,36
+10fb55535347a7795e837b84,Sialkot City Hospital,Sialkot,"6 Mall Road, Sialkot",3.9,29,2025-04-01T14:23:53+00:00,0311-4074727,"Delta Care, Beta Insurance",56,76
+5f34ed561525913df686f645,Faisalabad Central Hospital,Faisalabad,"36 Iqbal Town Main Blvd, Faisalabad",4.7,61,2025-04-01T13:16:23+00:00,0379-7712365,"Beta Insurance, Alpha Insurance",482,79
+057e749db4a9c0b3f74bc19d,Lahore Central Medical Center,Lahore,"65 Ferozepur Road, Lahore",4.5,89,2025-04-01T15:00:11+00:00,0341-1325556,"Delta Care, Beta Insurance",277,88
+fdecfaf99d29654aed4836c3,Larkana General Hospital,Larkana,"7 Model Town C Block, Larkana",3.7,32,2025-04-01T13:45:39+00:00,0383-6705776,"Beta Insurance, Epsilon Assurance",279,52
+85699f62d8432a896c103a52,Larkana National Hospital,Larkana,"27 Airport Road, Larkana",4.0,54,2025-04-01T21:01:00+00:00,0344-1705332,"Epsilon Assurance, Gamma Health",391,54
+0a9835c3563005b9b5aeb6c5,Sukkur General Clinic,Sukkur,"88 Korangi Road, Sukkur",3.9,72,2025-04-01T17:30:32+00:00,0332-6352246,"Epsilon Assurance, Alpha Insurance",221,78
+6f8449679b1b8a3d30e82f76,Faisalabad National Medical Center,Faisalabad,"179 Gulberg Main Boulevard, Faisalabad",3.7,110,2025-04-01T00:36:11+00:00,0347-3348968,"Alpha Insurance, Gamma Health",145,22
+beff7293afab7f4a8679675b,Sialkot National Hospital,Sialkot,"171 Ring Road, Sialkot",3.6,40,2025-04-01T12:52:19+00:00,0377-8623137,"Beta Insurance, Epsilon Assurance",337,17
+e71ee3e22a64a9063353a967,Sialkot City Medical Center,Sialkot,"53 Allama Iqbal Road, Sialkot",4.7,115,2025-04-01T11:10:16+00:00,0323-5930970,"Gamma Health, Beta Insurance",351,85
+2687d6f8fe69083f9f280904,Sialkot Central Hospital,Sialkot,"32 Iqbal Town Main Blvd, Sialkot",4.7,80,2025-04-01T02:39:00+00:00,0353-6801946,"Delta Care, Alpha Insurance",123,11
+a1e540710026dbeb64957c2f,Quetta General Hospital,Quetta,"186 Jail Road, Quetta",3.7,35,2025-04-01T02:59:36+00:00,0396-8912765,"Epsilon Assurance, Alpha Insurance",485,69
+3eaac318cd84332ea50e0d41,Faisalabad National Medical Center,Faisalabad,"132 Mall Road, Faisalabad",3.7,39,2025-04-01T09:40:07+00:00,0351-3109899,"Epsilon Assurance, Beta Insurance",463,43
+beeec3b3ca8dfce07dbfb4a4,Mardan General Clinic,Mardan,"117 Gulshan-e-Iqbal Block 7, Mardan",3.6,93,2025-04-01T13:25:52+00:00,0377-1749495,"Epsilon Assurance, Beta Insurance",364,51
+16b090525e4b81a691023165,Lahore Regional Medical Center,Lahore,"145 Ferozepur Road, Lahore",3.6,40,2025-04-01T14:00:39+00:00,0318-6250578,"Beta Insurance, Epsilon Assurance",118,73
+ebb480bf39f6ce61f729593b,Multan Central Clinic,Multan,"200 Shahrah-e-Faisal, Multan",4.6,46,2025-04-01T00:32:24+00:00,0320-7503498,"Beta Insurance, Epsilon Assurance",459,13
+ac774da6bd3279b3b257b090,Quetta Central Medical Center,Quetta,"139 Blue Area, Quetta",3.9,70,2025-04-01T00:00:10+00:00,0378-8519755,"Gamma Health, Beta Insurance",328,68
+b635108dbc198c21bc1c2783,Peshawar General Clinic,Peshawar,"114 M. M. Alam Road, Peshawar",4.8,23,2025-04-01T04:16:18+00:00,0365-8858060,"Gamma Health, Delta Care",395,87
+baf2e2f376fb9f68432549b2,Bahawalpur National Clinic,Bahawalpur,"76 F-8/3 Street, Bahawalpur",3.7,26,2025-04-01T05:47:46+00:00,0397-7188467,"Beta Insurance, Delta Care",230,30
+e1fe372d1222df4093287b74,Multan City Medical Center,Multan,"153 F-8/3 Street, Multan",4.7,19,2025-04-01T00:27:12+00:00,0389-3741846,"Delta Care, Epsilon Assurance",450,57
+04661f3610a6d74d82d1cf76,Rawalpindi National Clinic,Rawalpindi,"194 Gulberg Main Boulevard, Rawalpindi",4.0,105,2025-04-01T01:38:53+00:00,0349-8545677,"Alpha Insurance, Epsilon Assurance",420,42
+d34f75f771548398b23d2452,Karachi Central Clinic,Karachi,"29 University Road, Karachi",4.3,19,2025-04-01T07:51:59+00:00,0310-1247967,"Beta Insurance, Alpha Insurance",292,20
+3fa24a8f5b0fcb425db094a8,Karachi Regional Hospital,Karachi,"53 North Nazimabad Block H, Karachi",4.6,23,2025-04-01T15:31:39+00:00,0392-8911195,"Beta Insurance, Gamma Health",201,68
+4554fcb69b75ee8f30cb52c9,Sukkur Regional Hospital,Sukkur,"180 Gulshan-e-Iqbal Block 7, Sukkur",3.5,113,2025-04-01T03:09:04+00:00,0386-1855602,"Delta Care, Gamma Health",113,95
+6a2cc762de8e6490b13ecab5,Peshawar Regional Clinic,Peshawar,"34 Bahria Town Sector E, Peshawar",4.5,111,2025-04-01T11:27:57+00:00,0392-3635440,"Delta Care, Epsilon Assurance",74,14
+4de91df222d1ada9b3aeb55c,Peshawar General Medical Center,Peshawar,"102 F-8/3 Street, Peshawar",4.8,50,2025-04-01T20:05:24+00:00,0344-7143973,"Epsilon Assurance, Alpha Insurance",445,47
+41a49f94901dca354ab4bd47,Peshawar National Clinic,Peshawar,"100 Defence Road, Peshawar",3.9,65,2025-04-01T00:08:44+00:00,0381-3989551,"Alpha Insurance, Epsilon Assurance",249,59
+afe2da827124f10484d7c9de,Sialkot General Medical Center,Sialkot,"126 Shalimar Link Road, Sialkot",4.9,34,2025-04-01T01:20:15+00:00,0397-5873976,"Gamma Health, Beta Insurance",431,18
+212496096e4d3e07484cb04c,Sukkur City Clinic,Sukkur,"182 Mall Road, Sukkur",4.2,18,2025-04-01T00:32:12+00:00,0324-8134627,"Epsilon Assurance, Beta Insurance",290,34
+5231e0ee75e47d75aced6386,Larkana Central Hospital,Larkana,"11 Airport Road, Larkana",4.8,81,2025-04-01T06:20:30+00:00,0386-3396344,"Beta Insurance, Alpha Insurance",77,21
+53954fc0ca42340cb5b8b581,Sukkur National Clinic,Sukkur,"103 Model Town C Block, Sukkur",3.8,30,2025-04-01T05:20:01+00:00,0356-9353822,"Alpha Insurance, Delta Care",481,28
+440fbc9e099255b7a12f7cad,Peshawar City Medical Center,Peshawar,"107 Satellite Town, Peshawar",4.8,84,2025-04-01T05:52:34+00:00,0343-9448566,"Gamma Health, Epsilon Assurance",187,15
+4afc9518c19a0d9cc0fbc0b5,Mardan City Hospital,Mardan,"128 University Road, Mardan",3.6,107,2025-04-01T11:31:14+00:00,0351-3971433,"Delta Care, Beta Insurance",359,34
+88aa512ba97e3224bbb15585,Sialkot City Clinic,Sialkot,"93 Allama Iqbal Road, Sialkot",4.8,64,2025-04-01T04:02:09+00:00,0346-9525771,"Gamma Health, Delta Care",148,34
+ada9d5f2a343bba33acc17aa,Quetta Central Medical Center,Quetta,"174 University Road, Quetta",3.7,22,2025-04-01T03:01:28+00:00,0332-8466543,"Delta Care, Alpha Insurance",339,45
+b7261b01493317a56fdf0314,Peshawar City Clinic,Peshawar,"190 North Nazimabad Block H, Peshawar",4.7,26,2025-04-01T04:07:07+00:00,0367-3702267,"Beta Insurance, Gamma Health",251,16
+29dae8b7f8905d5dbc701f5b,Bahawalpur Regional Medical Center,Bahawalpur,"151 Zamzama Street, Bahawalpur",5.0,96,2025-04-01T10:10:35+00:00,0376-6308651,"Epsilon Assurance, Gamma Health",115,98
+7f5c959e6599accd0ab91aac,Islamabad Regional Medical Center,Islamabad,"44 Bahria Town Sector E, Islamabad",4.8,58,2025-04-01T08:32:51+00:00,0379-7735336,"Delta Care, Beta Insurance",203,19
+e99053147588df927d11b5b8,Peshawar Central Clinic,Peshawar,"3 GT Road, Peshawar",4.8,11,2025-04-01T13:28:41+00:00,0333-9860533,"Gamma Health, Alpha Insurance",113,96
+76d5aa086f7350a282662522,Rawalpindi City Hospital,Rawalpindi,"133 M. M. Alam Road, Rawalpindi",4.6,112,2025-04-01T04:57:09+00:00,0374-8001413,"Gamma Health, Delta Care",424,44
+018a3ce6f7fb35aa4a20277a,Bahawalpur City Medical Center,Bahawalpur,"194 DHA Phase 6, Bahawalpur",4.9,23,2025-04-01T10:35:32+00:00,0321-5215306,"Beta Insurance, Delta Care",278,87
+97ae4cec084e3bef4b3640b6,Sialkot City Hospital,Sialkot,"26 GT Road, Sialkot",3.7,112,2025-04-01T02:26:55+00:00,0331-3148596,"Beta Insurance, Alpha Insurance",67,65
+0ffe1241bd74f2696eb45a22,Larkana Regional Medical Center,Larkana,"49 Blue Area, Larkana",4.0,80,2025-04-01T14:25:57+00:00,0393-2377633,"Beta Insurance, Epsilon Assurance",355,19
+a75e32c286574179895d264d,Quetta National Clinic,Quetta,"33 Airport Road, Quetta",4.7,30,2025-04-01T05:22:01+00:00,0330-5387837,"Gamma Health, Delta Care",246,90
+11d02162ec16aacd6bb974ad,Sukkur National Medical Center,Sukkur,"197 Satellite Town, Sukkur",4.2,31,2025-04-01T19:57:56+00:00,0333-9473033,"Alpha Insurance, Delta Care",437,82
+3fdb004da6bbe71153492b2f,Hyderabad National Medical Center,Hyderabad,"151 Jail Road, Hyderabad",3.7,14,2025-04-01T16:45:39+00:00,0386-1530476,"Beta Insurance, Epsilon Assurance",101,58
+94b7df85e570a4bdc1df6c5c,Lahore Central Medical Center,Lahore,"166 F-8/3 Street, Lahore",4.6,102,2025-04-01T14:23:38+00:00,0311-4119323,"Delta Care, Epsilon Assurance",417,96
+331993061f3449224516e7b2,Islamabad National Clinic,Islamabad,"100 Saddar Road, Islamabad",3.7,59,2025-04-01T19:26:54+00:00,0329-3028349,"Beta Insurance, Gamma Health",484,60
+c36f1d17d5d08297037187e6,Bahawalpur Central Hospital,Bahawalpur,"164 M. M. Alam Road, Bahawalpur",4.9,55,2025-04-01T05:42:19+00:00,0355-4927327,"Delta Care, Epsilon Assurance",398,74
+39a80ec43be28318d88be37a,Gujranwala Central Clinic,Gujranwala,"64 Model Town C Block, Gujranwala",4.8,105,2025-04-01T06:04:08+00:00,0339-7026294,"Alpha Insurance, Beta Insurance",431,32
+fbf508990aa1b340037cede6,Bahawalpur Regional Medical Center,Bahawalpur,"30 Jail Road, Bahawalpur",3.8,29,2025-04-01T16:44:50+00:00,0317-5118490,"Delta Care, Gamma Health",190,39
+94d4f50afbec4a578deea241,Islamabad Central Medical Center,Islamabad,"171 Sarwar Road, Islamabad",4.2,115,2025-04-01T04:52:35+00:00,0331-8088247,"Alpha Insurance, Delta Care",229,60
+1c5b3ebc4673822e61412466,Bahawalpur General Clinic,Bahawalpur,"55 Zamzama Street, Bahawalpur",4.0,99,2025-04-01T18:58:44+00:00,0397-2258921,"Delta Care, Epsilon Assurance",139,48
+0b914ccb388e8faaaa0fef05,Sukkur Regional Hospital,Sukkur,"20 North Nazimabad Block H, Sukkur",4.5,81,2025-04-01T17:19:48+00:00,0383-1207705,"Epsilon Assurance, Delta Care",492,22
+edaf118edc54e67c60826ed2,Sialkot National Hospital,Sialkot,"20 Gulshan-e-Iqbal Block 7, Sialkot",4.3,119,2025-04-01T07:24:59+00:00,0352-3540060,"Beta Insurance, Epsilon Assurance",83,79
+60a413242d1a4337e796c6ee,Multan Regional Medical Center,Multan,"105 Blue Area, Multan",4.7,24,2025-04-01T23:03:01+00:00,0389-2744363,"Beta Insurance, Epsilon Assurance",358,55
+4cc75f27215046b89402380f,Gujranwala Regional Medical Center,Gujranwala,"169 University Road, Gujranwala",4.7,82,2025-04-01T01:51:22+00:00,0326-5809355,"Delta Care, Epsilon Assurance",96,74
+f65670a0dfb70a804ae03a40,Gujranwala General Clinic,Gujranwala,"65 Johar Town Main Road, Gujranwala",4.2,85,2025-04-01T18:20:53+00:00,0357-8321723,"Epsilon Assurance, Gamma Health",152,89
+4813e46c686316ff0094792b,Islamabad National Clinic,Islamabad,"119 Bahria Town Sector E, Islamabad",4.9,86,2025-04-01T09:38:11+00:00,0350-3437206,"Epsilon Assurance, Beta Insurance",153,92
+9027aecdd908134cb76b1d1f,Quetta National Hospital,Quetta,"108 Sarwar Road, Quetta",4.1,84,2025-04-01T10:51:42+00:00,0388-8680012,"Gamma Health, Epsilon Assurance",83,36
+ae416a68316d6bb8e2254980,Islamabad General Hospital,Islamabad,"61 GT Road, Islamabad",4.5,111,2025-04-01T00:09:16+00:00,0372-5494841,"Beta Insurance, Epsilon Assurance",495,94
+02d7d9f6a7ba862c92a3cef7,Quetta City Clinic,Quetta,"23 F-8/3 Street, Quetta",3.7,72,2025-04-01T00:26:27+00:00,0377-6705257,"Alpha Insurance, Epsilon Assurance",390,35
+27e2692c6922aed598a1f9b1,Karachi National Clinic,Karachi,"2 Zamzama Street, Karachi",4.1,59,2025-04-01T02:54:41+00:00,0364-5459807,"Beta Insurance, Alpha Insurance",177,10
+8ae2ff64d3d2fb84012784db,Faisalabad Central Hospital,Faisalabad,"125 Gulberg Main Boulevard, Faisalabad",3.5,36,2025-04-01T16:46:24+00:00,0382-4169362,"Delta Care, Epsilon Assurance",222,49
+fdbd63a3018f73ce6241dda2,Islamabad General Hospital,Islamabad,"59 Jail Road, Islamabad",4.5,42,2025-04-01T19:32:58+00:00,0378-1943809,"Alpha Insurance, Epsilon Assurance",74,16
+15c073f3d00c082442b48756,Gujranwala National Hospital,Gujranwala,"189 M. M. Alam Road, Gujranwala",3.5,113,2025-04-01T00:30:48+00:00,0393-5509916,"Epsilon Assurance, Gamma Health",459,67
+dc6dd7df32db7de8e0f8b3f1,Larkana Regional Medical Center,Larkana,"120 Canal Bank Road, Larkana",4.1,96,2025-04-01T12:05:55+00:00,0385-2130346,"Alpha Insurance, Beta Insurance",105,38
+3f569d184071638ac78c9c8a,Gujranwala General Clinic,Gujranwala,"181 Iqbal Town Main Blvd, Gujranwala",3.5,55,2025-04-01T11:21:52+00:00,0358-9261077,"Alpha Insurance, Delta Care",189,46
+53f9d0e91c4c6228884a2587,Larkana Regional Medical Center,Larkana,"191 Ferozepur Road, Larkana",4.5,24,2025-04-01T16:58:43+00:00,0358-3852759,"Beta Insurance, Alpha Insurance",52,23
+8a98e951e29c01f38df26414,Larkana City Medical Center,Larkana,"59 Canal Bank Road, Larkana",4.7,83,2025-04-01T06:31:26+00:00,0339-2076230,"Alpha Insurance, Epsilon Assurance",134,95
+1133bd59e7c65307160c6a97,Faisalabad National Clinic,Faisalabad,"67 Saddar Road, Faisalabad",4.3,62,2025-04-01T08:00:57+00:00,0367-7128387,"Delta Care, Epsilon Assurance",474,44
+0903c8c4a1b86f5275d36dc6,Gujranwala National Clinic,Gujranwala,"181 Johar Town Main Road, Gujranwala",4.8,72,2025-04-01T11:10:01+00:00,0337-7531469,"Delta Care, Alpha Insurance",194,20
+b6d04ecb3fd2f1a135dfaa33,Mardan Central Clinic,Mardan,"161 DHA Phase 6, Mardan",4.5,112,2025-04-01T03:22:52+00:00,0341-9144298,"Alpha Insurance, Beta Insurance",187,21
+598658143f216f1e72a802e7,Quetta National Medical Center,Quetta,"138 Sarwar Road, Quetta",4.3,79,2025-04-01T07:03:05+00:00,0329-1546749,"Epsilon Assurance, Gamma Health",84,13
+c90106fa1e344108c62e0bfe,Multan General Medical Center,Multan,"70 Airport Road, Multan",4.4,52,2025-04-01T02:51:26+00:00,0316-9629523,"Gamma Health, Delta Care",266,55
+b28d7f55acd656b6e89266ba,Karachi National Hospital,Karachi,"54 University Road, Karachi",4.5,10,2025-04-01T14:44:02+00:00,0382-9907460,"Epsilon Assurance, Beta Insurance",245,84
+2c1842d8adb6b42994e96719,Rawalpindi Regional Hospital,Rawalpindi,"187 Shahrah-e-Faisal, Rawalpindi",4.2,78,2025-04-01T23:31:27+00:00,0382-5513949,"Delta Care, Alpha Insurance",168,55
+ad2930e4b9912975950e46ab,Faisalabad Regional Medical Center,Faisalabad,"55 Allama Iqbal Road, Faisalabad",4.2,54,2025-04-01T13:06:29+00:00,0397-5409277,"Epsilon Assurance, Gamma Health",246,100
+9fcd36db4af073ca0e0ca7bf,Rawalpindi National Clinic,Rawalpindi,"3 Shalimar Link Road, Rawalpindi",3.9,80,2025-04-01T11:50:36+00:00,0312-4736324,"Alpha Insurance, Epsilon Assurance",246,85
+5d656413f2a8b2a343c85165,Gujranwala City Medical Center,Gujranwala,"176 University Road, Gujranwala",5.0,97,2025-04-01T19:27:19+00:00,0359-3299921,"Alpha Insurance, Delta Care",164,91
+d5d61435e9d551429a963f4c,Sialkot National Medical Center,Sialkot,"170 Saddar Road, Sialkot",4.6,55,2025-04-01T00:43:20+00:00,0316-1640062,"Beta Insurance, Delta Care",477,15
+8cbf4b5adeb7479c2e7fae50,Quetta National Clinic,Quetta,"195 Gulshan-e-Iqbal Block 7, Quetta",4.8,77,2025-04-01T03:01:24+00:00,0325-3885571,"Alpha Insurance, Epsilon Assurance",385,66
+c9240702c63e33c3e5124957,Bahawalpur City Medical Center,Bahawalpur,"9 GT Road, Bahawalpur",4.6,58,2025-04-01T16:51:24+00:00,0373-3036884,"Beta Insurance, Delta Care",462,97
+c5c75c1a410201aeac445953,Multan Regional Medical Center,Multan,"31 Model Town C Block, Multan",4.3,79,2025-04-01T09:43:13+00:00,0343-8409702,"Beta Insurance, Epsilon Assurance",349,61
+22f069c3769022ec4b465053,Bahawalpur General Medical Center,Bahawalpur,"133 Bahria Town Sector E, Bahawalpur",3.9,108,2025-04-01T11:16:33+00:00,0396-8438028,"Delta Care, Epsilon Assurance",464,12
+0264614405a8849e0553e346,Rawalpindi Regional Medical Center,Rawalpindi,"105 Saddar Road, Rawalpindi",3.6,77,2025-04-01T21:23:29+00:00,0398-9245925,"Beta Insurance, Epsilon Assurance",178,40
+13dad5c84f48b34664546662,Islamabad Regional Clinic,Islamabad,"12 Blue Area, Islamabad",4.6,21,2025-04-01T22:13:02+00:00,0381-8637839,"Beta Insurance, Gamma Health",109,86
+330bd20cc3dd864345e2676d,Bahawalpur National Medical Center,Bahawalpur,"59 Gulshan-e-Iqbal Block 7, Bahawalpur",4.4,13,2025-04-01T15:09:29+00:00,0393-8733105,"Delta Care, Alpha Insurance",481,97
+45e2abfcd7bfead1d7224c4e,Larkana National Medical Center,Larkana,"44 University Road, Larkana",4.5,109,2025-04-01T21:50:33+00:00,0323-9598569,"Beta Insurance, Epsilon Assurance",261,48
+ecf1972dca7eecdac20d8cd7,Sialkot National Clinic,Sialkot,"187 Allama Iqbal Road, Sialkot",4.2,21,2025-04-01T08:44:31+00:00,0355-5065176,"Gamma Health, Epsilon Assurance",480,65
+d50117aec4a50a6f32752b94,Sialkot National Clinic,Sialkot,"129 G-10 Markaz, Sialkot",4.8,32,2025-04-01T21:02:17+00:00,0316-9563275,"Epsilon Assurance, Delta Care",232,28
