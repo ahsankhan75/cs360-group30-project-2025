@@ -218,7 +218,7 @@ const HospitalFilters = ({ onFilterChange }) => {
         <div>
           <label className="block font-medium">Medical Imaging</label>
           <div className="flex flex-wrap gap-2">
-            {["MRI", "CT Scan", "X-Ray", "Ultrasound"].map((type) => (
+            {["MRI", "CT", "X-Ray", "Ultrasound"].map((type) => (
               <label key={type} className="flex items-center">
                 <input
                   type="checkbox"

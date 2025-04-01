@@ -1,3 +1,68 @@
+import React, { useState } from "react";
+
+const HoverMenu = ({ label, options }) => {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <div
+      style={{ position: "relative", display: "inline-block", marginRight: "10px" }}
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <button
+        style={{
+          padding: "12px 30px",
+          border: label === "Sign up" ? "2px solid #0694A2" : "none",
+          color: label === "Sign up" ? "#0694A2" : "white",
+          backgroundColor: label === "Sign up" ? "white" : "#0694A2",
+          borderRadius: "8px",
+          textDecoration: "none",
+          fontWeight: "600",
+          cursor: "pointer"
+        }}
+      >
+        {label}
+      </button>
+      {hovered && (
+        <div
+          style={{
+            position: "absolute",
+            top: "100%",
+            left: 0,
+            backgroundColor: "white",
+            border: "1px solid #ccc",
+            borderRadius: "8px",
+            boxShadow: "0 2px 10px rgba(0,0,0,0.1)",
+            zIndex: 999,
+            minWidth: "180px",
+            textAlign: "left"
+          }}
+        >
+          {options.map((opt, idx) => (
+            <a
+              key={idx}
+              href={opt.href}
+              style={{
+                display: "block",
+                padding: "10px 20px",
+                color: "#0694A2",
+                textDecoration: "none",
+                fontWeight: "500"
+              }}
+              onMouseEnter={(e) => (e.target.style.backgroundColor = "#f0f0f0")}
+              onMouseLeave={(e) => (e.target.style.backgroundColor = "white")}
+            >
+              {opt.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+};
+
+
+
 const Home = () => {
   // Adjustable position for the text and button block
   const textX = "-50px"; // left/right
@@ -36,45 +101,31 @@ const Home = () => {
         </svg>
       </div>
 
-      {/* ✅ Text + Buttons */}
-      <div style={textContainerStyle}>
+    
+
+<div style={textContainerStyle}>
         <h1 style={{ fontWeight: "bold", fontSize: "48px", color: "#0694A2", marginBottom: "10px", letterSpacing: "2px" }}>
           EMCON
         </h1>
-
         <p style={{ color: "#0694A2", fontSize: "20px", marginBottom: "30px" }}>
           Smart healthcare navigation for everyone
         </p>
-        <a 
-          href="/signup" 
-          style={{
-            padding: "12px 30px",
-            border: "2px solid #0694A2",
-            color: "#0694A2",
-            backgroundColor: "white",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600",
-            marginRight: "10px"
-          }}
-        >
-          Sign up
-        </a>
-        <a 
-          href="/login" 
-          style={{
-            padding: "12px 30px",
-            backgroundColor: "#0694A2",
-            color: "white",
-            borderRadius: "8px",
-            textDecoration: "none",
-            fontWeight: "600"
-          }}
-        >
-          Login
-        </a>
 
-      
+        <HoverMenu
+          label="Sign up"
+          options={[
+            { label: "For Users", href: "/signup" },
+            { label: "For Hospital Admin", href: "/signup" }
+          ]}
+        />
+
+        <HoverMenu
+          label="Login"
+          options={[
+            { label: "For Users", href: "/login" },
+            { label: "For Hospital Admin", href: "/login" }
+          ]}
+        />
       </div>
 
       {/* ✅ Image in separate div */}
