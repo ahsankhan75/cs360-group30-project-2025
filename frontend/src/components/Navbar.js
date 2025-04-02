@@ -17,7 +17,7 @@ const Navbar = () => {
         <a href="/" className="hover:text-[#15aacf]">Home</a>
         <a href="/hospitals" className="hover:text-[#15aacf]">Find Hospitals</a>
         <a href="#insurance" className="hover:text-[#15aacf]">Insurance</a>
-        <a href="#donations" className="hover:text-[#15aacf]">Donations</a>
+        <a href="/requests" className="hover:text-[#15aacf]">Donations</a>
         <a href="#medical-card" className="hover:text-[#15aacf]">Medical Card</a>
       </nav>
     </header>

@@ -8,6 +8,7 @@ import Signup from './pages/Signup'
 import Navbar from './components/Navbar'
 import Hospitals from "./pages/Hospitals";
 import Home from "./pages/Home";
+import BloodRequestsPage from './pages/BloodRequestsPage'
 // import "./Background.css";
 
 
@@ -46,10 +47,15 @@ function App() {
               path="/signup" 
               element={!user ? <Signup /> : <Navigate to="/hospitals" />} 
             />
-             <Route 
+            <Route 
               path="/" 
               element={<Home />} 
             />
+            <Route 
+              path="/requests" 
+              element={<BloodRequestsPage />} 
+            />
+            
             
             {/* <Route 
               path="/hospitals" 

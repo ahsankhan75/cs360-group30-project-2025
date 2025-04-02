@@ -17,25 +17,6 @@ function Signup() {
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">
-      {/* SVG Background Shape */}
-
-
-      {/* Created a separate NavBar.js file in components and used it directly in App.js */}
-      
-      
-      {/* HEADER */}
-      {/* <header className="bg-white p-4 md:p-6 flex justify-start items-center"> 
-        <img src="/kk.png" alt="EMCON Logo" className="w-24 h-auto mr-6" />
-        <nav className="flex space-x-6">
-          <a href="#home" className="hover:text-[#15aacf]">Home</a>
-          <a href="#find-hospitals" className="hover:text-[#15aacf]">Find Hospitals</a>
-          <a href="#insurance" className="hover:text-[#15aacf]">Insurance</a>
-          <a href="#donations" className="hover:text-[#15aacf]">Donations</a>
-          <a href="#medical-card" className="hover:text-[#15aacf]">Medical Card</a>
-        </nav>
-      </header> */}
-
-      {/* MAIN CONTENT */}
       <main className="flex-1 flex justify-center items-center p-6 relative">
         <div className="absolute left-0 top-0 h-full w-auto z-[1]">
           <svg
