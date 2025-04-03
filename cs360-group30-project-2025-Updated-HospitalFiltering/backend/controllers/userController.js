@@ -46,4 +46,18 @@ const signupAdmin = async (req, res) => {
   }
 }
 
-module.exports = { signupUser, loginUser , signupAdmin }
+// Add this new function in your file, for example below loginUser
+const loginAdmin = async (req, res) => {
+    const { email, password } = req.body;
+    try {
+      const admin = await User.adminLogin(email, password);
+      const token = createToken(admin._id);
+      res.status(200).json({ email, token });
+    } catch (error) {
+      res.status(400).json({ error: error.message });
+    }
+  }
+  
+  // Then update your export to include loginAdmin:
+  module.exports = { signupUser, loginUser, signupAdmin, loginAdmin }
+  

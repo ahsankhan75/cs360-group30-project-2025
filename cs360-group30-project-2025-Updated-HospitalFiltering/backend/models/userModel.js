@@ -71,7 +71,7 @@ userSchema.statics.login = async function(email, password) {
   if (!match) {
     throw Error('Incorrect password');
   }
-  
+
   return user;
 }
 
@@ -157,6 +157,23 @@ userSchema.statics.signupAsAdmin = async function(
   });
 
   return result;
+}
+// Add this below your existing static methods
+userSchema.statics.adminLogin = async function(email, password) {
+  if (!email || !password) {
+    throw Error('All fields must be filled');
+  }
+  // Directly query the "admins" collection
+  const adminsCollection = mongoose.connection.collection('admins');
+  const admin = await adminsCollection.findOne({ email: email });
+  if (!admin) {
+    throw Error('Incorrect email');
+  }
+  const match = await bcrypt.compare(password, admin.password);
+  if (!match) {
+    throw Error('Incorrect password');
+  }
+  return admin;
 }
 
 module.exports = mongoose.model('User', userSchema);
