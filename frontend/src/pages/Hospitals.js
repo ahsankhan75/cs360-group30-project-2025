@@ -71,7 +71,7 @@ const Hospitals = () => {
 
   return (
     <div className="relative p-6 min-h-screen bg-white">
-      <ProfileIcon /> {/* 👈 inserted here */}
+      <ProfileIcon /> 
 
       <h1 className="text-2xl font-bold mb-4 text-gray-800">Find Hospitals</h1>
       <HospitalFilters onFilterChange={fetchHospitals} />
