@@ -115,7 +115,7 @@ const Home = () => {
           label="Sign up"
           options={[
             { label: "For Users", href: "/signup" },
-            { label: "For Hospital Admin", href: "/signup" }
+            { label: "For Hospital Admin", href: "/signupasadmin" }
           ]}
         />
 
@@ -123,7 +123,7 @@ const Home = () => {
           label="Login"
           options={[
             { label: "For Users", href: "/login" },
-            { label: "For Hospital Admin", href: "/login" }
+            { label: "For Hospital Admin", href: "/adminlogin" }
           ]}
         />
       </div>

@@ -127,7 +127,7 @@
 // export default BloodRequestTable;
 
 import React, { useState } from 'react';
-import BloodRequestRow from '/Users/salmanajmal/Desktop/SE/New/cs360-group30-project-2025-hospitalFilter/frontend/src/components/ BloodRequestRow.jsx';
+import BloodRequestRow from './ BloodRequestRow';
 
 const BloodRequestTable = ({ data }) => {
   const [page, setPage] = useState(1);
