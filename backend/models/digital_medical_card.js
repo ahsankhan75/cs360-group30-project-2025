@@ -9,7 +9,7 @@ const DigitalMedicalCardSchema = new mongoose.Schema(
       trim: true,
       match: [/^\S+@\S+\.\S+$/, "Please provide a valid email address"],
     },
-
+    name: { type: String },
     dateOfBirth: { type: Date },
     age: { type: Number },
     gender: { type: String, enum: ["Male", "Female", "Other"] },
