@@ -272,7 +272,7 @@
 
 
 import React, { useState } from 'react';
-
+import ProfileIcon from "../components/profile-icon";
 const cityCoordinates = {
   Lahore: { lat: 31.5204, lon: 74.3587 },
   Karachi: { lat: 24.8607, lon: 67.0011 },
@@ -418,6 +418,7 @@ const AddMultipleRequestsPage = () => {
 
   return (
     <div className="p-8 max-w-screen-lg mx-auto">
+       <ProfileIcon />
       <h1 className="text-3xl font-bold mb-6 text-teal-500">Add Multiple Blood Requests</h1>
       <form onSubmit={handleSubmit} className="space-y-6">
         {requests.map((req, index) => {

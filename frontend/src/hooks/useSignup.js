@@ -1,3 +1,4 @@
+// hooks/useSignup.js
 import { useState } from 'react'
 import { useAuthContext } from './useAuthContext'
 
@@ -6,14 +7,17 @@ export const useSignup = () => {
   const [isLoading, setIsLoading] = useState(null)
   const { dispatch } = useAuthContext()
 
-  const signup = async (fullName, email, password, confirmPassword) => {
+  const signup = async (fullName, email, password, confirmPassword, adminId = null) => {
     setIsLoading(true)
     setError(null)
 
-    const response = await fetch('/api/user/signup', {
+    // Use the admin endpoint if adminId is provided
+    const endpoint = adminId ? '/api/user/adminSignup' : '/api/user/signup'
+
+    const response = await fetch(endpoint, {
       method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({ fullName, email, password, confirmPassword })
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ fullName, email, password, confirmPassword, adminId })
     })
     const json = await response.json()
 
@@ -22,13 +26,13 @@ export const useSignup = () => {
       setError(json.error)
     }
     if (response.ok) {
-      // save the user to local storage
+      // Save the user to local storage
       localStorage.setItem('user', JSON.stringify(json))
 
-      // update the auth context
-      dispatch({type: 'LOGIN', payload: json})
+      // Update the auth context
+      dispatch({ type: 'LOGIN', payload: json })
 
-      // update loading state
+      // Update loading state
       setIsLoading(false)
     }
   }

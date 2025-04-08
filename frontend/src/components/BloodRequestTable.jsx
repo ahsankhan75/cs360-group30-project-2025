@@ -127,7 +127,8 @@
 // export default BloodRequestTable;
 
 import React, { useState } from 'react';
-import BloodRequestRow from './ BloodRequestRow';
+import BloodRequestRow from './BloodRequestRow';
+
 
 const BloodRequestTable = ({ data }) => {
   const [page, setPage] = useState(1);
