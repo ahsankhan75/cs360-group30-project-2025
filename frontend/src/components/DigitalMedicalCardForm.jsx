@@ -10,7 +10,7 @@ const ProfileIcon = () => (
       </div>
     </div>
   </div>
-)
+);
 const DigitalMedicalCardDisplay = ({ data }) => (
   <div className="bg-teal-500 min-h-screen p-8 flex justify-center">
     <div className="bg-white rounded-xl w-full max-w-4xl shadow-lg overflow-hidden">
@@ -22,14 +22,16 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Profile Section */}
           <div className="col-span-3">
             <div className="flex flex-col items-center mb-4">
-              <ProfileIcon1 />
-              <h2 className="text-teal-400 text-xl font-medium">{data.name }</h2>
+              <ProfileIcon />
+              <h2 className="text-teal-400 text-xl font-medium">{data.name}</h2>
             </div>
 
             <div className="bg-gray-50 p-4 rounded-md">
               <div className="mb-3">
                 <p className="text-gray-500 text-sm">Date Of Birth:</p>
-                <p className="text-gray-700">{new Date(data.dateOfBirth).toLocaleDateString()}</p>
+                <p className="text-gray-700">
+                  {new Date(data.dateOfBirth).toLocaleDateString()}
+                </p>
               </div>
               <div className="mb-3">
                 <p className="text-gray-500 text-sm">Age:</p>
@@ -49,7 +51,9 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Medical Information */}
           <div className="col-span-4">
             <div className="bg-orange-100 p-4 rounded-md h-full">
-              <h3 className="text-teal-500 font-medium text-lg mb-3">Medical Information</h3>
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Medical Information
+              </h3>
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Blood Type:</span>
@@ -58,7 +62,10 @@ const DigitalMedicalCardDisplay = ({ data }) => (
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Organ Donor:</span>
-                <span className="text-gray-700"> {data.organDonor ? "Yes" : "No"}</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.organDonor ? "Yes" : "No"}
+                </span>
               </div>
 
               <div className="mb-2">
@@ -67,23 +74,43 @@ const DigitalMedicalCardDisplay = ({ data }) => (
               </div>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Current Medications:</span>
-                <span className="text-gray-700"> {data.currentMedications}</span>
+                <span className="text-gray-700 font-medium">
+                  Current Medications:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.currentMedications}
+                </span>
               </div>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Medical Devices & Implants:</span>
-                <span className="text-gray-700"> {data.medicalDevicesImplants}</span>
+                <span className="text-gray-700 font-medium">
+                  Medical Devices & Implants:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.medicalDevicesImplants}
+                </span>
               </div>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Recent Surgeries/Hospitalizations:</span>
-                <span className="text-gray-700"> {data.recentSurgeryHospitalization}</span>
+                <span className="text-gray-700 font-medium">
+                  Recent Surgeries/Hospitalizations:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.recentSurgeryHospitalization}
+                </span>
               </div>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Dietary Restrictions:</span>
-                <span className="text-gray-700"> {data.dietaryRestrictions}</span>
+                <span className="text-gray-700 font-medium">
+                  Dietary Restrictions:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.dietaryRestrictions}
+                </span>
               </div>
             </div>
           </div>
@@ -91,7 +118,9 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Current Medications */}
           <div className="col-span-5">
             <div className="bg-orange-100 p-4 rounded-md mb-4">
-              <h3 className="text-teal-500 font-medium text-lg mb-3">Current Medications</h3>
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Current Medications
+              </h3>
 
               {data.currentMedications &&
                 data.currentMedications.split(",").map((med, idx) => (
@@ -105,22 +134,35 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Emergency Contacts */}
           <div className="col-span-4">
             <div className="bg-orange-100 p-4 rounded-md h-full">
-              <h3 className="text-teal-500 font-medium text-lg mb-3">Emergency Contacts</h3>
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Emergency Contacts
+              </h3>
 
               <div className="mb-3">
                 <p className="text-gray-700 font-medium">Primary:</p>
                 <div className="ml-2">
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Name:</span>
-                    <span className="text-gray-700"> {data.primaryEmergencyContact?.name}</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.name}
+                    </span>
                   </div>
                   <div className="mb-1">
-                    <span className="text-gray-700 font-medium">Relationship:</span>
-                    <span className="text-gray-700"> {data.primaryEmergencyContact?.relationship}</span>
+                    <span className="text-gray-700 font-medium">
+                      Relationship:
+                    </span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.relationship}
+                    </span>
                   </div>
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Phone:</span>
-                    <span className="text-gray-700"> {data.primaryEmergencyContact?.number}</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.number}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -130,15 +172,26 @@ const DigitalMedicalCardDisplay = ({ data }) => (
                 <div className="ml-2">
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Name:</span>
-                    <span className="text-gray-700"> {data.secondaryEmergencyContact?.name}</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.name}
+                    </span>
                   </div>
                   <div className="mb-1">
-                    <span className="text-gray-700 font-medium">Relationship:</span>
-                    <span className="text-gray-700"> {data.secondaryEmergencyContact?.relationship}</span>
+                    <span className="text-gray-700 font-medium">
+                      Relationship:
+                    </span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.relationship}
+                    </span>
                   </div>
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Phone:</span>
-                    <span className="text-gray-700"> {data.secondaryEmergencyContact?.number}</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.number}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -148,21 +201,36 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Insurance Information */}
           <div className="col-span-4">
             <div className="bg-orange-100 p-4 rounded-md h-full">
-              <h3 className="text-teal-500 font-medium text-lg mb-3">Insurance Information</h3>
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Insurance Information
+              </h3>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Insurance Provider:</span>
-                <span className="text-gray-700"> {data.insurance?.provider}</span>
+                <span className="text-gray-700 font-medium">
+                  Insurance Provider:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.provider}
+                </span>
               </div>
 
               <div className="mb-2">
-                <span className="text-gray-700 font-medium">Policy Number:</span>
-                <span className="text-gray-700"> {data.insurance?.policyNumber}</span>
+                <span className="text-gray-700 font-medium">
+                  Policy Number:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.policyNumber}
+                </span>
               </div>
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Group Number:</span>
-                <span className="text-gray-700"> {data.insurance?.groupNumber}</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.groupNumber}
+                </span>
               </div>
             </div>
           </div>
@@ -170,21 +238,32 @@ const DigitalMedicalCardDisplay = ({ data }) => (
           {/* Primary Physician */}
           <div className="col-span-4">
             <div className="bg-orange-100 p-4 rounded-md h-full">
-              <h3 className="text-teal-500 font-medium text-lg mb-3">Primary Physician</h3>
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Primary Physician
+              </h3>
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Name:</span>
-                <span className="text-gray-700"> {data.primaryPhysician?.name}</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.name}
+                </span>
               </div>
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Specialty:</span>
-                <span className="text-gray-700"> {data.primaryPhysician?.specialization}</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.specialization}
+                </span>
               </div>
 
               <div className="mb-2">
                 <span className="text-gray-700 font-medium">Contact:</span>
-                <span className="text-gray-700"> {data.primaryPhysician?.contact}</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.contact}
+                </span>
               </div>
             </div>
           </div>
@@ -192,7 +271,7 @@ const DigitalMedicalCardDisplay = ({ data }) => (
       </div>
     </div>
   </div>
-)
+);
 const DigitalMedicalCardForm = () => {
   const { user } = useAuthContext();
   const [formData, setFormData] = useState({
@@ -359,6 +438,7 @@ const DigitalMedicalCardForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-10 mb-10">
+      <ProfileIcon1 />
       <ProfileIcon />
       <h2 className="text-2xl font-bold text-teal-500 mb-6">
         Create Digital Medical Card
@@ -367,7 +447,7 @@ const DigitalMedicalCardForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <InputField
+          <InputField
             label="Name"
             name="name"
             value={formData.name}
