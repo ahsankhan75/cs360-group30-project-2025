@@ -14,8 +14,6 @@
 
 // // import "./Background.css";
 
-
-
 // function App() {
 //   const { user } = useAuthContext()
 //   console.log("Current User:", user);
@@ -37,26 +35,26 @@
 //         <Navbar />
 //         <div className="pages">
 //           <Routes>
-//           <Route 
-//             path="/hospitals" 
-//             element={<Hospitals />} 
+//           <Route
+//             path="/hospitals"
+//             element={<Hospitals />}
 //           />
-//              <Route 
-//               path="/login" 
-//               element={!user ? <Login /> : <Navigate to="/hospitals" />} 
+//              <Route
+//               path="/login"
+//               element={!user ? <Login /> : <Navigate to="/hospitals" />}
 //             />
-            
-//             <Route 
-//               path="/signup" 
-//               element={!user ? <Signup /> : <Navigate to="/hospitals" />} 
+
+//             <Route
+//               path="/signup"
+//               element={!user ? <Signup /> : <Navigate to="/hospitals" />}
 //             />
-//             <Route 
-//               path="/" 
-//               element={<Home />} 
+//             <Route
+//               path="/"
+//               element={<Home />}
 //             />
-//             {/* <Route 
-//               path="/requests" 
-//               element={<BloodRequestsPage />} 
+//             {/* <Route
+//               path="/requests"
+//               element={<BloodRequestsPage />}
 //             /> */}
 //            <BrowserRouter>
 //       <Routes>
@@ -108,7 +106,7 @@
 //             <Route path="/requests" element={<BloodRequestsPage />} />
 //             <Route path="/requests/:requestId" element={<BloodRequestDetailPage />} />
 //           </Routes>
-          
+
 //         </div>
 //       </BrowserRouter>
 //       <Route path="/admin/requests" element={< AddMultipleRequestsPage/>} />
@@ -117,8 +115,6 @@
 // }
 
 // export default App;
-
-
 
 //LAST VERSION
 // import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
@@ -166,22 +162,21 @@
 
 // export default App;
 
-
-
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
-import { useAuthContext } from './hooks/useAuthContext';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { useAuthContext } from "./hooks/useAuthContext";
 
 // pages & components
-import Login from './pages/Login';
-import Signup from './pages/Signup';
-import Navbar from './components/Navbar';
-import Hospitals from './pages/Hospitals';
-import Home from './pages/Home';
-import BloodRequestsPage from './pages/BloodRequestsPage';
-import BloodRequestDetailPage from './pages/BloodRequestDetailPage';
-import AddMultipleRequestsPage from './pages/AddMultipleRequestsPage';
-import AdminLogin from './pages/AdminLogin';
-import SignupAsAdmin from './pages/SignupAsAdmin';
+import Login from "./pages/Login";
+import Signup from "./pages/Signup";
+import Navbar from "./components/Navbar";
+import Hospitals from "./pages/Hospitals";
+import Home from "./pages/Home";
+import BloodRequestsPage from "./pages/BloodRequestsPage";
+import BloodRequestDetailPage from "./pages/BloodRequestDetailPage";
+import AddMultipleRequestsPage from "./pages/AddMultipleRequestsPage";
+import AdminLogin from "./pages/AdminLogin";
+import SignupAsAdmin from "./pages/SignupAsAdmin";
+import DigitalMedicalCardForm from "./components/DigitalMedicalCardForm";
 
 function App() {
   const { user } = useAuthContext();
@@ -204,16 +199,29 @@ function App() {
               element={!user ? <Signup /> : <Navigate to="/hospitals" />}
             />
             <Route path="/requests" element={<BloodRequestsPage />} />
-            <Route path="/requests/:requestId" element={<BloodRequestDetailPage />} />
-            <Route path="/admin/requests" element={<AddMultipleRequestsPage />} />
+            <Route
+              path="/requests/:requestId"
+              element={<BloodRequestDetailPage />}
+            />
+            <Route
+              path="/admin/requests"
+              element={<AddMultipleRequestsPage />}
+            />
             <Route
               path="/adminlogin"
-              element={!user ? <AdminLogin /> : <Navigate to="/admin/requests" />}
+              element={
+                !user ? <AdminLogin /> : <Navigate to="/admin/requests" />
+              }
             />
             <Route
               path="/signupasadmin"
-              element={!user ? <SignupAsAdmin /> : <Navigate to="/admin/requests" />}
+              element={
+                !user ? <SignupAsAdmin /> : <Navigate to="/admin/requests" />
+              }
             />
+
+            {/* Add Routes for Digital Medical Card */}
+            <Route path="/medical-card" element={<DigitalMedicalCardForm />} />
           </Routes>
         </div>
       </BrowserRouter>
