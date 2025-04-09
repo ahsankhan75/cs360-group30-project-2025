@@ -6,6 +6,7 @@ const userRoutes = require("./routes/user");
 const emConRoutes = require("./routes/emCon");
 const bloodRequestRoutes = require("./routes/bloodRequestRoutes");
 const medicalCardRoutes = require("./routes/digitalMedicalCardRoutes");
+const reviewRoutes = require("./routes/reviewRoutes");
 
 // express app
 const app = express();
@@ -23,6 +24,7 @@ app.use("/api/hospitals", emConRoutes);
 app.use("/api/user", userRoutes);
 app.use("/api/blood-requests", bloodRequestRoutes);
 app.use("/api/medical-card", medicalCardRoutes);
+app.use("/api/reviews", reviewRoutes);
 
 // connect to db
 mongoose

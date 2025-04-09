@@ -14,6 +14,7 @@ import AddMultipleRequestsPage from "./pages/AddMultipleRequestsPage";
 import AdminLogin from "./pages/AdminLogin";
 import SignupAsAdmin from "./pages/SignupAsAdmin";
 import DigitalMedicalCardForm from "./components/DigitalMedicalCardForm";
+import Reviews from "./pages/Reviews"; // Import the new Reviews page
 
 function App() {
   const { user } = useAuthContext();
@@ -69,6 +70,10 @@ function App() {
                   <Navigate to="/medical-card" />
                 )
               }
+            />
+            <Route
+              path="/reviews"
+              element={<Reviews />}
             />
 
             <Route
