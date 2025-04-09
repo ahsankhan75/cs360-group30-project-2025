@@ -1,4 +1,3 @@
-
 ///2
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { useAuthContext } from "./hooks/useAuthContext";
@@ -28,7 +27,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="/hospitals" element={<Hospitals />} />
-            
+
             <Route
               path="/login"
               element={!user ? <Login /> : <Navigate to="/hospitals" />}
@@ -37,29 +36,52 @@ function App() {
               path="/signup"
               element={!user ? <Signup /> : <Navigate to="/hospitals" />}
             />
-            <Route path="/requests" element={<BloodRequestsPage />} />
+            <Route
+              path="/requests"
+              element={
+                user ? <BloodRequestsPage /> : <Navigate to="/requests" />
+              }
+            />
             <Route
               path="/requests/:requestId"
-              element={<BloodRequestDetailPage />}
+              element={
+                user ? <BloodRequestDetailPage /> : <Navigate to="/requests" />
+              }
             />
 
             {/* Protected Routes */}
             <Route
               path="/admin/requests"
-              element={user ? <AddMultipleRequestsPage /> : <Navigate to="/adminlogin" />}
+              element={
+                user ? (
+                  <AddMultipleRequestsPage />
+                ) : (
+                  <Navigate to="/adminlogin" />
+                )
+              }
             />
             <Route
               path="/medical-card"
-              element={user ? <DigitalMedicalCardForm /> : <Navigate to="/medical-card" />}
+              element={
+                user ? (
+                  <DigitalMedicalCardForm />
+                ) : (
+                  <Navigate to="/medical-card" />
+                )
+              }
             />
 
             <Route
               path="/adminlogin"
-              element={!user ? <AdminLogin /> : <Navigate to="/admin/requests" />}
+              element={
+                !user ? <AdminLogin /> : <Navigate to="/admin/requests" />
+              }
             />
             <Route
               path="/signupasadmin"
-              element={!user ? <SignupAsAdmin /> : <Navigate to="/admin/requests" />}
+              element={
+                !user ? <SignupAsAdmin /> : <Navigate to="/admin/requests" />
+              }
             />
           </Routes>
         </div>

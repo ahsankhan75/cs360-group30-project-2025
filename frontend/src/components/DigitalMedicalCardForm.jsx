@@ -1,149 +1,281 @@
 import { useAuthContext } from "../hooks/useAuthContext";
-import ProfileIcon from "../components/profile-icon";
+import ProfileIcon1 from "../components/profile-icon";
 import { useEffect, useState } from "react";
-
-const DigitalMedicalCardDisplay = ({ data }) => (
-  <div className="max-w-7xl mx-auto p-6 bg-white rounded shadow mt-10 mb-10 space-y-6">
-    <ProfileIcon />
-    <h2 className="text-2xl font-bold text-teal-500 mb-6">
-      Your Digital Medical Card
-    </h2>
-
-    {/* Left big vertical card */}
-    <div className="flex space-x-6">
-      <div className="w-1/2 bg-orange-200 p-6 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-xl font-bold text-teal-500">
-          Personal Information
-        </h3>
-        <p className="text-teal-500">
-          <strong>Date of Birth:</strong>{" "}
-          {new Date(data.dateOfBirth).toLocaleDateString()}
-        </p>
-        <p className="text-teal-500">
-          <strong>Age:</strong> {data.age}
-        </p>
-        <p className="text-teal-500">
-          <strong>Gender:</strong> {data.gender}
-        </p>
-        <p className="text-teal-500">
-          <strong>Contact Number:</strong> {data.userContactNumber}
-        </p>
+const ProfileIcon = () => (
+  <div className="w-32 h-32 bg-blue-100 rounded-full overflow-hidden mb-3 flex items-center justify-center">
+    <div className="relative w-full h-full">
+      <div className="absolute inset-0 bg-blue-200 rounded-full"></div>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <div className="w-20 h-20 bg-orange-300 rounded-full relative top-8"></div>
       </div>
-
-      {/* Medical Information Card */}
-      <div className="w-1/2 bg-orange-200 p-6 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-xl font-bold text-teal-500">Medical Information</h3>
-        <p className="text-teal-500">
-          <strong>Blood Type:</strong> {data.bloodType}
-        </p>
-        <p className="text-teal-500">
-          <strong>Organ Donor:</strong> {data.organDonor ? "Yes" : "No"}
-        </p>
-        <p className="text-teal-500">
-          <strong>Allergies:</strong> {data.allergies}
-        </p>
-        <p className="text-teal-500">
-          <strong>Current Medications:</strong> {data.currentMedications}
-        </p>
-        <p className="text-teal-500">
-          <strong>Medical Devices/Implants:</strong>{" "}
-          {data.medicalDevicesImplants}
-        </p>
-        <p className="text-teal-500">
-          <strong>Recent Surgery/Hospitalization:</strong>{" "}
-          {data.recentSurgeryHospitalization}
-        </p>
-        <p className="text-teal-500">
-          <strong>Dietary Restrictions:</strong> {data.dietaryRestrictions}
-        </p>
-      </div>
-    </div>
-
-    {/* Right side cards */}
-    <div className="flex space-x-6">
-      {/* Current Medications Card */}
-      <div className="w-1/3 bg-orange-200 p-6 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-xl font-bold text-teal-500">Current Medications</h3>
-        <p className="text-teal-500">
-          {data.currentMedications.split(",").map((med, idx) => (
-            <span key={idx} className="block">
-              {med.trim()}
-            </span>
-          ))}
-        </p>
-      </div>
-
-      {/* Emergency Contacts Card */}
-      <div className="w-1/3 bg-orange-200 p-6 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-xl font-bold text-teal-500">Emergency Contacts</h3>
-        <div className="space-y-2">
-          <p className="text-teal-500">
-            <strong>Primary</strong>
-          </p>
-          <p className="text-teal-500">
-            <strong>Name:</strong> {data.primaryEmergencyContact.name}
-          </p>
-          <p className="text-teal-500">
-            <strong>Relationship:</strong>{" "}
-            {data.primaryEmergencyContact.relationship}
-          </p>
-          <p className="text-teal-500">
-            <strong>Contact:</strong> {data.primaryEmergencyContact.number}
-          </p>
-        </div>
-        <div className="space-y-2">
-          <p className="text-teal-500">
-            <strong>Secondary</strong>
-          </p>
-          <p className="text-teal-500">
-            <strong>Name:</strong> {data.secondaryEmergencyContact.name}
-          </p>
-          <p className="text-teal-500">
-            <strong>Relationship:</strong>{" "}
-            {data.secondaryEmergencyContact.relationship}
-          </p>
-          <p className="text-teal-500">
-            <strong>Contact:</strong> {data.secondaryEmergencyContact.number}
-          </p>
-        </div>
-      </div>
-
-      {/* Insurance Information Card */}
-      <div className="w-1/3 bg-orange-200 p-6 rounded-lg shadow-lg space-y-4">
-        <h3 className="text-xl font-bold text-teal-500">
-          Insurance Information
-        </h3>
-        <p className="text-teal-500">
-          <strong>Provider:</strong> {data.insurance.provider}
-        </p>
-        <p className="text-teal-500">
-          <strong>Policy Number:</strong> {data.insurance.policyNumber}
-        </p>
-        <p className="text-teal-500">
-          <strong>Group Number:</strong> {data.insurance.groupNumber}
-        </p>
-      </div>
-    </div>
-
-    {/* Primary Physician Card */}
-    <div className="w-full bg-orange-200 p-6 rounded-lg shadow-lg space-y-4 mt-6">
-      <h3 className="text-xl font-bold text-teal-500">Primary Physician</h3>
-      <p className="text-teal-500">
-        <strong>Name:</strong> {data.primaryPhysician.name}
-      </p>
-      <p className="text-teal-500">
-        <strong>Specialization:</strong> {data.primaryPhysician.specialization}
-      </p>
-      <p className="text-teal-500">
-        <strong>Contact Number:</strong> {data.primaryPhysician.contact}
-      </p>
     </div>
   </div>
 );
+const DigitalMedicalCardDisplay = ({ data }) => (
+  <div className="bg-teal-500 min-h-screen p-8 flex justify-center">
+    <div className="bg-white rounded-xl w-full max-w-4xl shadow-lg overflow-hidden">
+      <div className="p-6">
+        {/* Header with logo and navigation is handled elsewhere */}
+        <ProfileIcon1 />
+        {/* Main Content */}
+        <div className="grid grid-cols-12 gap-4">
+          {/* Profile Section */}
+          <div className="col-span-3">
+            <div className="flex flex-col items-center mb-4">
+              <ProfileIcon />
+              <h2 className="text-teal-400 text-xl font-medium">{data.name}</h2>
+            </div>
 
+            <div className="bg-gray-50 p-4 rounded-md">
+              <div className="mb-3">
+                <p className="text-gray-500 text-sm">Date Of Birth:</p>
+                <p className="text-gray-700">
+                  {new Date(data.dateOfBirth).toLocaleDateString()}
+                </p>
+              </div>
+              <div className="mb-3">
+                <p className="text-gray-500 text-sm">Age:</p>
+                <p className="text-gray-700">{data.age}</p>
+              </div>
+              <div className="mb-3">
+                <p className="text-gray-500 text-sm">Gender:</p>
+                <p className="text-gray-700">{data.gender}</p>
+              </div>
+              <div className="mb-3">
+                <p className="text-gray-500 text-sm">Contact:</p>
+                <p className="text-gray-700">{data.userContactNumber}</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Medical Information */}
+          <div className="col-span-4">
+            <div className="bg-orange-100 p-4 rounded-md h-full">
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Medical Information
+              </h3>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Blood Type:</span>
+                <span className="text-gray-700"> {data.bloodType}</span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Organ Donor:</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.organDonor ? "Yes" : "No"}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Allergies:</span>
+                <span className="text-gray-700"> {data.allergies}</span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Current Medications:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.currentMedications}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Medical Devices & Implants:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.medicalDevicesImplants}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Recent Surgeries/Hospitalizations:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.recentSurgeryHospitalization}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Dietary Restrictions:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.dietaryRestrictions}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Current Medications */}
+          <div className="col-span-5">
+            <div className="bg-orange-100 p-4 rounded-md mb-4">
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Current Medications
+              </h3>
+
+              {data.currentMedications &&
+                data.currentMedications.split(",").map((med, idx) => (
+                  <div key={idx} className="mb-2">
+                    <p className="text-gray-700">{med.trim()}</p>
+                  </div>
+                ))}
+            </div>
+          </div>
+
+          {/* Emergency Contacts */}
+          <div className="col-span-4">
+            <div className="bg-orange-100 p-4 rounded-md h-full">
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Emergency Contacts
+              </h3>
+
+              <div className="mb-3">
+                <p className="text-gray-700 font-medium">Primary:</p>
+                <div className="ml-2">
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">Name:</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.name}
+                    </span>
+                  </div>
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">
+                      Relationship:
+                    </span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.relationship}
+                    </span>
+                  </div>
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">Phone:</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.primaryEmergencyContact?.number}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <p className="text-gray-700 font-medium">Secondary:</p>
+                <div className="ml-2">
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">Name:</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.name}
+                    </span>
+                  </div>
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">
+                      Relationship:
+                    </span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.relationship}
+                    </span>
+                  </div>
+                  <div className="mb-1">
+                    <span className="text-gray-700 font-medium">Phone:</span>
+                    <span className="text-gray-700">
+                      {" "}
+                      {data.secondaryEmergencyContact?.number}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Insurance Information */}
+          <div className="col-span-4">
+            <div className="bg-orange-100 p-4 rounded-md h-full">
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Insurance Information
+              </h3>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Insurance Provider:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.provider}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">
+                  Policy Number:
+                </span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.policyNumber}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Group Number:</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.insurance?.groupNumber}
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Primary Physician */}
+          <div className="col-span-4">
+            <div className="bg-orange-100 p-4 rounded-md h-full">
+              <h3 className="text-teal-500 font-medium text-lg mb-3">
+                Primary Physician
+              </h3>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Name:</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.name}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Specialty:</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.specialization}
+                </span>
+              </div>
+
+              <div className="mb-2">
+                <span className="text-gray-700 font-medium">Contact:</span>
+                <span className="text-gray-700">
+                  {" "}
+                  {data.primaryPhysician?.contact}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+);
 const DigitalMedicalCardForm = () => {
   const { user } = useAuthContext();
   const [formData, setFormData] = useState({
+    name: "",
     dateOfBirth: "",
     age: "",
     gender: "",
@@ -306,6 +438,7 @@ const DigitalMedicalCardForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-10 mb-10">
+      <ProfileIcon1 />
       <ProfileIcon />
       <h2 className="text-2xl font-bold text-teal-500 mb-6">
         Create Digital Medical Card
@@ -314,6 +447,12 @@ const DigitalMedicalCardForm = () => {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Personal Details */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <InputField
+            label="Name"
+            name="name"
+            value={formData.name}
+            onChange={handleChange}
+          />
           <InputField
             label="Date of Birth"
             name="dob"
