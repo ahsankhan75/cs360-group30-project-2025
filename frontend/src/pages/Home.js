@@ -72,8 +72,8 @@ const Home = () => {
     width: "400px",
     textAlign: "left",
     transform: `translate(${textX}, ${textY})`,
-    position: "absolute", // absolute positioning for total freedom
-    right: "300px",        // anchor to the right edge
+    position: "absolute", 
+    right: "400px",        // anchor to the right edge
     top: "290px" ,     // base vertical offset
     zIndex: 10 
   };
