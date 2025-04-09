@@ -1,5 +1,3 @@
-
-
 import React, { useState, useEffect } from 'react';
 
 const cityCoordinates = {
@@ -24,6 +22,7 @@ const cityCoordinates = {
   Sargodha: { lat: 32.0836, lon: 72.6711 },
   Mirpur: { lat: 33.1478, lon: 73.751 },
 };
+
 
 const bloodTypes = ['A+', 'A-', 'B+', 'B-', 'O+', 'O-', 'AB+', 'AB-'];
 const urgencyLevels = ['Low', 'Medium', 'High'];
