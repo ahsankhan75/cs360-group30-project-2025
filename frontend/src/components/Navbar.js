@@ -29,6 +29,9 @@ const Navbar = () => {
         <a href="/medical-card" className="hover:text-[#15aacf]">
           Medical Card
         </a>
+        <a href="/reviews" className="hover:text-[#15aacf]">
+          Reviews
+        </a>
       </nav>
     </header>
   );
