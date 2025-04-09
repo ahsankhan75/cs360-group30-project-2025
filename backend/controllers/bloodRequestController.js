@@ -121,6 +121,10 @@
 // };
 
 const BloodRequest = require('../models/blood_request');
+const requireAuth = require("../middleware/requireAuth");
+
+
+
 
 // Get all blood requests
 const getAllBloodRequests = async (req, res) => {
@@ -171,11 +175,28 @@ const getSingleBloodRequest = async (req, res) => {
   }
 };
 
-// Add multiple blood requests
+// // Add multiple blood requests
+// const addMultipleBloodRequests = async (req, res) => {
+//   try {
+//     const requests = req.body; // Array of blood request objects
+//     const saved = await BloodRequest.insertMany(requests, { ordered: false });
+//     res.status(201).json(saved);
+//   } catch (error) {
+//     res.status(400).json({ message: error.message });
+//   }
+// };
+
 const addMultipleBloodRequests = async (req, res) => {
   try {
-    const requests = req.body; // Array of blood request objects
-    const saved = await BloodRequest.insertMany(requests, { ordered: false });
+    const userEmail = req.user.email;
+    const requests = req.body;
+
+    const requestsWithEmail = requests.map((request) => ({
+      ...request,
+      email: userEmail,
+    }));
+
+    const saved = await BloodRequest.insertMany(requestsWithEmail, { ordered: false });
     res.status(201).json(saved);
   } catch (error) {
     res.status(400).json({ message: error.message });
@@ -197,11 +218,30 @@ const deleteBloodRequest = async (req, res) => {
   }
 };
 
+const acceptBloodRequest = async (req, res) => {
+  const { requestId } = req.params;
+  try {
+    const request = await BloodRequest.findOneAndUpdate(
+      { requestId },
+      { accepted: true },
+      { new: true }
+    );
+    if (!request) {
+      return res.status(404).json({ error: 'Request not found' });
+    }
+    res.json(request);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+};
+
+
 // Export all handlers
 module.exports = {
   getAllBloodRequests,
   createBloodRequest,
   getSingleBloodRequest,
   addMultipleBloodRequests,
-  deleteBloodRequest
+  deleteBloodRequest,
+  acceptBloodRequest
 };
