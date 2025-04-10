@@ -1,12 +1,9 @@
-
-
-const Hospital = require('../models/hospitalModel')
-
+const Hospital = require('../models/hospitalModel');
+const Review = require('../models/reviewModel');
 
 const findHospitalByFilter = async (req, res) => {
     try {
-
-        const { icu, ventilator, blood_bank, medicalImaging, latitude, longitude, radius } = req.query;
+        const { icu, ventilator, blood_bank, medicalImaging, latitude, longitude, radius, name, location, services, minRating } = req.query;
         
         let query = {};
         if (icu) query["resources.icu_beds"] = { $gte: parseInt(icu) };
@@ -40,12 +37,51 @@ const findHospitalByFilter = async (req, res) => {
             };
         }
 
-        const hospitals = await Hospital.find(query);
-        // console.log(hospitals)
-        res.status(200).json(hospitals);
+        // Apply additional filters based on query parameters
+        if (name) {
+            query.name = { $regex: name, $options: 'i' };
+        }
+        
+        if (location) {
+            query['location.address'] = { $regex: location, $options: 'i' };
+        }
+        
+        if (services) {
+            const servicesList = services.split(',').map(s => s.trim());
+            query.services = { $in: servicesList };
+        }
+        
+        if (minRating) {
+            query.ratings = { $gte: parseFloat(minRating) };
+        }
+
+        const hospitals = await Hospital.find(query)
+            .sort({ ratings: -1, name: 1 }); // Sort by rating (desc) and then name
+
+        // Get review counts for these hospitals
+        const hospitalIds = hospitals.map(h => h._id);
+        const reviewCounts = await Review.aggregate([
+            { $match: { hospitalId: { $in: hospitalIds } } },
+            { $group: { _id: '$hospitalId', count: { $sum: 1 } } }
+        ]);
+        
+        // Create a map of hospital ID to review count
+        const reviewCountMap = {};
+        reviewCounts.forEach(item => {
+            reviewCountMap[item._id] = item.count;
+        });
+        
+        // Add review count to each hospital
+        const hospitalsWithReviewCount = hospitals.map(hospital => {
+            const hospitalObj = hospital.toObject();
+            hospitalObj.reviewCount = reviewCountMap[hospital._id] || 0;
+            return hospitalObj;
+        });
+
+        res.status(200).json(hospitalsWithReviewCount);
     } catch (error) {
         res.status(400).json({ error: "Error fetching hospitals" });
     }
 };
 
-module.exports = { findHospitalByFilter }
+module.exports = { findHospitalByFilter };

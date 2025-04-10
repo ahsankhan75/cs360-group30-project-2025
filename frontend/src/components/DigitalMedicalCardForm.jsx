@@ -16,7 +16,6 @@ const DigitalMedicalCardDisplay = ({ data }) => (
     <div className="bg-white rounded-xl w-full max-w-4xl shadow-lg overflow-hidden">
       <div className="p-6">
         {/* Header with logo and navigation is handled elsewhere */}
-        <ProfileIcon1 />
         {/* Main Content */}
         <div className="grid grid-cols-12 gap-4">
           {/* Profile Section */}
@@ -438,7 +437,6 @@ const DigitalMedicalCardForm = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white rounded shadow mt-10 mb-10">
-      <ProfileIcon1 />
       <ProfileIcon />
       <h2 className="text-2xl font-bold text-teal-500 mb-6">
         Create Digital Medical Card

@@ -46,9 +46,6 @@ form.signup, form.login {
   border-radius: 4px;
 }
 
-
-
-
 /* adding extra code */
 /* Auth Forms - Updated */
 form.signup, form.login {
@@ -109,4 +106,124 @@ form.signup button:hover, form.login button:hover {
   margin-top: 10px;
   font-size: 14px;
   text-align: center;
+}
+
+/* Navbar and content spacing */
+.pages {
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 768px) {
+  .pages {
+    min-height: calc(100vh - 56px);
+  }
+}
+
+/* Fix for fixed navbar */
+html {
+  scroll-padding-top: 80px; /* Ensures anchors aren't hidden behind navbar */
+}
+
+/* Improve scrolling experience */
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  overflow-y: scroll;
+}
+
+/* Add these styles at the end of your existing CSS file */
+
+/* Responsive table styles */
+@media (max-width: 768px) {
+  .responsive-table-container {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+  
+  /* Custom scrollbar for table containers */
+  .responsive-table-container::-webkit-scrollbar {
+    height: 6px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-thumb {
+    background: #d1d1d1;
+    border-radius: 10px;
+  }
+  
+  .responsive-table-container::-webkit-scrollbar-thumb:hover {
+    background: #c1c1c1;
+  }
+}
+
+/* Improved toast notifications */
+.Toastify__toast {
+  border-radius: 8px !important;
+}
+
+.Toastify__toast--success {
+  background-color: rgba(34, 197, 94, 0.9) !important;
+}
+
+.Toastify__toast--error {
+  background-color: rgba(239, 68, 68, 0.9) !important;
+}
+
+.Toastify__toast--warning {
+  background-color: rgba(245, 158, 11, 0.9) !important;
+}
+
+.Toastify__toast--info {
+  background-color: rgba(59, 130, 246, 0.9) !important;
+}
+
+/* Loading spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+
+/* Focus styles for accessibility */
+:focus {
+  outline: 2px solid rgba(20, 184, 166, 0.5);
+  outline-offset: 2px;
+}
+
+/* Custom styles for range inputs */
+input[type="range"] {
+  -webkit-appearance: none;
+  height: 7px;
+  background: #e2e8f0;
+  border-radius: 5px;
+  background-image: linear-gradient(#0d9488, #0d9488);
+  background-repeat: no-repeat;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  height: 18px;
+  width: 18px;
+  border-radius: 50%;
+  background: #0d9488;
+  cursor: pointer;
+  box-shadow: 0 0 2px 0 rgba(0,0,0,0.25);
+  transition: background .3s ease-in-out;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  -webkit-appearance: none;
+  box-shadow: none;
+  border: none;
+  background: transparent;
 }

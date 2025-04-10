@@ -113,8 +113,113 @@ const getAllHospitalNames = async (req, res) => {
   }
 };
 
+// Get all reviews by the current user
+const getReviewsByUser = async (req, res) => {
+  try {
+    const userId = req.user._id;
+    
+    const reviews = await Review.find({ userId })
+      .sort({ createdAt: -1 }) // Sort by newest first
+      .populate('user', 'fullName email')
+      .populate({
+        path: 'hospitalId',
+        select: 'name location.address ratings reviewCount',
+        model: 'Hospital'
+      })
+      .exec();
+    
+    res.status(200).json(reviews);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+};
+
+// Update a review
+const updateReview = async (req, res) => {
+  const { reviewId } = req.params;
+  const { rating, comment } = req.body;
+  const userId = req.user._id;
+
+  try {
+    // Validate reviewId format
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ error: 'Invalid review ID format' });
+    }
+
+    // Find the review
+    const review = await Review.findById(reviewId);
+    
+    // Check if review exists
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+    
+    // Check if user owns the review
+    if (review.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: 'Not authorized to update this review' });
+    }
+
+    // Update the review
+    review.rating = rating || review.rating;
+    review.comment = comment !== undefined ? comment : review.comment;
+    await review.save();
+    
+    // Populate user data before sending response
+    await review.populate('user', 'fullName');
+    
+    // Update hospital average rating
+    await updateHospitalRating(review.hospitalId);
+
+    res.status(200).json(review);
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a review
+const deleteReview = async (req, res) => {
+  const { reviewId } = req.params;
+  const userId = req.user._id;
+
+  try {
+    // Validate reviewId format
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(400).json({ error: 'Invalid review ID format' });
+    }
+
+    // Find the review
+    const review = await Review.findById(reviewId);
+    
+    // Check if review exists
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+    
+    // Check if user owns the review
+    if (review.userId.toString() !== userId.toString()) {
+      return res.status(403).json({ error: 'Not authorized to delete this review' });
+    }
+
+    // Store hospitalId before deleting
+    const hospitalId = review.hospitalId;
+
+    // Delete the review
+    await Review.deleteOne({ _id: reviewId });
+    
+    // Update hospital average rating
+    await updateHospitalRating(hospitalId);
+
+    res.status(200).json({ message: 'Review deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
 module.exports = {
   getReviewsByHospital,
   createReview,
-  getAllHospitalNames
+  getAllHospitalNames,
+  getReviewsByUser,
+  updateReview,
+  deleteReview
 };

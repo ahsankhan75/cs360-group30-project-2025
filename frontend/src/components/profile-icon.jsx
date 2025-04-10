@@ -1,86 +1,74 @@
-import React, { useEffect, useState, useRef } from "react";
+import React, { useState } from "react";
+import { useAuthContext } from "../hooks/useAuthContext";
+import { useLogout } from "../hooks/useLogout";
+import { Link } from "react-router-dom";
 
 const ProfileIcon = () => {
-  const [user, setUser] = useState(null);
-  const [hovered, setHovered] = useState(false);
-  const hideTimeoutRef = useRef(null);
-
-  useEffect(() => {
-    const storedUser = localStorage.getItem("user");
-    if (storedUser) {
-      try {
-        const parsedUser = JSON.parse(storedUser);
-        if (parsedUser?.token) {
-          setUser(parsedUser);
-        }
-      } catch (error) {
-        console.error("Failed to parse user from localStorage:", error);
-      }
-    }
-  }, []);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const { user } = useAuthContext();
+  const { logout } = useLogout();
 
   const handleLogout = () => {
-    localStorage.removeItem("user");
-    window.location.href = "/";
+    logout();
+    setShowDropdown(false);
   };
 
-  const handleMouseEnter = () => {
-    clearTimeout(hideTimeoutRef.current);
-    setHovered(true);
-  };
-
-  const handleMouseLeave = () => {
-    hideTimeoutRef.current = setTimeout(() => {
-      setHovered(false);
-    }, 200); // 200ms delay before hiding
-  };
-
+  // Don't render if user is not logged in
   if (!user) return null;
 
+  // Extract first letter of email for avatar
+  const firstLetter = user.email.charAt(0).toUpperCase();
+
   return (
-    <div
-      className="fixed top-4 right-4 z-[9999]"
-      style={{ backgroundColor: "white", padding: "5px", borderRadius: "50%" }}
-      onMouseEnter={handleMouseEnter}
-      onMouseLeave={handleMouseLeave}
-    >
-      <img
-        src="/profile-icon.png"
-        alt="Profile"
-        className="w-10 h-10 rounded-full cursor-pointer border border-gray-400 shadow-lg"
-        title={user.email}
-      />
-      {/* {hovered && (
+    <div className="relative inline-block text-left">
+      <button
+        onClick={() => setShowDropdown(!showDropdown)}
+        className="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+        aria-haspopup="true"
+        aria-expanded={showDropdown}
+      >
+        {firstLetter}
+      </button>
+
+      {/* Dropdown menu */}
+      {showDropdown && (
         <div
-          className="absolute top-full right-0 mt-2 w-32 bg-white border border-gray-300 shadow-lg rounded-md"
-          onMouseEnter={handleMouseEnter}
-          onMouseLeave={handleMouseLeave}
+          className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
+          role="menu"
+          aria-orientation="vertical"
         >
-          <button
-            onClick={handleLogout}
-            className="w-full text-left px-4 py-2 text-gray-700 hover:bg-gray-100"
-          >
-            Logout
-          </button>
+          <div className="py-1" role="none">
+            <div className="px-4 py-2 border-b">
+              <p className="text-sm font-medium text-gray-900 truncate">
+                {user.email}
+              </p>
+            </div>
+            <Link
+              to="/dashboard"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              role="menuitem"
+              onClick={() => setShowDropdown(false)}
+            >
+              Dashboard
+            </Link>
+            <Link
+              to="/medical-card"
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              role="menuitem"
+              onClick={() => setShowDropdown(false)}
+            >
+              Medical Card
+            </Link>
+            <button
+              onClick={handleLogout}
+              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+              role="menuitem"
+            >
+              Sign Out
+            </button>
+          </div>
         </div>
-      )} */}
-      {hovered && (
-  <div
-    className="absolute top-full right-0 mt-2 w-64 bg-white border border-gray-300 shadow-lg rounded-md p-3"
-    onMouseEnter={handleMouseEnter}
-    onMouseLeave={handleMouseLeave}
-  >
-    <div className="mb-3 border-b pb-2 text-sm text-gray-800">
-      <div><strong>Email:</strong> {user.email}</div>
-    </div>
-    <button
-      onClick={handleLogout}
-      className="w-full text-left px-3 py-2 text-gray-700 hover:bg-gray-100 rounded"
-    >
-      Logout
-    </button>
-  </div>
-)}
+      )}
     </div>
   );
 };
