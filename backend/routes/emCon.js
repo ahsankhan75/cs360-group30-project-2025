@@ -1,18 +1,15 @@
-const express = require('express')
-const requireAuth = require('../middleware/requireAuth')
-const { findHospitalByFilter } = require('../controllers/hospitalFilterController')
-const { getAllHospitalNames } = require('../controllers/reviewController')
-const { getHospitalDetails } = require('../controllers/hospitalController')
+const express = require('express');
+const requireAuth = require('../middleware/requireAuth');
+const { findHospitalByFilter } = require('../controllers/hospitalFilterController');
+const { getHospitalsByNames, getHospital } = require('../controllers/hospitalController');
 
-const router = express.Router()
+const router = express.Router();
 
-// Public routes
+// Public routes - specific routes first
 router.get("/filter", findHospitalByFilter);
-router.get("/names", getAllHospitalNames);
-router.get("/:id", getHospitalDetails);
+router.get("/names", getHospitalsByNames);
 
-// Protected routes
-// Add any routes that need authentication here
-// router.post("/...", requireAuth, ...);
+// Parameter routes last
+router.get("/:id", getHospital);
 
-module.exports = router
+module.exports = router;

@@ -2,16 +2,43 @@ import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import StarRating from '../components/Reviews/StarRating';
-import { toast } from 'react-toastify';
 import EditReviewModal from '../components/Reviews/EditReviewModal';
+import { fetchWithErrorHandling } from '../utils/api';
 
 const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [editingReview, setEditingReview] = useState(null);
   const [totalReviewCount, setTotalReviewCount] = useState(0);
   const [averageRating, setAverageRating] = useState(0);
   const { user } = useAuthContext();
+
+  // Custom date formatter function to replace date-fns
+  const formatTimeAgo = (dateString) => {
+    try {
+      const date = new Date(dateString);
+      const now = new Date();
+      
+      const seconds = Math.floor((now - date) / 1000);
+      const minutes = Math.floor(seconds / 60);
+      const hours = Math.floor(minutes / 60);
+      const days = Math.floor(hours / 24);
+      const months = Math.floor(days / 30);
+      const years = Math.floor(days / 365);
+      
+      if (seconds < 60) return 'just now';
+      if (minutes < 60) return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
+
+      if (hours < 24) return `${hours} ${hours === 1 ? 'hour' : 'hours'} ago`;
+      if (days < 30) return `${days} ${days === 1 ? 'day' : 'days'} ago`;
+      if (months < 12) return `${months} ${months === 1 ? 'month' : 'months'} ago`;
+      return `${years} ${years === 1 ? 'year' : 'years'} ago`;
+    } catch (error) {
+      console.error('Error formatting date:', error);
+      return 'Unknown date';
+    }
+  };
 
   useEffect(() => {
     const fetchMyReviews = async () => {
@@ -20,31 +47,68 @@ const MyReviews = () => {
         return;
       }
 
+      setLoading(true);
       try {
         const response = await fetch('/api/reviews/my-reviews', {
           headers: {
             'Authorization': `Bearer ${user.token}`
           }
         });
-
+        
         if (!response.ok) {
           throw new Error('Failed to fetch your reviews');
         }
-
+        
         const data = await response.json();
-        setReviews(data);
         
-        // Calculate statistics
-        setTotalReviewCount(data.length);
-        if (data.length > 0) {
-          const avgRating = data.reduce((sum, review) => sum + review.rating, 0) / data.length;
-          setAverageRating(avgRating);
+        // Ensure data has the expected structure
+        if (data && Array.isArray(data.reviews)) {
+          setReviews(data.reviews);
+          
+          // Handle stats if they exist
+          if (data.stats) {
+            setTotalReviewCount(data.stats.totalReviewCount || 0);
+            setAverageRating(data.stats.averageRating || 0);
+          } else {
+            // Calculate stats from reviews if not provided
+            setTotalReviewCount(data.reviews.length);
+            
+            const totalRating = data.reviews.reduce(
+              (sum, review) => sum + review.rating, 
+              0
+            );
+            setAverageRating(
+              data.reviews.length > 0 
+                ? totalRating / data.reviews.length 
+                : 0
+            );
+          }
+        } else if (Array.isArray(data)) {
+          // Handle case where API returns just an array of reviews
+          setReviews(data);
+          setTotalReviewCount(data.length);
+          
+          const totalRating = data.reduce(
+            (sum, review) => sum + review.rating, 
+            0
+          );
+          setAverageRating(
+            data.length > 0 
+              ? totalRating / data.length 
+              : 0
+          );
+        } else {
+          // Handle unexpected response
+          console.error('Unexpected API response format:', data);
+          setReviews([]);
+          setTotalReviewCount(0);
+          setAverageRating(0);
         }
-        
-        setLoading(false);
-      } catch (error) {
-        console.error('Error fetching reviews:', error);
-        toast.error(error.message);
+      } catch (err) {
+        console.error('Error fetching reviews:', err);
+        setError(err.message);
+        setReviews([]);
+      } finally {
         setLoading(false);
       }
     };
@@ -52,20 +116,11 @@ const MyReviews = () => {
     fetchMyReviews();
   }, [user]);
 
-  const handleReviewUpdate = (updatedReview) => {
-    setReviews(prevReviews => 
-      prevReviews.map(review => 
-        review._id === updatedReview._id ? updatedReview : review
-      )
-    );
-    toast.success('Review updated successfully');
-  };
-
   const handleReviewDelete = async (reviewId) => {
     if (!window.confirm('Are you sure you want to delete this review?')) {
       return;
     }
-
+    
     try {
       const response = await fetch(`/api/reviews/${reviewId}`, {
         method: 'DELETE',
@@ -73,26 +128,47 @@ const MyReviews = () => {
           'Authorization': `Bearer ${user.token}`
         }
       });
-
+      
       if (!response.ok) {
         throw new Error('Failed to delete review');
       }
-
-      // Remove the review from the state
-      setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
-      toast.success('Review deleted successfully');
       
-      // Update statistics
-      setTotalReviewCount(prevCount => prevCount - 1);
-    } catch (error) {
-      console.error('Error deleting review:', error);
-      toast.error(error.message);
+      // Update reviews list
+      setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
+      
+      // Update stats
+      setTotalReviewCount(prev => prev - 1);
+      
+      if (totalReviewCount > 1) {
+        const deletedReview = reviews.find(review => review._id === reviewId);
+        const newTotalRating = averageRating * totalReviewCount - (deletedReview?.rating || 0);
+        const newCount = totalReviewCount - 1;
+        setAverageRating(newCount > 0 ? newTotalRating / newCount : 0);
+      } else {
+        setAverageRating(0);
+      }
+    } catch (err) {
+      console.error('Error deleting review:', err);
+      alert('Failed to delete review: ' + err.message);
     }
   };
 
-  const formatDate = (dateString) => {
-    const options = { year: 'numeric', month: 'long', day: 'numeric' };
-    return new Date(dateString).toLocaleDateString(undefined, options);
+  const handleReviewUpdate = (updatedReview) => {
+    setReviews(prevReviews => 
+      prevReviews.map(review => 
+        review._id === updatedReview._id ? updatedReview : review
+      )
+    );
+    
+    // Update average rating
+    const totalRating = reviews.reduce(
+      (sum, review) => sum + (review._id === updatedReview._id ? updatedReview.rating : review.rating), 
+      0
+    );
+    
+    setAverageRating(totalRating / totalReviewCount);
+    
+    setEditingReview(null);
   };
 
   if (!user) {
@@ -147,6 +223,17 @@ const MyReviews = () => {
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
           </div>
+        ) : error ? (
+          <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-lg shadow-md">
+            <h2 className="text-xl font-semibold mb-2">Error Loading Reviews</h2>
+            <p>{error}</p>
+            <button 
+              onClick={() => window.location.reload()} 
+              className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
+            >
+              Try Again
+            </button>
+          </div>
         ) : reviews.length === 0 ? (
           <div className="bg-white rounded-lg shadow-md p-6 md:p-8 text-center">
             <div className="text-teal-500 mb-4">
@@ -169,7 +256,6 @@ const MyReviews = () => {
                 key={review._id} 
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
-                {/* Hospital Info */}
                 <div className="bg-gray-50 p-4 border-b">
                   <Link 
                     to={`/reviews?hospital=${review.hospitalId._id}`}
@@ -180,7 +266,6 @@ const MyReviews = () => {
                   <p className="text-sm text-gray-600">{review.hospitalId.location?.address}</p>
                 </div>
                 
-                {/* Review Content */}
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center">
@@ -188,7 +273,7 @@ const MyReviews = () => {
                       <span className="ml-2 font-medium">{review.rating}.0</span>
                     </div>
                     <span className="text-xs text-gray-500">
-                      {formatDate(review.createdAt)}
+                      {formatTimeAgo(review.createdAt)}
                     </span>
                   </div>
                   
@@ -200,7 +285,6 @@ const MyReviews = () => {
                     )}
                   </div>
                   
-                  {/* Action buttons */}
                   <div className="mt-4 flex justify-end space-x-2">
                     <button 
                       onClick={() => handleReviewDelete(review._id)}
@@ -227,7 +311,6 @@ const MyReviews = () => {
           </div>
         )}
         
-        {/* Back to All Reviews link */}
         <div className="mt-8 text-center">
           <Link 
             to="/reviews" 
@@ -241,7 +324,6 @@ const MyReviews = () => {
         </div>
       </div>
       
-      {/* Edit Review Modal */}
       {editingReview && (
         <EditReviewModal 
           review={editingReview}

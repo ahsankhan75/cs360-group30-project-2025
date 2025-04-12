@@ -1,14 +1,15 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 
 const UserDashboard = () => {
-  const [userRequests, setUserRequests] = useState([]);
+  const [acceptedRequests, setAcceptedRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const { user } = useAuthContext();
 
   useEffect(() => {
-    const fetchUserRequests = async () => {
+    const fetchAcceptedRequests = async () => {
       if (!user) {
         setLoading(false);
         return;
@@ -16,7 +17,7 @@ const UserDashboard = () => {
 
       try {
         setLoading(true);
-        const response = await fetch('/api/blood-requests/mine', {
+        const response = await fetch('/api/blood-requests/accepted', {
           headers: {
             'Authorization': `Bearer ${user.token}`
           }
@@ -24,25 +25,40 @@ const UserDashboard = () => {
 
         if (!response.ok) {
           if (response.status === 404) {
-            // Handle 404 specifically - might mean the endpoint is wrong or not implemented
-            console.error('The /api/blood-requests/mine endpoint was not found');
-            toast.error('Could not load your requests. The API endpoint may not be implemented.');
+            console.error('The /api/blood-requests/accepted endpoint was not found');
+            // Fallback to the mine endpoint if accepted isn't implemented yet
+            const fallbackResponse = await fetch('/api/blood-requests/mine', {
+              headers: {
+                'Authorization': `Bearer ${user.token}`
+              }
+            });
+            
+            if (fallbackResponse.ok) {
+              const data = await fallbackResponse.json();
+              // Filter only accepted requests on the client side as fallback
+              const acceptedData = data.filter(req => req.accepted);
+              setAcceptedRequests(acceptedData);
+              return;
+            } else {
+              throw new Error(`HTTP error with fallback! Status: ${fallbackResponse.status}`);
+            }
           } else {
             throw new Error(`HTTP error! Status: ${response.status}`);
           }
         } else {
           const data = await response.json();
-          setUserRequests(data);
+          setAcceptedRequests(data);
         }
       } catch (error) {
-        console.error('Error fetching user requests:', error);
-        toast.error('Failed to load your blood donation requests');
+        console.error('Error fetching accepted requests:', error);
+        toast.error('Failed to load your accepted blood donations');
+        setAcceptedRequests([]); // Set empty array on error
       } finally {
         setLoading(false);
       }
     };
 
-    fetchUserRequests();
+    fetchAcceptedRequests();
   }, [user]);
 
   if (loading) {
@@ -53,18 +69,21 @@ const UserDashboard = () => {
     );
   }
 
-  if (userRequests.length === 0) {
+  if (acceptedRequests.length === 0) {
     return (
       <div className="bg-white rounded-lg shadow-md p-6">
-        <h2 className="text-xl font-semibold mb-4">My Blood Donation Requests</h2>
-        <p className="text-gray-600">You haven't made any blood donation requests yet.</p>
+        <h2 className="text-xl font-semibold mb-4">My Accepted Donations</h2>
+        <p className="text-gray-600">You haven't accepted any donation requests yet.</p>
+        <Link to="/blood-requests" className="inline-block mt-4 text-teal-600 hover:underline">
+          Find donation opportunities
+        </Link>
       </div>
     );
   }
 
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <h2 className="text-xl font-semibold mb-4">My Blood Donation Requests</h2>
+      <h2 className="text-xl font-semibold mb-4">My Accepted Donations</h2>
       <div className="overflow-x-auto">
         <table className="min-w-full divide-y divide-gray-200">
           <thead>
@@ -72,13 +91,12 @@ const UserDashboard = () => {
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Type</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Units</th>
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Accepted</th>
               <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
             </tr>
           </thead>
           <tbody className="bg-white divide-y divide-gray-200">
-            {userRequests.map((request) => (
+            {acceptedRequests.map((request) => (
               <tr key={request.requestId} className="hover:bg-gray-50">
                 <td className="px-6 py-4 whitespace-nowrap">{request.hospitalName}</td>
                 <td className="px-6 py-4 whitespace-nowrap font-medium">{request.bloodType}</td>
@@ -91,16 +109,13 @@ const UserDashboard = () => {
                     {request.urgencyLevel}
                   </span>
                 </td>
-                <td className="px-6 py-4 whitespace-nowrap">{request.unitsNeeded}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    request.accepted ? 'bg-green-100 text-green-800' : 'bg-blue-100 text-blue-800'
-                  }`}>
-                    {request.accepted ? 'Accepted' : 'Pending'}
-                  </span>
-                </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(request.datePosted).toLocaleDateString()}
+                  {new Date(request.acceptedAt || request.datePosted).toLocaleDateString()}
+                </td>
+                <td className="px-6 py-4 whitespace-nowrap">
+                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                    Accepted
+                  </span>
                 </td>
               </tr>
             ))}

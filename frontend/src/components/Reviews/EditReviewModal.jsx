@@ -35,6 +35,11 @@ const EditReviewModal = ({ review, onClose, onReviewUpdated }) => {
     setError('');
 
     try {
+      // Make sure we have a valid review ID
+      if (!review || !review._id) {
+        throw new Error('Invalid review data');
+      }
+
       const response = await fetch(`/api/reviews/${review._id}`, {
         method: 'PATCH',
         headers: {
@@ -60,6 +65,7 @@ const EditReviewModal = ({ review, onClose, onReviewUpdated }) => {
       
       onClose();
     } catch (err) {
+      console.error('Update review error:', err);
       setError(err.message);
       toast.error(err.message);
     } finally {

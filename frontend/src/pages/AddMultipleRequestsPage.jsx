@@ -248,7 +248,7 @@ const AddMultipleRequestsPage = () => {
   return (
     <div className="p-4 md:p-8 max-w-screen-xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl md:text-3xl font-bold text-teal-600">Blood Donation Requests Management</h1>
+        <h1 className="text-2xl md:text-3xl font-bold text-teal-600">My Blood Donation Requests</h1>
         {isLoading && (
           <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-b-2 border-teal-600"></div>
         )}

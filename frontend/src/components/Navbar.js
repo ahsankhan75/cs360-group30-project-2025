@@ -25,75 +25,78 @@ const Navbar = () => {
 
   return (
     <header 
-      className={`bg-white p-4 md:p-6 flex justify-between items-center shadow-sm 
-                 fixed top-0 left-0 right-0 w-full z-50 transition-all duration-200 ease-in-out
-                 ${scrolled ? 'shadow-md' : ''}`}
+      className={`bg-white p-4 md:p-6 fixed top-0 left-0 right-0 w-full z-50 transition-all duration-200 ease-in-out
+                 ${scrolled ? 'shadow-md' : 'shadow-sm'}`}
     >
-      <Link to="/" className="flex items-center">
-        <img src="/kk.png" alt="EMCON Logo" className="w-16 md:w-24 h-auto mr-6" />
-      </Link>
-      
-      {/* Desktop Navigation */}
-      <nav className="hidden md:flex space-x-6">
-        <Link to="/" className="hover:text-teal-500 transition-colors">
-          Home
-        </Link>
-        <Link to="/hospitals" className="hover:text-teal-500 transition-colors">
-          Find Hospitals
-        </Link>
-        {user && (
-          <>
-            <Link to="/requests" className="hover:text-teal-500 transition-colors">
-              Blood Donations
+      <div className="max-w-screen-xl mx-auto flex justify-between items-center">
+        <div className="flex items-center">
+          <Link to="/" className="flex items-center mr-6">
+            <img src="/kk.png" alt="EMCON Logo" className="w-16 md:w-24 h-auto" />
+          </Link>
+          
+          {/* Desktop Navigation - Now aligned left with the logo */}
+          <nav className="hidden md:flex space-x-6 ml-4">
+            <Link to="/" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+              Home
             </Link>
-            <Link to="/admin/requests" className="hover:text-teal-500 transition-colors">
-              Manage Requests
+            <Link to="/hospitals" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+              Find Hospitals
             </Link>
-            <Link to="/medical-card" className="hover:text-teal-500 transition-colors">
-              Medical Card
-            </Link>
-            <Link to="/reviews" className="hover:text-teal-500 transition-colors">
-              Reviews
-            </Link>
-          </>
-        )}
-      </nav>
-      
-      <div className="flex items-center gap-4">
-        {user ? (
-          <ProfileIcon />
-        ) : (
-          <div className="hidden md:flex gap-3">
-            <Link 
-              to="/login"
-              className="px-4 py-1.5 text-teal-600 border border-teal-600 rounded-md hover:bg-teal-50 transition-colors"
-            >
-              Login
-            </Link>
-            <Link 
-              to="/signup"
-              className="px-4 py-1.5 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
-            >
-              Sign Up
-            </Link>
-          </div>
-        )}
+            {user && (
+              <>
+                <Link to="/blood-requests" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+                  Blood Donations
+                </Link>
+                <Link to="/my-blood-requests" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+                  Manage Requests
+                </Link>
+                <Link to="/medical-card" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+                  Medical Card
+                </Link>
+                <Link to="/reviews" className="text-gray-700 hover:text-teal-500 transition-colors font-medium">
+                  Reviews
+                </Link>
+              </>
+            )}
+          </nav>
+        </div>
         
-        {/* Mobile menu button */}
-        <button 
-          className="md:hidden focus:outline-none"
-          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-        >
-          {mobileMenuOpen ? (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+        <div className="flex items-center gap-4">
+          {user ? (
+            <ProfileIcon />
           ) : (
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-            </svg>
+            <div className="hidden md:flex gap-3">
+              <Link 
+                to="/login"
+                className="px-4 py-1.5 text-teal-600 border border-teal-600 rounded-md hover:bg-teal-50 transition-colors"
+              >
+                Login
+              </Link>
+              <Link 
+                to="/signup"
+                className="px-4 py-1.5 bg-teal-600 text-white rounded-md hover:bg-teal-700 transition-colors"
+              >
+                Sign Up
+              </Link>
+            </div>
           )}
-        </button>
+          
+          {/* Mobile menu button */}
+          <button 
+            className="md:hidden focus:outline-none"
+            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          >
+            {mobileMenuOpen ? (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            ) : (
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+              </svg>
+            )}
+          </button>
+        </div>
       </div>
 
       {/* Mobile Navigation Menu */}
@@ -117,14 +120,14 @@ const Navbar = () => {
             {user ? (
               <>
                 <Link 
-                  to="/requests" 
+                  to="/blood-requests" 
                   className="hover:text-teal-500 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Blood Donations
                 </Link>
                 <Link 
-                  to="/admin/requests" 
+                  to="/my-blood-requests" 
                   className="hover:text-teal-500 transition-colors"
                   onClick={() => setMobileMenuOpen(false)}
                 >

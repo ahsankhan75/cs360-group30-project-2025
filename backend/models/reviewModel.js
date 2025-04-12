@@ -20,23 +20,20 @@ const reviewSchema = new Schema({
   },
   comment: {
     type: String,
-    required: false
-  }
-}, {
-  timestamps: true,
-  toJSON: { virtuals: true },
-  toObject: { virtuals: true }
-});
+    required: false,
+    trim: true
+  },
+  helpfulCount: {
+    type: Number,
+    default: 0
+  },
+  helpfulVotes: [{
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'User'
+  }]
+}, { timestamps: true });
 
-// Virtual for populating user details
-reviewSchema.virtual('user', {
-  ref: 'User',
-  localField: 'userId',
-  foreignField: '_id',
-  justOne: true
-});
-
-// Add an index for faster queries by hospital
-reviewSchema.index({ hospitalId: 1 });
+// Compound index to ensure a user can only review a hospital once
+reviewSchema.index({ hospitalId: 1, userId: 1 }, { unique: true });
 
 module.exports = mongoose.model('Review', reviewSchema);

@@ -16,7 +16,7 @@ router.get('/hospital/:hospitalId', getReviewsByHospital);
 // Protected routes (require authentication)
 router.post('/', requireAuth, createReview);
 router.get('/my-reviews', requireAuth, getReviewsByUser);
-router.patch('/:reviewId', requireAuth, updateReview);
+router.patch('/:id', requireAuth, updateReview);
 router.delete('/:reviewId', requireAuth, deleteReview);
 
 module.exports = router;

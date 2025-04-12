@@ -1,24 +1,58 @@
 // File: pages/AdminLogin.js
-import { useState } from "react";
-import { useAdminLogin } from "../hooks/useAdminLogin";
-import { useNavigate } from "react-router-dom";
+import { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { useAdminAuthContext } from '../hooks/useAdminAuthContext';
+import { toast } from 'react-toastify';
 
-function AdminLogin() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const { adminLogin, error, isLoading } = useAdminLogin();
+const AdminLogin = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState(null);
   const navigate = useNavigate();
+  const { dispatch } = useAdminAuthContext();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await adminLogin(email, password);
-    // Optionally navigate to an admin dashboard after login:
-    // navigate('/admindashboard');
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch('/api/admin/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Login failed');
+      }
+
+      // Save to localStorage
+      localStorage.setItem('adminUser', JSON.stringify(data));
+      
+      // Update auth context
+      dispatch({ type: 'LOGIN', payload: data });
+      
+      // Success notification
+      toast.success('Login successful!');
+      
+      // Redirect to admin dashboard
+      navigate('/admin/dashboard');
+    } catch (error) {
+      setError(error.message);
+      toast.error(error.message);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">
-      <main className="flex-1 flex justify-center items-center p-6 relative">
+      {/* MAIN CONTENT - Match the user login style */}
+      <main className="flex-1 flex justify-end items-center p-6 relative">
         {/* SVG Background Shapes */}
         <div className="absolute left-0 top-0 h-full w-auto z-[1]">
           <svg
@@ -95,7 +129,8 @@ function AdminLogin() {
           </div>
         </div>
 
-        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full">
+        {/* Form Container - match the user login style */}
+        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full mx-auto md:ml-[40%] mt-48 text-left z-[20]">
           <img src="/kk.png" alt="EMCON Logo" className="w-48 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-[#2a9fa7] mb-4 text-center">
             Admin Login
@@ -105,28 +140,38 @@ function AdminLogin() {
               <label className="block font-medium">Email</label>
               <input
                 type="email"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 placeholder="Enter your email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
             <div>
               <label className="block font-medium">Password</label>
               <input
                 type="password"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 placeholder="Enter your password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
+            <p className="text-sm text-gray-600">
+              <span
+                className="text-[#15aacf] cursor-pointer hover:underline"
+                onClick={() => navigate("/admin/signup")}
+              >
+                Create an admin account?
+              </span>
+            </p>
             <button
               type="submit"
               className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90 disabled:opacity-50"
               disabled={isLoading}
             >
-              Log In
+              {isLoading ? 'Logging in...' : 'Log In'}
             </button>
             {error && <div className="text-red-500 mt-2">{error}</div>}
           </form>
@@ -141,23 +186,14 @@ function AdminLogin() {
             <p className="mt-2">Smart healthcare navigation for everyone!</p>
           </div>
           <div className="flex space-x-6">
-            <a href="#home" className="hover:underline">
-              Find Hospitals
-            </a>
-            <a href="#insurance" className="hover:underline">
-              Insurance
-            </a>
-            <a href="#donations" className="hover:underline">
-              Donations
-            </a>
-            <a href="#medical-card" className="hover:underline">
-              Medical Card
-            </a>
+            <a href="/" className="hover:underline">Home</a>
+            <a href="/hospitals" className="hover:underline">Find Hospitals</a>
+            <a href="/login" className="hover:underline">User Login</a>
           </div>
         </div>
       </footer>
     </div>
   );
-}
+};
 
 export default AdminLogin;

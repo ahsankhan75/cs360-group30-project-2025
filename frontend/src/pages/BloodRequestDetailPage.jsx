@@ -1,13 +1,18 @@
 // src/pages/BloodRequestDetailPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { toast } from 'react-toastify';
 import StarRating from '../components/Reviews/StarRating';
 
 const BloodRequestDetailPage = () => {
   const { requestId } = useParams();
   const [request, setRequest] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
   const [hospital, setHospital] = useState(null);
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const fetchRequestData = async () => {
@@ -37,6 +42,39 @@ const BloodRequestDetailPage = () => {
     fetchRequestData();
   }, [requestId]);
 
+  const handleAcceptRequest = async () => {
+    if (!user) {
+      toast.error("You must be logged in to accept a request");
+      navigate('/login');
+      return;
+    }
+
+    try {
+      setAccepting(true);
+      const response = await fetch(`/api/blood-requests/${requestId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}` // Add the token for authorization
+        }
+      });
+
+      if (!response.ok) {
+        const data = await response.json();
+        throw new Error(data.error || 'Failed to accept request');
+      }
+
+      const updatedRequest = await response.json();
+      setRequest({...request, accepted: true, acceptedBy: user._id});
+      toast.success('Blood donation request accepted! Thank you for your help.');
+    } catch (error) {
+      console.error('Error accepting request:', error);
+      toast.error(error.message || 'Failed to accept request');
+    } finally {
+      setAccepting(false);
+    }
+  };
+
   if (loading) {
     return <div className="p-8">Loading request details...</div>;
   }
@@ -52,6 +90,18 @@ const BloodRequestDetailPage = () => {
     <div className="p-8 max-w-screen-xl mx-auto">
       <h1 className="text-3xl font-bold text-teal-500 mb-4">Blood Donation Request</h1>
       <div className="text-md text-gray-600 mb-4">Hospital Information</div>
+
+      <div className="mb-6">
+        <Link 
+          to="/blood-requests" 
+          className="text-teal-600 hover:underline flex items-center"
+        >
+          <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+            <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
+          </svg>
+          Back to All Requests
+        </Link>
+      </div>
 
       <div className="bg-orange-100 shadow-lg rounded p-6 mb-6">
         <div className="flex justify-between items-start">
@@ -108,9 +158,13 @@ const BloodRequestDetailPage = () => {
 
         {/* Action Buttons */}
         <div className="mt-6 flex gap-4">
-          {!request.accepted ? (
-            <button className="px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600">
-              Accept Request
+          {request && !request.accepted ? (
+            <button 
+              onClick={handleAcceptRequest}
+              disabled={accepting}
+              className={`px-4 py-2 bg-green-500 text-white font-medium rounded hover:bg-green-600 ${accepting ? 'opacity-50 cursor-not-allowed' : ''}`}
+            >
+              {accepting ? 'Processing...' : 'Accept Request'}
             </button>
           ) : (
             <div className="px-4 py-2 bg-green-100 text-green-700 font-medium rounded border border-green-300">

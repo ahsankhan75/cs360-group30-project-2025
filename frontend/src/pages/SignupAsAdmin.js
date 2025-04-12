@@ -1,26 +1,32 @@
 // pages/SignupAsAdmin.js
 import { useState } from "react";
-import { useSignup } from "../hooks/useSignup"; 
+import { useAdminSignup } from "../hooks/useAdminSignup"; 
 import { useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
 
 function SignupAsAdmin() {
   const [fullName, setFullName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [adminId, setAdminId] = useState("");
-  const { signup, error, isLoading } = useSignup(); 
+  const [adminSecret, setAdminSecret] = useState("");
+  const { signup, error, isLoading } = useAdminSignup();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signup(fullName, email, password, confirmPassword, adminId);
+    
+    const success = await signup(fullName, email, password, confirmPassword, adminSecret);
+    
+    if (success) {
+      toast.success("Admin account created successfully!");
+      navigate('/admin/dashboard');
+    }
   };
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">
-      <main className="flex-1 flex justify-center items-center p-6">
-        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full">
+      <main className="flex-1 flex justify-center items-center p-6 relative">
         <div className="absolute left-0 top-0 h-full w-auto z-[1]">
           <svg
             viewBox="0 0 275 667"
@@ -96,6 +102,7 @@ function SignupAsAdmin() {
             </svg>
           </div>
         </div>
+        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full text-left z-[20]">
           <img src="/kk.png" alt="EMCON Logo" className="w-32 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-[#2a9fa7] mb-4 text-center">
             Signup as Admin
@@ -107,9 +114,10 @@ function SignupAsAdmin() {
               <input
                 type="text"
                 placeholder="Enter your full name"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 value={fullName}
                 onChange={(e) => setFullName(e.target.value)}
+                required
               />
             </div>
 
@@ -119,9 +127,10 @@ function SignupAsAdmin() {
               <input
                 type="email"
                 placeholder="Enter your email"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                required
               />
             </div>
 
@@ -131,9 +140,10 @@ function SignupAsAdmin() {
               <input
                 type="password"
                 placeholder="Enter your password"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                required
               />
             </div>
 
@@ -143,21 +153,23 @@ function SignupAsAdmin() {
               <input
                 type="password"
                 placeholder="Confirm your password"
-                className="w-full p-2 border rounded-md"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
+                required
               />
             </div>
 
-            {/* Admin ID Field */}
+            {/* Admin Secret Field */}
             <div>
-              <label className="block font-medium">Admin ID</label>
+              <label className="block font-medium">Admin Secret</label>
               <input
-                type="text"
-                placeholder="Enter your admin ID"
-                className="w-full p-2 border rounded-md"
-                value={adminId}
-                onChange={(e) => setAdminId(e.target.value)}
+                type="password"
+                placeholder="Enter admin secret code"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
+                value={adminSecret}
+                onChange={(e) => setAdminSecret(e.target.value)}
+                required
               />
             </div>
 
@@ -165,9 +177,9 @@ function SignupAsAdmin() {
             <p className="text-sm text-gray-600">
               <span
                 className="text-[#15aacf] cursor-pointer hover:underline"
-                onClick={() => navigate("/adminlogin")}
+                onClick={() => navigate("/admin/login")}
               >
-                Already an admin? 
+                Already an admin? Login here
               </span>
             </p>
 
@@ -176,7 +188,7 @@ function SignupAsAdmin() {
               className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90 disabled:opacity-50"
               disabled={isLoading}
             >
-              Sign Up
+              {isLoading ? 'Processing...' : 'Sign Up'}
             </button>
             {error && <div className="text-red-500 mt-2">{error}</div>}
           </form>
@@ -191,16 +203,13 @@ function SignupAsAdmin() {
           </div>
 
           <div className="flex space-x-6">
-            <a href="#home" className="hover:underline">Find Hospitals</a>
-            <a href="#insurance" className="hover:underline">Insurance</a>
-            <a href="#donations" className="hover:underline">Donations</a>
-            <a href="#medical-card" className="hover:underline">Medical Card</a>
+            <a href="/" className="hover:underline">Home</a>
+            <a href="/hospitals" className="hover:underline">Find Hospitals</a>
+            <a href="/admin/login" className="hover:underline">Admin Login</a>
           </div>
         </div>
       </footer>
     </div>
-  
-    
   );
 }
 

@@ -123,7 +123,7 @@ const Home = () => {
           label="Login"
           options={[
             { label: "For Users", href: "/login" },
-            { label: "For Hospital Admin", href: "/adminlogin" }
+            { label: "For Hospital Admin", href: "/admin/login" }
           ]}
         />
       </div>

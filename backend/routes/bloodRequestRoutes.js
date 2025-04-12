@@ -1,28 +1,25 @@
 const express = require('express');
 const router = express.Router();
 const bloodRequestController = require('../controllers/bloodRequestController');
-const { getSingleBloodRequest, deleteBloodRequest, acceptBloodRequest, getUserBloodRequests } = require('../controllers/bloodRequestController');
+const { getSingleBloodRequest, deleteBloodRequest, acceptBloodRequest, getUserBloodRequests, getAcceptedBloodRequests } = require('../controllers/bloodRequestController');
 const requireAuth = require("../middleware/requireAuth");
+const requireAdminAuth = require("../middleware/requireAdminAuth");
 
-// Route to get all blood requests
-router.get('/', bloodRequestController.getAllBloodRequests);
-
-// Route to create a new blood request
-router.post('/', bloodRequestController.createBloodRequest);
-
-// IMPORTANT: Specific routes must come BEFORE parameterized routes
-// Place the /mine route before /:requestId
+// More specific routes should go first
+// User routes - regular users can accept requests and view their accepted requests
+router.get('/accepted', requireAuth, getAcceptedBloodRequests);
 router.get('/mine', requireAuth, getUserBloodRequests);
 
-// After specific routes, we can have parameterized routes
+// Public routes - anyone can view blood requests
+router.get('/', bloodRequestController.getAllBloodRequests);
+
+// Admin-only routes - only admins can create, update, and delete requests
+router.post('/', requireAdminAuth, bloodRequestController.createBloodRequest);
+router.post("/multiple", requireAdminAuth, bloodRequestController.addMultipleBloodRequests);
+
+// Dynamic routes with parameters go last
 router.get('/:requestId', getSingleBloodRequest);
-
-const { addMultipleBloodRequests } = require('../controllers/bloodRequestController');
-
-router.post("/multiple", requireAuth, addMultipleBloodRequests);
-
-router.delete('/:requestId', deleteBloodRequest);
-
-router.patch('/:requestId/accept', acceptBloodRequest);
+router.patch('/:requestId/accept', requireAuth, acceptBloodRequest);
+router.delete('/:requestId', requireAdminAuth, deleteBloodRequest);
 
 module.exports = router;

@@ -78,6 +78,11 @@ export const useReviews = () => {
     
     setLoading(true);
     try {
+      // Ensure we have a valid reviewId
+      if (!reviewId) {
+        throw new Error('Invalid review ID');
+      }
+
       const response = await fetch(`/api/reviews/${reviewId}`, {
         method: 'PATCH',
         headers: {
@@ -100,6 +105,7 @@ export const useReviews = () => {
       toast.success('Review updated successfully!');
       return data;
     } catch (err) {
+      console.error('Error updating review:', err);
       setError(err.message);
       toast.error(err.message);
       return null;

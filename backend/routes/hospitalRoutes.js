@@ -1,19 +1,23 @@
 const express = require('express');
+const {
+  getHospitals,
+  getHospital,
+  filterHospitals,
+  getHospitalsByNames
+} = require('../controllers/hospitalController');
+
 const router = express.Router();
-const { 
-  getReviewsByHospital, 
-  createReview,
-  getAllHospitalNames
-} = require('../controllers/reviewController');
-const requireAuth = require('../middleware/requireAuth');
 
-// Public routes
-router.get('/hospital/:hospitalId', getReviewsByHospital);
+// GET all hospitals
+router.get('/', getHospitals);
 
-// Protected routes (require authentication)
-router.post('/', requireAuth, createReview);
+// GET hospitals by names (for dropdown)
+router.get('/names', getHospitalsByNames);
 
-// Add this route if it doesn't already exist
-router.get('/:id', getHospitalById);
+// GET filtered hospitals
+router.get('/filter', filterHospitals);
+
+// GET single hospital
+router.get('/:id', getHospital);
 
 module.exports = router;
