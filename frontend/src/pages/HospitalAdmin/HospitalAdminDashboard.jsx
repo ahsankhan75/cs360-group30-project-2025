@@ -10,7 +10,7 @@ const HospitalAdminDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [dashboardData, setDashboardData] = useState({
-    hospitalInfo: {},
+    hospital: {},
     stats: {
       activeBloodRequests: 0,
       completedBloodRequests: 0,
@@ -104,7 +104,7 @@ const HospitalAdminDashboard = () => {
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Hospital Admin Dashboard</h1>
           <p className="text-lg text-gray-600 mt-2">
-            Welcome back, {hospitalAdmin.fullName || hospitalAdmin.email}
+            Welcome back, {hospitalAdmin?.fullName || hospitalAdmin?.email}
           </p>
         </header>
         
@@ -119,7 +119,7 @@ const HospitalAdminDashboard = () => {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm font-medium">Active Blood Requests</h2>
-                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats.activeBloodRequests}</p>
+                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats?.activeBloodRequests || 0}</p>
               </div>
             </div>
           </div>
@@ -133,7 +133,7 @@ const HospitalAdminDashboard = () => {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm font-medium">Completed Requests</h2>
-                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats.completedBloodRequests}</p>
+                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats?.completedBloodRequests || 0}</p>
               </div>
             </div>
           </div>
@@ -147,7 +147,7 @@ const HospitalAdminDashboard = () => {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm font-medium">Average Rating</h2>
-                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats.averageRating ? dashboardData.stats.averageRating.toFixed(1) : 'N/A'}</p>
+                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats?.averageRating ? dashboardData.stats.averageRating.toFixed(1) : 'N/A'}</p>
               </div>
             </div>
           </div>
@@ -161,7 +161,7 @@ const HospitalAdminDashboard = () => {
               </div>
               <div className="ml-4">
                 <h2 className="text-gray-600 text-sm font-medium">Total Reviews</h2>
-                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats.reviewCount}</p>
+                <p className="text-3xl font-bold text-gray-800">{dashboardData.stats?.reviewCount || 0}</p>
               </div>
             </div>
           </div>
@@ -175,31 +175,31 @@ const HospitalAdminDashboard = () => {
               <dl className="divide-y divide-gray-200">
                 <div className="py-3 grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospitalInfo.name || 'N/A'}</dd>
+                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.name || 'N/A'}</dd>
                 </div>
                 <div className="py-3 grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Address</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospitalInfo.location?.address || 'N/A'}</dd>
+                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.location?.address || 'N/A'}</dd>
                 </div>
                 <div className="py-3 grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Contact</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
-                    {dashboardData.hospitalInfo.contact?.email && (
-                      <div>Email: {dashboardData.hospitalInfo.contact.email}</div>
+                    {dashboardData.hospital?.contact?.email && (
+                      <div>Email: {dashboardData.hospital.contact.email}</div>
                     )}
-                    {dashboardData.hospitalInfo.contact?.phone && (
-                      <div>Phone: {dashboardData.hospitalInfo.contact.phone}</div>
+                    {dashboardData.hospital?.contact?.phone && (
+                      <div>Phone: {dashboardData.hospital.contact.phone}</div>
                     )}
-                    {!dashboardData.hospitalInfo.contact?.email && !dashboardData.hospitalInfo.contact?.phone && 'N/A'}
+                    {!dashboardData.hospital?.contact?.email && !dashboardData.hospital?.contact?.phone && 'N/A'}
                   </dd>
                 </div>
                 <div className="py-3 grid grid-cols-3 gap-4">
                   <dt className="text-sm font-medium text-gray-500">Resources</dt>
                   <dd className="text-sm text-gray-900 col-span-2">
                     <ul>
-                      <li>ICU Beds: {dashboardData.hospitalInfo.resources?.icu_beds || 'N/A'}</li>
-                      <li>Ventilators: {dashboardData.hospitalInfo.resources?.ventilators || 'N/A'}</li>
-                      <li>Blood Bank: {dashboardData.hospitalInfo.resources?.blood_bank ? 'Available' : 'Not Available'}</li>
+                      <li>ICU Beds: {dashboardData.hospital?.resources?.icu_beds || 'N/A'}</li>
+                      <li>Ventilators: {dashboardData.hospital?.resources?.ventilators || 'N/A'}</li>
+                      <li>Blood Bank: {dashboardData.hospital?.resources?.blood_bank ? 'Available' : 'Not Available'}</li>
                     </ul>
                   </dd>
                 </div>
@@ -220,7 +220,7 @@ const HospitalAdminDashboard = () => {
             </div>
             
             <div className="border-t border-gray-200 pt-4">
-              {dashboardData.recentBloodRequests.length > 0 ? (
+              {dashboardData.recentBloodRequests?.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {dashboardData.recentBloodRequests.map((request) => (
                     <li key={request._id || request.requestId} className="py-3">
@@ -266,7 +266,7 @@ const HospitalAdminDashboard = () => {
             </div>
             
             <div className="border-t border-gray-200 pt-4">
-              {dashboardData.recentReviews.length > 0 ? (
+              {dashboardData.recentReviews?.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
                   {dashboardData.recentReviews.map((review) => (
                     <li key={review._id} className="py-3">

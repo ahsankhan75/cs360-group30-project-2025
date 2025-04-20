@@ -8,18 +8,27 @@ const AdminHospitalAdminsPage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const { adminUser } = useAdminAuthContext();
-  console.log('Admin user:', adminUser); // Debugging line
+  const { admin, dispatch } = useAdminAuthContext(); // Destructure 'admin', not 'adminUser'
+
+  console.log('Admin user from context:', adminUser); // Debugging line
+  // ^ ^ ^ THIS IS THE CORRECTED LINE ^ ^ ^
+
+  // Now, use 'admin' instead of 'adminUser' throughout the rest of this component:
+  console.log('Admin data from context:', admin); // Check the actual admin object
+
+
+
 
   useEffect(() => {
     const fetchPendingAdmins = async () => {
-      if (!adminUser) return;
+      if (!admin) return;
 
       try {
         setLoading(true);
         console.log('Fetching pending hospital admins...'); // Debugging line
         const response = await fetch('/api/admin/hospital-admins/pending', {
           headers: {
-            'Authorization': `Bearer ${adminUser.token}`
+            'Authorization': `Bearer ${admin.token}`
           }
         });
 
@@ -40,17 +49,17 @@ const AdminHospitalAdminsPage = () => {
     };
 
     fetchPendingAdmins();
-  }, [adminUser]);
+  }, [admin]);
 
   const handleStatusUpdate = async (adminId, newStatus) => {
-    if (!adminUser) return;
+    if (!admin) return;
 
     try {
       const response = await fetch(`/api/admin/hospital-admins/${adminId}/status`, {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${adminUser.token}`
+          'Authorization': `Bearer ${admin.token}`
         },
         body: JSON.stringify({ status: newStatus })
       });
@@ -143,7 +152,7 @@ const AdminHospitalAdminsPage = () => {
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-gray-900">{admin.hospitalName || "Not specified"}</div>
-                            <div className="text-sm text-gray-500">{admin.hospitalId || "ID not provided"}</div>
+                            <div className="text-sm text-gray-500">{admin.hospitalId?._id || "ID not provided"}</div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                             {new Date(admin.createdAt).toLocaleDateString()}
