@@ -11,19 +11,54 @@ const ProfileIcon = () => {
   const { user } = useAuthContext();
   const { logout } = useLogout();
 
-  // Handle clicking outside the dropdown to close it
+  // Handle mouse events for the dropdown with delay
+  const [closeTimeout, setCloseTimeout] = useState(null);
+
+  const handleMouseEnter = () => {
+    // Clear any existing timeout to prevent the dropdown from closing
+    if (closeTimeout) {
+      clearTimeout(closeTimeout);
+      setCloseTimeout(null);
+    }
+    setShowDropdown(true);
+  };
+
+  const handleMouseLeave = () => {
+    // Set a timeout to close the dropdown after 3 seconds
+    const timeout = setTimeout(() => {
+      setShowDropdown(false);
+    }, 3000); // 3 seconds delay
+
+    setCloseTimeout(timeout);
+  };
+
+  // Handle clicks outside the dropdown
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        // Clear any existing timeout
+        if (closeTimeout) {
+          clearTimeout(closeTimeout);
+          setCloseTimeout(null);
+        }
+        // Close the dropdown immediately
         setShowDropdown(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
+    // Add event listener when dropdown is shown
+    if (showDropdown) {
+      document.addEventListener('mousedown', handleClickOutside);
+    }
+
+    // Clean up event listener and timeout
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
+      if (closeTimeout) {
+        clearTimeout(closeTimeout);
+      }
     };
-  }, []);
+  }, [showDropdown, closeTimeout]);
 
   // Fetch user's medical card data to get profile picture
   useEffect(() => {
@@ -43,10 +78,17 @@ const ProfileIcon = () => {
           setProfilePicture(data?.profilePicture || null);
           if (data && data.name) {
             setUserName(data.name);
+          } else if (user.fullName) {
+            setUserName(user.fullName);
           }
+        } else if (user.fullName) {
+          setUserName(user.fullName);
         }
       } catch (error) {
         console.error("Error fetching medical card:", error);
+        if (user.fullName) {
+          setUserName(user.fullName);
+        }
       }
     };
 
@@ -75,7 +117,8 @@ const ProfileIcon = () => {
     };
   }, []);
 
-  const handleLogout = () => {
+  const handleLogout = (e) => {
+    e.preventDefault();
     logout();
     setShowDropdown(false);
   };
@@ -87,10 +130,14 @@ const ProfileIcon = () => {
   const firstLetter = userName ? userName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div
+      className="relative inline-block text-left"
+      ref={dropdownRef}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={handleMouseLeave}
+    >
       <button
-        onClick={() => setShowDropdown(!showDropdown)}
-        className="w-10 h-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+        className="w-14 h-14 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
         aria-haspopup="true"
         aria-expanded={showDropdown}
       >
@@ -113,24 +160,13 @@ const ProfileIcon = () => {
           className="origin-top-right absolute right-0 mt-2 w-56 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 focus:outline-none z-50"
           role="menu"
           aria-orientation="vertical"
+          onMouseEnter={handleMouseEnter}
+          onMouseLeave={handleMouseLeave}
         >
           <div className="py-1" role="none">
-            <div className="px-4 py-3 border-b flex items-center">
-              <div className="mr-3">
-                {profilePicture && profilePicture.length > 0 ? (
-                  <img
-                    src={profilePicture.startsWith('http') ? profilePicture : `${window.location.origin.includes('localhost') ? 'http://localhost:4000' : ''}${profilePicture}`}
-                    alt="Profile"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center">
-                    {firstLetter}
-                  </div>
-                )}
-              </div>
-              <div>
-                {userName && <p className="text-sm font-medium text-gray-900">{userName}</p>}
+            <div className="px-4 py-3 border-b">
+              <div className="text-center">
+                <p className="text-sm font-medium text-gray-900">{userName || user.fullName || user.email.split('@')[0]}</p>
                 <p className="text-xs text-gray-500 truncate">
                   {user.email}
                 </p>
@@ -140,7 +176,15 @@ const ProfileIcon = () => {
               to="/dashboard"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               role="menuitem"
-              onClick={() => setShowDropdown(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                // Clear any existing timeout when clicking a menu item
+                if (closeTimeout) {
+                  clearTimeout(closeTimeout);
+                  setCloseTimeout(null);
+                }
+              }}
+              onMouseEnter={handleMouseEnter}
             >
               Dashboard
             </Link>
@@ -148,14 +192,30 @@ const ProfileIcon = () => {
               to="/medical-card"
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
               role="menuitem"
-              onClick={() => setShowDropdown(false)}
+              onClick={(e) => {
+                e.stopPropagation();
+                // Clear any existing timeout when clicking a menu item
+                if (closeTimeout) {
+                  clearTimeout(closeTimeout);
+                  setCloseTimeout(null);
+                }
+              }}
+              onMouseEnter={handleMouseEnter}
             >
               Medical Card
             </Link>
             <button
-              onClick={handleLogout}
+              onClick={(e) => {
+                handleLogout(e);
+                // Clear any existing timeout when clicking a menu item
+                if (closeTimeout) {
+                  clearTimeout(closeTimeout);
+                  setCloseTimeout(null);
+                }
+              }}
               className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
               role="menuitem"
+              onMouseEnter={handleMouseEnter}
             >
               Sign Out
             </button>

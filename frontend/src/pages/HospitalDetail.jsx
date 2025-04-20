@@ -14,19 +14,19 @@ const HospitalDetail = () => {
   const [error, setError] = useState(null);
   const [showReviewForm, setShowReviewForm] = useState(false);
   const { user } = useAuthContext();
-  
+
   useEffect(() => {
     const fetchHospital = async () => {
       try {
         const response = await fetch(`/api/hospitals/${id}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch hospital data');
         }
-        
+
         const data = await response.json();
         setHospital(data);
-        
+
         // Fetch reviews after getting hospital data
         fetchReviews(data._id);
       } catch (err) {
@@ -35,15 +35,15 @@ const HospitalDetail = () => {
         setLoading(false);
       }
     };
-    
+
     const fetchReviews = async (hospitalId) => {
       try {
         const response = await fetch(`/api/reviews/hospital/${hospitalId}`);
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch reviews');
         }
-        
+
         const reviewsData = await response.json();
         setReviews(reviewsData);
       } catch (err) {
@@ -52,15 +52,15 @@ const HospitalDetail = () => {
         setLoading(false);
       }
     };
-    
+
     fetchHospital();
   }, [id]);
-  
+
   const handleReviewSubmitted = (newReview) => {
     setReviews(prevReviews => [newReview, ...prevReviews]);
     setShowReviewForm(false);
   };
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center min-h-screen">
@@ -68,7 +68,7 @@ const HospitalDetail = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="p-6 max-w-screen-xl mx-auto">
@@ -79,17 +79,14 @@ const HospitalDetail = () => {
       </div>
     );
   }
-  
+
   if (!hospital) {
     return <div>No hospital data found.</div>;
   }
-  
+
   return (
     <div className="p-6 min-h-screen bg-gray-100">
-      <div className="relative z-50">
-        <ProfileIcon />
-      </div>
-      
+
       <div className="max-w-screen-xl mx-auto">
         <nav className="flex mb-6" aria-label="Breadcrumb">
           <ol className="inline-flex items-center space-x-1 md:space-x-3">
@@ -106,13 +103,13 @@ const HospitalDetail = () => {
             </li>
           </ol>
         </nav>
-        
+
         <div className="bg-white rounded-lg shadow-md p-6 mb-8">
           <div className="flex flex-col md:flex-row justify-between">
             <div>
               <h1 className="text-3xl font-bold text-teal-600 mb-2">{hospital.name}</h1>
               <p className="text-gray-700 mb-4">{hospital.location?.address}</p>
-              
+
               <div className="flex items-center mb-6">
                 {hospital.ratings ? (
                   <>
@@ -130,18 +127,18 @@ const HospitalDetail = () => {
                 )}
               </div>
             </div>
-            
+
             <div className="mt-4 md:mt-0">
               {user ? (
-                <button 
+                <button
                   onClick={() => setShowReviewForm(!showReviewForm)}
                   className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
                 >
                   {showReviewForm ? 'Cancel Review' : 'Write a Review'}
                 </button>
               ) : (
-                <Link 
-                  to="/login" 
+                <Link
+                  to="/login"
                   className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors"
                 >
                   Login to Write Review
@@ -150,20 +147,20 @@ const HospitalDetail = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
           <div className="md:col-span-2">
             {showReviewForm && (
-              <HospitalReviewForm 
-                hospitalId={hospital._id} 
+              <HospitalReviewForm
+                hospitalId={hospital._id}
                 hospitalName={hospital.name}
                 onReviewSubmitted={handleReviewSubmitted}
               />
             )}
-            
+
             <div className="bg-white rounded-lg shadow-md p-6">
               <h2 className="text-xl font-semibold mb-4">Hospital Information</h2>
-              
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <h3 className="font-medium text-teal-600">Resources</h3>
@@ -171,9 +168,36 @@ const HospitalDetail = () => {
                     <li><strong>ICU Beds:</strong> {hospital.resources?.icu_beds || 'N/A'}</li>
                     <li><strong>Ventilators:</strong> {hospital.resources?.ventilators || 'N/A'}</li>
                     <li><strong>Blood Bank:</strong> {hospital.resources?.blood_bank ? "Available" : "Not Available"}</li>
+                    <li><strong>Emergency Capacity:</strong> {hospital.resources?.emergency_capacity || 'N/A'}</li>
                   </ul>
                 </div>
-                
+
+                {hospital.services && hospital.services.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-teal-600">Specializations</h3>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {hospital.services.map((service, index) => (
+                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                          {service}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {hospital.insurance_accepted && hospital.insurance_accepted.length > 0 && (
+                  <div>
+                    <h3 className="font-medium text-teal-600 mt-4">Insurance Accepted</h3>
+                    <div className="mt-2 flex flex-wrap gap-1">
+                      {hospital.insurance_accepted.map((insurance, index) => (
+                        <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                          {insurance}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
                 <div>
                   <h3 className="font-medium text-teal-600">Medical Imaging</h3>
                   <ul className="mt-2">
@@ -188,13 +212,13 @@ const HospitalDetail = () => {
                   </ul>
                 </div>
               </div>
-              
+
               {hospital.contact && (
                 <div className="mt-6">
                   <h3 className="font-medium text-teal-600">Contact Information</h3>
                   <p className="mt-1"><strong>Phone:</strong> {hospital.contact.phone || 'N/A'}</p>
                   <p><strong>Email:</strong> {hospital.contact.email || 'N/A'}</p>
-                  <p><strong>Website:</strong> {hospital.contact.website ? 
+                  <p><strong>Website:</strong> {hospital.contact.website ?
                     <a href={hospital.contact.website} className="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">
                       {hospital.contact.website}
                     </a> : 'N/A'}
@@ -202,16 +226,16 @@ const HospitalDetail = () => {
                 </div>
               )}
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-md p-6 mt-8">
               <ReviewList reviews={reviews} loading={false} />
             </div>
           </div>
-          
+
           <div className="md:col-span-1">
             <div className="bg-white rounded-lg shadow-md p-6 sticky top-6">
               <h3 className="font-medium text-teal-600 mb-4">Location</h3>
-              
+
               {hospital.location?.coordinates && (
                 <div className="aspect-square bg-gray-200 rounded flex items-center justify-center">
                   <div className="text-center text-gray-600">
@@ -223,13 +247,13 @@ const HospitalDetail = () => {
                   </div>
                 </div>
               )}
-              
+
               <div className="mt-4">
                 <h4 className="font-medium">Address:</h4>
                 <p className="text-gray-700">{hospital.location?.address}</p>
               </div>
-              
-              <Link 
+
+              <Link
                 to={`/blood-requests?hospital=${hospital._id}`}
                 className="block w-full text-center mt-6 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 transition-colors"
               >

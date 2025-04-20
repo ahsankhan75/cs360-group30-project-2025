@@ -72,7 +72,7 @@ const HospitalAdminBloodRequests = () => {
   });
   const [isCreating, setIsCreating] = useState(false);
   const [showCreateForm, setShowCreateForm] = useState(false);
-  
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -89,10 +89,10 @@ const HospitalAdminBloodRequests = () => {
       setLoading(true);
       let url = `/api/hospital-admin/blood-requests`;
       const queryParams = [];
-      
+
       if (bloodType) queryParams.push(`bloodType=${bloodType}`);
       if (status) queryParams.push(`status=${status}`);
-      
+
       if (queryParams.length > 0) {
         url += `?${queryParams.join('&')}`;
       }
@@ -121,10 +121,10 @@ const HospitalAdminBloodRequests = () => {
 
   const handleCreateRequest = async (e) => {
     e.preventDefault();
-    
+
     try {
       setIsCreating(true);
-      
+
       const response = await fetch('/api/hospital-admin/blood-requests', {
         method: 'POST',
         headers: {
@@ -133,14 +133,14 @@ const HospitalAdminBloodRequests = () => {
         },
         body: JSON.stringify(formData)
       });
-      
+
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create blood request');
       }
-      
+
       const newRequest = await response.json();
-      
+
       setBloodRequests(prevRequests => [newRequest, ...prevRequests]);
       setFormData({
         bloodType: 'A+',
@@ -181,7 +181,7 @@ const HospitalAdminBloodRequests = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <HospitalAdminNavbar />
-      
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <div className="md:flex md:items-center md:justify-between mb-6">
           <h1 className="text-2xl font-bold text-gray-800">Blood Requests</h1>
@@ -192,7 +192,7 @@ const HospitalAdminBloodRequests = () => {
             {showCreateForm ? 'Cancel' : 'Create New Request'}
           </button>
         </div>
-        
+
         {error && (
           <div className="bg-red-50 p-4 rounded-md mb-6">
             <div className="flex">
@@ -207,7 +207,7 @@ const HospitalAdminBloodRequests = () => {
             </div>
           </div>
         )}
-        
+
         {showCreateForm && (
           <div className="bg-white rounded-lg shadow-md p-6 mb-6">
             <h2 className="text-lg font-medium text-gray-800 mb-4">Create New Blood Request</h2>
@@ -232,7 +232,7 @@ const HospitalAdminBloodRequests = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="urgencyLevel" className="block text-sm font-medium text-gray-700 mb-1">
                     Urgency Level *
@@ -252,7 +252,7 @@ const HospitalAdminBloodRequests = () => {
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label htmlFor="unitsNeeded" className="block text-sm font-medium text-gray-700 mb-1">
                     Units Needed *
@@ -269,7 +269,7 @@ const HospitalAdminBloodRequests = () => {
                     required
                   />
                 </div>
-                
+
                 <div>
                   <label htmlFor="contactNumber" className="block text-sm font-medium text-gray-700 mb-1">
                     Contact Number
@@ -284,7 +284,7 @@ const HospitalAdminBloodRequests = () => {
                     placeholder="Optional"
                   />
                 </div>
-                
+
                 <div className="sm:col-span-2">
                   <label htmlFor="contactEmail" className="block text-sm font-medium text-gray-700 mb-1">
                     Contact Email
@@ -300,7 +300,7 @@ const HospitalAdminBloodRequests = () => {
                   />
                 </div>
               </div>
-              
+
               <div className="mt-6 flex justify-end">
                 <button
                   type="button"
@@ -320,22 +320,22 @@ const HospitalAdminBloodRequests = () => {
             </form>
           </div>
         )}
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           <div className="lg:col-span-1">
             <div className="bg-white p-6 rounded-lg shadow-md">
               <h2 className="text-lg font-medium text-gray-800 mb-4">Filters</h2>
-              
+
               <BloodTypeFilter
                 selectedBloodType={bloodType}
                 onChange={setBloodType}
               />
-              
+
               <StatusFilter
                 selectedStatus={status}
                 onChange={setStatus}
               />
-              
+
               <button
                 onClick={() => {
                   setBloodType('');
@@ -347,16 +347,16 @@ const HospitalAdminBloodRequests = () => {
               </button>
             </div>
           </div>
-          
+
           <div className="lg:col-span-3">
-            <div className="bg-white rounded-lg shadow-md overflow-hidden">
+            <div className="bg-white rounded-lg shadow-md">
               <div className="p-6 border-b border-gray-200">
                 <h2 className="text-lg font-medium text-gray-800">Blood Requests</h2>
                 {bloodRequests.length === 0 && !loading && (
                   <p className="text-gray-500 mt-2">No blood requests found.</p>
                 )}
               </div>
-              
+
               {bloodRequests.length > 0 && (
                 <ul className="divide-y divide-gray-200">
                   {bloodRequests.map((request) => (
@@ -367,17 +367,17 @@ const HospitalAdminBloodRequests = () => {
                             <span className="text-lg font-medium text-gray-900">
                               Blood Type: {request.bloodType}
                             </span>
-                            <span 
+                            <span
                               className={`ml-3 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' : 
-                                request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' : 
+                                request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                                request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
                                 'bg-green-100 text-green-800'
                               }`}
                             >
                               {request.urgencyLevel}
                             </span>
                           </div>
-                          
+
                           <p className="mt-1 text-sm text-gray-500">
                             Posted: {new Date(request.datePosted).toLocaleString()}
                           </p>
@@ -388,8 +388,8 @@ const HospitalAdminBloodRequests = () => {
                             Contact: {request.contactNumber || 'N/A'} | {request.email}
                           </p>
                         </div>
-                        
-                        <span 
+
+                        <span
                           className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                             request.accepted ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800'
                           }`}

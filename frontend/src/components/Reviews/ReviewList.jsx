@@ -5,7 +5,7 @@ import EditReviewModal from './EditReviewModal';
 const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onReviewUpdated }) => {
   const { user } = useAuthContext();
   const [editingReview, setEditingReview] = useState(null);
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center py-8">
@@ -55,8 +55,8 @@ const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onR
     <>
       <div className="space-y-6">
         {reviews.map((review) => (
-          <div 
-            key={review._id} 
+          <div
+            key={review._id}
             className={`border-b border-gray-200 pb-4 mb-4 last:border-0 ${
               isUserReviews ? 'bg-teal-50 p-3 rounded-md' : ''
             }`}
@@ -65,16 +65,16 @@ const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onR
               <div className="flex items-center mb-2 md:mb-0">
                 <div className="flex mr-2">{renderStars(review.rating)}</div>
                 <span className="font-medium">
-                  {review.user?.fullName || 'Anonymous User'}
+                  {review.userId?.fullName || review.user?.fullName || review.userId?.email || 'Anonymous User'}
                   {isUserReviews && " (You)"}
                 </span>
               </div>
               <div className="flex items-center">
                 <span className="text-sm text-gray-500">{formatDate(review.createdAt)}</span>
-                
+
                 {/* Show edit button for user's own reviews */}
                 {isUserReviews && user && (
-                  <button 
+                  <button
                     className="ml-4 text-teal-600 hover:text-teal-800 flex items-center text-sm"
                     onClick={() => handleEditClick(review)}
                   >
@@ -86,7 +86,7 @@ const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onR
                 )}
               </div>
             </div>
-            
+
             <div className="mt-2">
               {review.comment ? (
                 <p className="text-gray-700">{review.comment}</p>
@@ -94,7 +94,7 @@ const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onR
                 <p className="text-gray-500 italic">No comment provided.</p>
               )}
             </div>
-            
+
             {/* Add date of visit if available */}
             {review.visitDate && (
               <div className="mt-2 text-xs text-gray-500">
@@ -107,7 +107,7 @@ const ReviewList = ({ reviews, loading, emptyMessage, isUserReviews = false, onR
 
       {/* Edit Review Modal */}
       {editingReview && (
-        <EditReviewModal 
+        <EditReviewModal
           review={editingReview}
           onClose={() => setEditingReview(null)}
           onReviewUpdated={handleReviewUpdated}

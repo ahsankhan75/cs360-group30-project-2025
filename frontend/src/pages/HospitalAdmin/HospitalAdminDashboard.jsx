@@ -21,7 +21,80 @@ const HospitalAdminDashboard = () => {
     recentBloodRequests: [],
     recentReviews: []
   });
-  
+
+  const [isEditing, setIsEditing] = useState(false);
+  const [formData, setFormData] = useState({
+    resources: {
+      icu_beds: 0,
+      ventilators: 0,
+      blood_bank: false,
+      emergency_capacity: 0
+    },
+    contact: {
+      email: '',
+      phone: ''
+    },
+    services: [],
+    insurance_accepted: []
+  });
+
+  // List of medical specializations
+  const specializations = [
+    'Cardiology',
+    'Neurology',
+    'Orthopedics',
+    'Pediatrics',
+    'Obstetrics & Gynecology',
+    'Oncology',
+    'Dermatology',
+    'Ophthalmology',
+    'ENT (Ear, Nose, Throat)',
+    'Urology',
+    'Psychiatry',
+    'Gastroenterology',
+    'Endocrinology',
+    'Nephrology',
+    'Pulmonology',
+    'Rheumatology',
+    'Hematology',
+    'Infectious Disease',
+    'General Surgery',
+    'Plastic Surgery',
+    'Neurosurgery',
+    'Cardiac Surgery',
+    'Vascular Surgery',
+    'Emergency Medicine',
+    'Radiology',
+    'Anesthesiology',
+    'Pathology',
+    'Physical Therapy',
+    'Dental Care'
+  ];
+
+  // List of common insurance providers
+  const insuranceProviders = [
+    'State Life Insurance',
+    'Jubilee Life Insurance',
+    'EFU Life Insurance',
+    'Adamjee Insurance',
+    'IGI Insurance',
+    'Allianz EFU Health Insurance',
+    'New Jubilee Insurance',
+    'United Insurance',
+    'Alpha Insurance',
+    'Asia Insurance',
+    'Askari Insurance',
+    'Atlas Insurance',
+    'Century Insurance',
+    'Habib Insurance',
+    'Premier Insurance',
+    'Reliance Insurance',
+    'Security General Insurance',
+    'TPL Insurance',
+    'UBL Insurers'
+  ];
+  const [isSaving, setIsSaving] = useState(false);
+
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -52,6 +125,23 @@ const HospitalAdminDashboard = () => {
 
         const data = await response.json();
         setDashboardData(data);
+
+        // Initialize form data with hospital data
+        setFormData({
+          resources: {
+            icu_beds: data.hospital?.resources?.icu_beds || 0,
+            ventilators: data.hospital?.resources?.ventilators || 0,
+            blood_bank: data.hospital?.resources?.blood_bank || false,
+            emergency_capacity: data.hospital?.resources?.emergency_capacity || 0
+          },
+          contact: {
+            email: data.hospital?.contact?.email || '',
+            phone: data.hospital?.contact?.phone || ''
+          },
+          services: data.hospital?.services || [],
+          insurance_accepted: data.hospital?.insurance_accepted || []
+        });
+
         setError(null);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
@@ -84,7 +174,7 @@ const HospitalAdminDashboard = () => {
           <div className="bg-white p-8 rounded-lg shadow-md max-w-md">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
             <p className="text-gray-700">{error}</p>
-            <button 
+            <button
               onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
             >
@@ -99,7 +189,7 @@ const HospitalAdminDashboard = () => {
   return (
     <div className="min-h-screen bg-gray-100">
       <HospitalAdminNavbar />
-      
+
       <div className="pt-16 pb-12 px-6 max-w-7xl mx-auto">
         <header className="mb-8">
           <h1 className="text-3xl font-bold text-gray-800">Hospital Admin Dashboard</h1>
@@ -107,7 +197,7 @@ const HospitalAdminDashboard = () => {
             Welcome back, {hospitalAdmin?.fullName || hospitalAdmin?.email}
           </p>
         </header>
-        
+
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           {/* Stats cards */}
           <div className="bg-white rounded-lg shadow p-6">
@@ -123,7 +213,7 @@ const HospitalAdminDashboard = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-green-100 text-green-600">
@@ -137,7 +227,7 @@ const HospitalAdminDashboard = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-yellow-100 text-yellow-600">
@@ -151,7 +241,7 @@ const HospitalAdminDashboard = () => {
               </div>
             </div>
           </div>
-          
+
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex items-center">
               <div className="p-3 rounded-full bg-blue-100 text-blue-600">
@@ -166,59 +256,277 @@ const HospitalAdminDashboard = () => {
             </div>
           </div>
         </div>
-        
+
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* Hospital Information */}
           <div className="bg-white rounded-lg shadow p-6">
-            <h2 className="text-xl font-bold text-gray-800 mb-4">Hospital Information</h2>
-            <div className="border-t border-gray-200 pt-4">
-              <dl className="divide-y divide-gray-200">
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Name</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.name || 'N/A'}</dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Address</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.location?.address || 'N/A'}</dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Contact</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">
-                    {dashboardData.hospital?.contact?.email && (
-                      <div>Email: {dashboardData.hospital.contact.email}</div>
-                    )}
-                    {dashboardData.hospital?.contact?.phone && (
-                      <div>Phone: {dashboardData.hospital.contact.phone}</div>
-                    )}
-                    {!dashboardData.hospital?.contact?.email && !dashboardData.hospital?.contact?.phone && 'N/A'}
-                  </dd>
-                </div>
-                <div className="py-3 grid grid-cols-3 gap-4">
-                  <dt className="text-sm font-medium text-gray-500">Resources</dt>
-                  <dd className="text-sm text-gray-900 col-span-2">
-                    <ul>
-                      <li>ICU Beds: {dashboardData.hospital?.resources?.icu_beds || 'N/A'}</li>
-                      <li>Ventilators: {dashboardData.hospital?.resources?.ventilators || 'N/A'}</li>
-                      <li>Blood Bank: {dashboardData.hospital?.resources?.blood_bank ? 'Available' : 'Not Available'}</li>
-                    </ul>
-                  </dd>
-                </div>
-              </dl>
+            <div className="flex justify-between items-center mb-4">
+              <h2 className="text-xl font-bold text-gray-800">Hospital Information</h2>
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => navigate('/hospital-admin/profile')}
+                  className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm"
+                >
+                  Manage Specializations
+                </button>
+                <button
+                  onClick={() => setIsEditing(!isEditing)}
+                  className="px-3 py-1 bg-teal-600 hover:bg-teal-700 text-white rounded-md text-sm"
+                >
+                  {isEditing ? 'Cancel' : 'Edit'}
+                </button>
+              </div>
             </div>
+
+            {isEditing ? (
+              <div className="border-t border-gray-200 pt-4">
+                <form onSubmit={async (e) => {
+                  e.preventDefault();
+                  setIsSaving(true);
+
+                  try {
+                    // Only send the fields we're updating
+                    const updateData = {
+                      contact: formData.contact,
+                      resources: formData.resources
+                    };
+
+                    const response = await fetch('/api/hospital-admin/profile', {
+                      method: 'PATCH',
+                      headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': `Bearer ${hospitalAdmin.token}`
+                      },
+                      body: JSON.stringify(updateData)
+                    });
+
+                    if (!response.ok) {
+                      const errorData = await response.json();
+                      throw new Error(errorData.error || 'Failed to update hospital profile');
+                    }
+
+                    const updatedHospital = await response.json();
+
+                    // Update the dashboard data with the new hospital info
+                    setDashboardData({
+                      ...dashboardData,
+                      hospital: updatedHospital
+                    });
+
+                    setIsEditing(false);
+                    toast.success('Hospital information updated successfully');
+                  } catch (err) {
+                    console.error('Error updating hospital profile:', err);
+                    toast.error(err.message || 'Failed to update hospital profile');
+                  } finally {
+                    setIsSaving(false);
+                  }
+                }}>
+                  <div className="space-y-4">
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">Contact Information</h3>
+                      <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-2 sm:gap-x-6">
+                        <div>
+                          <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
+                          <input
+                            type="email"
+                            id="email"
+                            value={formData.contact.email}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              contact: {
+                                ...formData.contact,
+                                email: e.target.value
+                              }
+                            })}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="phone" className="block text-sm font-medium text-gray-700">Phone</label>
+                          <input
+                            type="text"
+                            id="phone"
+                            value={formData.contact.phone}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              contact: {
+                                ...formData.contact,
+                                phone: e.target.value
+                              }
+                            })}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    <div>
+                      <h3 className="text-base font-medium text-gray-900 mb-2">Resources</h3>
+                      <div className="grid grid-cols-1 gap-y-4 sm:grid-cols-3 sm:gap-x-6">
+                        <div>
+                          <label htmlFor="icu_beds" className="block text-sm font-medium text-gray-700">ICU Beds</label>
+                          <input
+                            type="number"
+                            id="icu_beds"
+                            min="0"
+                            value={formData.resources.icu_beds}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              resources: {
+                                ...formData.resources,
+                                icu_beds: parseInt(e.target.value) || 0
+                              }
+                            })}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="ventilators" className="block text-sm font-medium text-gray-700">Ventilators</label>
+                          <input
+                            type="number"
+                            id="ventilators"
+                            min="0"
+                            value={formData.resources.ventilators}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              resources: {
+                                ...formData.resources,
+                                ventilators: parseInt(e.target.value) || 0
+                              }
+                            })}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="emergency_capacity" className="block text-sm font-medium text-gray-700">Emergency Capacity</label>
+                          <input
+                            type="number"
+                            id="emergency_capacity"
+                            min="0"
+                            value={formData.resources.emergency_capacity}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              resources: {
+                                ...formData.resources,
+                                emergency_capacity: parseInt(e.target.value) || 0
+                              }
+                            })}
+                            className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-teal-500 focus:border-teal-500 sm:text-sm"
+                          />
+                        </div>
+                        <div className="flex items-center">
+                          <input
+                            type="checkbox"
+                            id="blood_bank"
+                            checked={formData.resources.blood_bank}
+                            onChange={(e) => setFormData({
+                              ...formData,
+                              resources: {
+                                ...formData.resources,
+                                blood_bank: e.target.checked
+                              }
+                            })}
+                            className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                          />
+                          <label htmlFor="blood_bank" className="ml-2 block text-sm font-medium text-gray-700">Blood Bank Available</label>
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="flex justify-end pt-4">
+                      <button
+                        type="submit"
+                        disabled={isSaving}
+                        className="px-4 py-2 bg-teal-600 text-white rounded-md hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 disabled:opacity-50"
+                      >
+                        {isSaving ? 'Saving...' : 'Save Changes'}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            ) : (
+              <div className="border-t border-gray-200 pt-4">
+                <dl className="divide-y divide-gray-200">
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Name</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.name || 'N/A'}</dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Address</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">{dashboardData.hospital?.location?.address || 'N/A'}</dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Contact</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">
+                      {dashboardData.hospital?.contact?.email && (
+                        <div>Email: {dashboardData.hospital.contact.email}</div>
+                      )}
+                      {dashboardData.hospital?.contact?.phone && (
+                        <div>Phone: {dashboardData.hospital.contact.phone}</div>
+                      )}
+                      {!dashboardData.hospital?.contact?.email && !dashboardData.hospital?.contact?.phone && 'N/A'}
+                    </dd>
+                  </div>
+                  <div className="py-3 grid grid-cols-3 gap-4">
+                    <dt className="text-sm font-medium text-gray-500">Resources</dt>
+                    <dd className="text-sm text-gray-900 col-span-2">
+                      <ul>
+                        <li>ICU Beds: {dashboardData.hospital?.resources?.icu_beds || 'N/A'}</li>
+                        <li>Ventilators: {dashboardData.hospital?.resources?.ventilators || 'N/A'}</li>
+                        <li>Blood Bank: {dashboardData.hospital?.resources?.blood_bank ? 'Available' : 'Not Available'}</li>
+                        <li>Emergency Capacity: {dashboardData.hospital?.resources?.emergency_capacity || 'N/A'}</li>
+                      </ul>
+                    </dd>
+                  </div>
+
+                  {dashboardData.hospital?.services && dashboardData.hospital.services.length > 0 && (
+                    <div className="py-3 grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Specializations</dt>
+                      <dd className="text-sm text-gray-900 col-span-2">
+                        <div className="flex flex-wrap gap-1">
+                          {dashboardData.hospital.services.map((service, index) => (
+                            <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800">
+                              {service}
+                            </span>
+                          ))}
+                        </div>
+                      </dd>
+                    </div>
+                  )}
+
+                  {dashboardData.hospital?.insurance_accepted && dashboardData.hospital.insurance_accepted.length > 0 && (
+                    <div className="py-3 grid grid-cols-3 gap-4">
+                      <dt className="text-sm font-medium text-gray-500">Insurance Accepted</dt>
+                      <dd className="text-sm text-gray-900 col-span-2">
+                        <div className="flex flex-wrap gap-1">
+                          {dashboardData.hospital.insurance_accepted.map((insurance, index) => (
+                            <span key={index} className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
+                              {insurance}
+                            </span>
+                          ))}
+                        </div>
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              </div>
+            )}
           </div>
-          
+
           {/* Recent Blood Requests */}
           <div className="bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">Recent Blood Requests</h2>
-              <button 
+              <button
                 onClick={() => navigate('/hospital-admin/blood-requests')}
                 className="text-sm font-medium text-teal-600 hover:text-teal-800"
               >
                 View All
               </button>
             </div>
-            
+
             <div className="border-t border-gray-200 pt-4">
               {dashboardData.recentBloodRequests?.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
@@ -230,14 +538,14 @@ const HospitalAdminDashboard = () => {
                             Blood Type: {request.bloodType}
                           </p>
                           <p className="text-sm text-gray-500">
-                            Posted: {new Date(request.datePosted).toLocaleDateString()} • 
+                            Posted: {new Date(request.datePosted).toLocaleDateString()} •
                             Status: {request.accepted ? 'Accepted' : 'Pending'}
                           </p>
                         </div>
-                        <span 
+                        <span
                           className={`px-2 py-1 text-xs rounded-full ${
-                            request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' : 
-                            request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' : 
+                            request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                            request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
                             'bg-green-100 text-green-800'
                           }`}
                         >
@@ -252,19 +560,20 @@ const HospitalAdminDashboard = () => {
               )}
             </div>
           </div>
-          
+
           {/* Recent Reviews */}
           <div className="col-span-1 lg:col-span-2 bg-white rounded-lg shadow p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-gray-800">Recent Reviews</h2>
-              <button 
+              <button
                 onClick={() => navigate('/hospital-admin/reviews')}
                 className="text-sm font-medium text-teal-600 hover:text-teal-800"
+                aria-label="View all reviews"
               >
                 View All
               </button>
             </div>
-            
+
             <div className="border-t border-gray-200 pt-4">
               {dashboardData.recentReviews?.length > 0 ? (
                 <ul className="divide-y divide-gray-200">
@@ -273,15 +582,15 @@ const HospitalAdminDashboard = () => {
                       <div className="flex items-start">
                         <div className="min-w-0 flex-1">
                           <p className="text-sm font-medium text-gray-900">
-                            {review.userId?.email || 'Anonymous User'}
+                            {review.userId?.fullName || review.userId?.email || 'Anonymous User'}
                           </p>
                           <div className="flex items-center mt-1">
                             {[...Array(5)].map((_, i) => (
-                              <svg 
+                              <svg
                                 key={i}
-                                className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`} 
-                                fill="currentColor" 
-                                viewBox="0 0 20 20" 
+                                className={`h-4 w-4 ${i < review.rating ? 'text-yellow-400' : 'text-gray-300'}`}
+                                fill="currentColor"
+                                viewBox="0 0 20 20"
                                 xmlns="http://www.w3.org/2000/svg"
                               >
                                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118l-2.8-2.034c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />

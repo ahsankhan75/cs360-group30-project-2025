@@ -8,7 +8,8 @@ const {
   createBloodRequest,
   updateHospitalProfile,
   getPendingHospitalAdmins,
-  updateHospitalAdminStatus
+  updateHospitalAdminStatus,
+  getHospitalReviews
 } = require('../controllers/hospitalAdminController');
 const requireHospitalAdminAuth = require('../middleware/requireHospitalAdminAuth');
 const requireAdmin = require('../middleware/requireAdmin');
@@ -20,9 +21,9 @@ router.post('/signup', signupHospitalAdmin);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
-  res.status(200).json({ 
+  res.status(200).json({
     status: 'Hospital Admin API is available',
-    time: new Date().toISOString() 
+    time: new Date().toISOString()
   });
 });
 
@@ -31,6 +32,7 @@ router.get('/dashboard', requireHospitalAdminAuth, getHospitalAdminDashboard);
 router.get('/blood-requests', requireHospitalAdminAuth, getHospitalBloodRequests);
 router.post('/blood-requests', requireHospitalAdminAuth, createBloodRequest);
 router.patch('/profile', requireHospitalAdminAuth, updateHospitalProfile);
+router.get('/reviews', requireHospitalAdminAuth, getHospitalReviews);
 
 // Super admin routes for managing hospital admins
 router.get('/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);

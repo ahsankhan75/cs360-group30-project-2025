@@ -100,6 +100,16 @@ const HospitalAdminNavbar = () => {
                   Blood Requests
                 </Link>
                 <Link
+                  to="/hospital-admin/reviews"
+                  className={`${
+                    isActive('/hospital-admin/reviews')
+                      ? 'bg-teal-800 text-white'
+                      : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+                  } px-3 py-2 rounded-md text-sm font-medium`}
+                >
+                  Reviews
+                </Link>
+                <Link
                   to="/hospital-admin/profile"
                   className={`${
                     isActive('/hospital-admin/profile')

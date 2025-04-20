@@ -18,6 +18,7 @@ import HospitalAdminSignup from './pages/HospitalAdmin/HospitalAdminSignup';
 import HospitalAdminDashboard from './pages/HospitalAdmin/HospitalAdminDashboard';
 import HospitalAdminBloodRequests from './pages/HospitalAdmin/HospitalAdminBloodRequests';
 import HospitalAdminProfile from './pages/HospitalAdmin/HospitalAdminProfile';
+import HospitalAdminReviews from './pages/HospitalAdmin/HospitalAdminReviews';
 import HospitalAdminRequireAuth from './components/HospitalAdmin/HospitalAdminRequireAuth';
 import HospitalAdminNavbar from './components/HospitalAdmin/HospitalAdminNavbar';
 
@@ -27,7 +28,7 @@ import Signup from "./pages/Signup";
 import Navbar from "./components/Navbar";
 import Hospitals from "./pages/Hospitals";
 import Home from "./pages/Home";
-import Dashboard from "./pages/Dashboard"; 
+import Dashboard from "./pages/Dashboard";
 import BloodRequestsPage from "./pages/BloodRequestsPage";
 import BloodRequestDetailPage from "./pages/BloodRequestDetailPage";
 import MyBloodRequestsPage from "./pages/MyBloodRequestsPage";
@@ -36,7 +37,7 @@ import DigitalMedicalCardForm from "./components/DigitalMedicalCardForm";
 import Reviews from "./pages/Reviews";
 import HospitalDetail from "./pages/HospitalDetail";
 import MyReviews from "./pages/MyReviews";
-import AdminNavbar from "./components/Admin/AdminNavbar";
+// Admin components are imported through their respective pages
 
 function App() {
   const { user } = useAuthContext();
@@ -52,20 +53,19 @@ function App() {
                 {/* Admin login/signup page has its own layout */}
                 <Route path="/admin/login" element={null} />
                 <Route path="/admin/signup" element={null} />
-                <Route path="/signupasadmin" element={null} />
-                
+
                 {/* Hospital Admin pages have their own navbar */}
                 <Route path="/hospital-admin/login" element={null} />
                 <Route path="/hospital-admin/signup" element={null} />
-                <Route path="/hospital-admin/*" element={<HospitalAdminNavbar />} />
-                
-                {/* Other admin pages show the AdminNavbar through AdminLayout */}
-                <Route path="/admin/*" element={<AdminNavbar />} />
-                
+                <Route path="/hospital-admin/*" element={null} />
+
+                {/* Admin pages use AdminNavbar through AdminLayout */}
+                <Route path="/admin/*" element={null} />
+
                 {/* Regular routes show navbar */}
                 <Route path="*" element={<Navbar />} />
               </Routes>
-              
+
               <div className="pages">
                 <Routes>
                   {/* User Routes */}
@@ -78,20 +78,20 @@ function App() {
                   <Route path="/hospital/:id" element={<HospitalDetail />} />
                   <Route path="/medical-card" element={user ? <DigitalMedicalCardForm /> : <Navigate to="/login" />} />
                   <Route path="/my-reviews" element={user ? <MyReviews /> : <Navigate to="/login" />} />
-                  
+
                   {/* Blood request routes - Users can only view and accept */}
                   <Route path="/blood-requests" element={<BloodRequestsPage />} />
                   <Route path="/blood-requests/:requestId" element={user ? <BloodRequestDetailPage /> : <Navigate to="/login" />} />
                   <Route path="/my-blood-requests" element={user ? <MyBloodRequestsPage /> : <Navigate to="/login" />} />
-                  
+
                   {/* Legacy routes that redirect to the new consistent naming */}
                   <Route path="/requests" element={<Navigate to="/blood-requests" replace />} />
                   <Route path="/requests/:requestId" element={<Navigate to="/blood-requests/:requestId" replace />} />
-                  
+
                   {/* Admin Authentication Routes - Public */}
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/signup" element={<AdminSignup />} />
-                  <Route path="/signupasadmin" element={<SignupAsAdmin />} />
+                  <Route path="/signupasadmin" element={<Navigate to="/hospital-admin/signup" replace />} />
 
                   {/* Protected Admin Routes */}
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -101,11 +101,11 @@ function App() {
                   <Route path="/admin/hospital-admins" element={<AdminRequireAuth><AdminHospitalAdminsPage /></AdminRequireAuth>} />
                   <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
                   <Route path="/admin/reviews" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
-                  
+
                   {/* Hospital Admin Authentication Routes - Public */}
                   <Route path="/hospital-admin/login" element={<HospitalAdminLogin />} />
                   <Route path="/hospital-admin/signup" element={<HospitalAdminSignup />} />
-                  
+
                   {/* Protected Hospital Admin Routes */}
                   <Route path="/hospital-admin" element={<Navigate to="/hospital-admin/dashboard" replace />} />
                   <Route path="/hospital-admin/dashboard" element={
@@ -116,6 +116,9 @@ function App() {
                   } />
                   <Route path="/hospital-admin/profile" element={
                     <HospitalAdminRequireAuth><HospitalAdminProfile /></HospitalAdminRequireAuth>
+                  } />
+                  <Route path="/hospital-admin/reviews" element={
+                    <HospitalAdminRequireAuth><HospitalAdminReviews /></HospitalAdminRequireAuth>
                   } />
                 </Routes>
               </div>

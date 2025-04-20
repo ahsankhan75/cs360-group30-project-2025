@@ -17,7 +17,7 @@ const AdminDashboard = () => {
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!adminUser) return
-      
+
       setLoading(true)
       try {
         // In a full implementation, this would fetch data from a /api/admin/dashboard endpoint
@@ -47,15 +47,9 @@ const AdminDashboard = () => {
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="bg-white shadow-sm z-10">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-semibold text-gray-800">Dashboard</h1>
-          </div>
-        </header>
-        
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+      <div className="flex-1 overflow-auto">
+        <main className="p-6">
           {loading ? (
             <div className="flex justify-center items-center h-64">
               <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
@@ -67,61 +61,125 @@ const AdminDashboard = () => {
             </div>
           ) : (
             <>
-              <h2 className="text-xl font-semibold text-gray-700 mb-6">Welcome, {adminUser.fullName || 'Admin'}</h2>
-              
+              <h2 className="text-2xl font-bold text-gray-800 mb-6">Admin Dashboard</h2>
+
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-                <div className="bg-white shadow rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-teal-100 text-teal-500">
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="bg-blue-500 text-white shadow rounded-lg p-6">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-medium">Total Users</h3>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
                       </svg>
                     </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-medium text-gray-900">Users</h3>
-                      <div className="text-3xl font-semibold text-gray-700">{stats.userCount}</div>
+                    <div className="text-4xl font-bold">{stats.userCount}</div>
+                    <div className="mt-4">
+                      <a href="/admin/users" className="text-sm hover:underline">View All Users</a>
                     </div>
                   </div>
                 </div>
-                
-                <div className="bg-white shadow rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-blue-100 text-blue-500">
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                <div className="bg-green-500 text-white shadow rounded-lg p-6">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-medium">Hospitals</h3>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"></path>
                       </svg>
                     </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-medium text-gray-900">Hospitals</h3>
-                      <div className="text-3xl font-semibold text-gray-700">{stats.hospitalCount}</div>
+                    <div className="text-4xl font-bold">{stats.hospitalCount}</div>
+                    <div className="mt-4">
+                      <a href="/admin/hospitals" className="text-sm hover:underline">Manage Hospitals</a>
                     </div>
                   </div>
                 </div>
-                
-                <div className="bg-white shadow rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-yellow-100 text-yellow-500">
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
-                      </svg>
-                    </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-medium text-gray-900">Reviews</h3>
-                      <div className="text-3xl font-semibold text-gray-700">{stats.reviewCount}</div>
-                    </div>
-                  </div>
-                </div>
-                
-                <div className="bg-white shadow rounded-lg p-4">
-                  <div className="flex items-center">
-                    <div className="p-3 rounded-full bg-red-100 text-red-500">
-                      <svg className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+
+                <div className="bg-red-500 text-white shadow rounded-lg p-6">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-medium">Blood Requests</h3>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
                       </svg>
                     </div>
-                    <div className="ml-4">
-                      <h3 className="text-lg font-medium text-gray-900">Blood Requests</h3>
-                      <div className="text-3xl font-semibold text-gray-700">{stats.bloodRequestCount}</div>
+                    <div className="text-4xl font-bold">{stats.bloodRequestCount}</div>
+                    <div className="mt-4">
+                      <a href="/admin/blood-requests" className="text-sm hover:underline">Manage Requests</a>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="bg-purple-500 text-white shadow rounded-lg p-6">
+                  <div className="flex flex-col">
+                    <div className="flex justify-between items-center mb-4">
+                      <h3 className="text-xl font-medium">Reviews</h3>
+                      <svg className="h-8 w-8" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z"></path>
+                      </svg>
+                    </div>
+                    <div className="text-4xl font-bold">{stats.reviewCount}</div>
+                    <div className="mt-4">
+                      <a href="/admin/reviews" className="text-sm hover:underline">Manage Reviews</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
+                <div className="bg-white shadow rounded-lg p-6">
+                  <h3 className="text-xl font-semibold mb-4">Recent Blood Requests</h3>
+                  <div className="overflow-x-auto">
+                    <table className="min-w-full">
+                      <thead>
+                        <tr className="text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                          <th className="px-4 py-2">Hospital</th>
+                          <th className="px-4 py-2">Blood Type</th>
+                          <th className="px-4 py-2">Urgency</th>
+                          <th className="px-4 py-2">Date</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td className="px-4 py-3">Bahawalpur Regional Medical Center</td>
+                          <td className="px-4 py-3">A-</td>
+                          <td className="px-4 py-3"><span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Medium</span></td>
+                          <td className="px-4 py-3">4/10/2025</td>
+                        </tr>
+                        <tr>
+                          <td className="px-4 py-3">Peshawar</td>
+                          <td className="px-4 py-3">A-</td>
+                          <td className="px-4 py-3"><span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">Medium</span></td>
+                          <td className="px-4 py-3">4/10/2025</td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+
+                <div className="bg-white shadow rounded-lg p-6">
+                  <h3 className="text-xl font-semibold mb-4">Recent Reviews</h3>
+                  <div className="space-y-4">
+                    <div className="border-b pb-4">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Larkana Central Clinic</h4>
+                        <div className="flex text-yellow-400">
+                          <span>★★★★</span><span className="text-gray-300">★</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">By: Uzair Khattak</p>
+                      <p className="text-sm mt-2">My review for larkana 1</p>
+                      <p className="text-xs text-gray-500 mt-1">4/20/2026</p>
+                    </div>
+                    <div className="border-b pb-4">
+                      <div className="flex justify-between">
+                        <h4 className="font-medium">Sukkur Central Medical Center</h4>
+                        <div className="flex text-yellow-400">
+                          <span>★★★★★</span>
+                        </div>
+                      </div>
+                      <p className="text-sm text-gray-600 mt-1">By: Salman Khan</p>
+                      <p className="text-sm mt-2">Nice</p>
+                      <p className="text-xs text-gray-500 mt-1">4/20/2026</p>
                     </div>
                   </div>
                 </div>

@@ -20,9 +20,9 @@ const AdminDashboard = () => {
       reviews: []
     }
   });
-  
+
   const { admin } = useAdminAuthContext();
-  
+
   useEffect(() => {
     const fetchDashboardData = async () => {
       if (!admin) {
@@ -30,18 +30,18 @@ const AdminDashboard = () => {
         setLoading(false);
         return;
       }
-      
+
       try {
         const response = await fetch('/api/admin/dashboard', {
           headers: {
             'Authorization': `Bearer ${admin.token}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error(`HTTP error! Status: ${response.status}`);
         }
-        
+
         const data = await response.json();
         setDashboardData(data);
         setError(null);
@@ -53,10 +53,10 @@ const AdminDashboard = () => {
         setLoading(false);
       }
     };
-    
+
     fetchDashboardData();
   }, [admin]);
-  
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -64,7 +64,7 @@ const AdminDashboard = () => {
       </div>
     );
   }
-  
+
   if (error) {
     return (
       <div className="bg-red-50 border-l-4 border-red-500 p-4 mb-6">
@@ -72,19 +72,19 @@ const AdminDashboard = () => {
       </div>
     );
   }
-  
+
   const { stats, recentActivity } = dashboardData;
-  
+
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
-      
-      <div className="flex-1 flex flex-col overflow-hidden">
+
+      <div className="flex-1 flex flex-col">
         <AdminHeader title="Dashboard" />
-        
-        <main className="flex-1 overflow-x-hidden overflow-y-auto bg-gray-100 p-6">
+
+        <main className="flex-1 bg-gray-100 p-6">
           <h1 className="text-3xl font-bold text-gray-800 mb-6">Admin Dashboard</h1>
-          
+
           {/* Stats Cards */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
             <div className="bg-gradient-to-br from-blue-500 to-blue-600 text-white rounded-lg p-6 shadow-md">
@@ -97,7 +97,7 @@ const AdminDashboard = () => {
               <p className="text-3xl font-bold mt-4">{stats.userCount}</p>
               <Link to="/admin/users" className="text-xs text-blue-100 mt-4 block hover:underline">View All Users</Link>
             </div>
-            
+
             <div className="bg-gradient-to-br from-green-500 to-green-600 text-white rounded-lg p-6 shadow-md">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">Hospitals</h2>
@@ -108,7 +108,7 @@ const AdminDashboard = () => {
               <p className="text-3xl font-bold mt-4">{stats.hospitalCount}</p>
               <Link to="/admin/hospitals" className="text-xs text-green-100 mt-4 block hover:underline">Manage Hospitals</Link>
             </div>
-            
+
             <div className="bg-gradient-to-br from-red-500 to-red-600 text-white rounded-lg p-6 shadow-md">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">Blood Requests</h2>
@@ -119,7 +119,7 @@ const AdminDashboard = () => {
               <p className="text-3xl font-bold mt-4">{stats.bloodRequestCount}</p>
               <Link to="/admin/blood-requests" className="text-xs text-red-100 mt-4 block hover:underline">Manage Requests</Link>
             </div>
-            
+
             <div className="bg-gradient-to-br from-purple-500 to-purple-600 text-white rounded-lg p-6 shadow-md">
               <div className="flex justify-between items-center">
                 <h2 className="text-lg font-semibold">Reviews</h2>
@@ -131,14 +131,14 @@ const AdminDashboard = () => {
               <Link to="/admin/reviews" className="text-xs text-purple-100 mt-4 block hover:underline">Manage Reviews</Link>
             </div>
           </div>
-          
+
           {/* Recent Activity */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Recent Blood Requests */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Blood Requests</h2>
               {recentActivity.bloodRequests && recentActivity.bloodRequests.length > 0 ? (
-                <div className="overflow-x-auto">
+                <div className="responsive-table-container">
                   <table className="min-w-full">
                     <thead>
                       <tr className="bg-gray-50">
@@ -173,7 +173,7 @@ const AdminDashboard = () => {
               )}
               <Link to="/admin/blood-requests" className="mt-4 text-sm text-teal-600 hover:underline block">View All Requests</Link>
             </div>
-            
+
             {/* Recent Reviews */}
             <div className="bg-white rounded-lg shadow p-6">
               <h2 className="text-xl font-semibold mb-4 text-gray-800">Recent Reviews</h2>
@@ -184,7 +184,7 @@ const AdminDashboard = () => {
                       <div className="flex justify-between items-start">
                         <div>
                           <h3 className="font-medium">{review.hospitalId?.name || 'Unknown Hospital'}</h3>
-                          <p className="text-sm text-gray-500">By: {review.userId?.email || 'Anonymous'}</p>
+                          <p className="text-sm text-gray-500">By: {review.userId?.fullName || review.userId?.email || 'Anonymous'}</p>
                         </div>
                         <div className="flex">
                           {[...Array(5)].map((_, i) => (

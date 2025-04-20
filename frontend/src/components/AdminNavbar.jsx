@@ -7,7 +7,7 @@ const AdminNavbar = () => {
   const { admin } = useAdminAuthContext();
   const { logout } = useAdminLogout();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  
+
   // Array of navigation links for easy management
   const navLinks = [
     { to: "/admin/dashboard", label: "Dashboard" },
@@ -16,19 +16,19 @@ const AdminNavbar = () => {
     { to: "/admin/blood-requests", label: "Blood Requests" },
     { to: "/admin/reviews", label: "Reviews" }
   ];
-  
+
   // Handle logout
   const handleLogout = () => {
     logout();
   };
-  
+
   // Toggle mobile menu
   const toggleMobileMenu = () => {
     setMobileMenuOpen(!mobileMenuOpen);
   };
-  
+
   return (
-    <nav className="bg-gray-900 text-white">
+    <nav className="bg-[#1e293b] text-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16">
           <div className="flex items-center">
@@ -37,26 +37,26 @@ const AdminNavbar = () => {
               <span className="font-bold text-xl">EMCON Admin</span>
             </Link>
           </div>
-          
+
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-6">
             {admin && (
               <>
                 {navLinks.map((link) => (
-                  <Link 
-                    key={link.to} 
-                    to={link.to} 
+                  <Link
+                    key={link.to}
+                    to={link.to}
                     className="px-3 py-2 text-white hover:text-teal-300 transition-colors"
                   >
                     {link.label}
                   </Link>
                 ))}
-                
+
                 <div className="border-l border-gray-700 h-6 mx-2"></div>
-                
+
                 <span className="text-gray-400 text-sm">{admin.email}</span>
-                
-                <button 
+
+                <button
                   onClick={handleLogout}
                   className="px-4 py-1.5 bg-red-600 text-white rounded-md hover:bg-red-700 transition-colors"
                 >
@@ -65,10 +65,10 @@ const AdminNavbar = () => {
               </>
             )}
           </div>
-          
+
           {/* Mobile menu button */}
           <div className="flex md:hidden items-center">
-            <button 
+            <button
               onClick={toggleMobileMenu}
               className="inline-flex items-center justify-center p-2 rounded-md text-gray-400 hover:text-white hover:bg-gray-700 focus:outline-none"
               aria-expanded="false"
@@ -102,7 +102,7 @@ const AdminNavbar = () => {
                 {link.label}
               </Link>
             ))}
-            
+
             <div className="border-t border-gray-700 my-2 pt-2">
               <div className="px-3 py-2 text-sm text-gray-400">
                 {admin && admin.email}

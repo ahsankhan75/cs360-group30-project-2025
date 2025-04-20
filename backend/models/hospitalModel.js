@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const hospitalSchema = new Schema({
     name: { type: String, required: true },
-    
+
     location: {
         type: { type: String, enum: ["Point"], default: "Point" },  // GeoJSON type
         coordinates: { type: [Number], required: true },  // [longitude, latitude]
@@ -15,6 +15,7 @@ const hospitalSchema = new Schema({
         icu_beds: { type: Number, default: 0 },
         ventilators: { type: Number, default: 0 },
         blood_bank: { type: Boolean, default: false },
+        emergency_capacity: { type: Number, default: 0 },
         medical_imaging: { type: [String], default: [] }  // Example: ["MRI", "CT", "X-Ray", "Ultrasound"]
     },
 
@@ -31,7 +32,7 @@ const hospitalSchema = new Schema({
 
     ratings: { type: Number, min: 0, max: 5, default: 0 },
     reviewCount: { type: Number, default: 0 },
-    
+
     wait_times: {
         emergency: { type: String, default: "Unknown" },  // Example: "30 mins"
         general: { type: String, default: "Unknown" }

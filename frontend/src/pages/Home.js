@@ -68,19 +68,46 @@ const Home = () => {
   const textX = "-50px"; // left/right
   const textY = "20px";  // up/down
 
+  // Super Admin buttons style
+  const superAdminContainerStyle = {
+    position: "absolute",
+    top: "20px",
+    left: "20px",
+    display: "flex",
+    gap: "10px",
+    zIndex: 20
+  };
+
+  const superAdminButtonStyle = {
+    padding: "8px 16px",
+    backgroundColor: "#0694A2",
+    color: "white",
+    borderRadius: "6px",
+    fontSize: "14px",
+    fontWeight: "600",
+    cursor: "pointer",
+    textDecoration: "none",
+    display: "inline-block"
+  };
+
   const textContainerStyle = {
     width: "400px",
     textAlign: "left",
     transform: `translate(${textX}, ${textY})`,
-    position: "absolute", 
+    position: "absolute",
     right: "400px",        // anchor to the right edge
     top: "290px" ,     // base vertical offset
-    zIndex: 10 
+    zIndex: 10
   };
 
   return (
     <div style={{ position: "relative", minHeight: "100vh", textAlign: "center", paddingTop: "80px", fontSize: "24px" }}>
-      
+      {/* Super Admin buttons */}
+      <div style={superAdminContainerStyle}>
+        <a href="/admin/signup" style={superAdminButtonStyle}>Super Admin Signup</a>
+        <a href="/admin/login" style={superAdminButtonStyle}>Super Admin Login</a>
+      </div>
+
       {/* ✅ SVG Background Shapes */}
       <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", overflow: "hidden", zIndex: -1 }}>
         <svg viewBox="0 0 998 1134" fill="none" xmlns="http://www.w3.org/2000/svg"
@@ -101,7 +128,7 @@ const Home = () => {
         </svg>
       </div>
 
-    
+
 
 <div style={textContainerStyle}>
         <h1 style={{ fontWeight: "bold", fontSize: "48px", color: "#0694A2", marginBottom: "10px", letterSpacing: "2px" }}>
@@ -115,7 +142,7 @@ const Home = () => {
           label="Sign up"
           options={[
             { label: "For Users", href: "/signup" },
-            { label: "For Hospital Admin", href: "/signupasadmin" }
+            { label: "For Hospital Admin", href: "/hospital-admin/signup" }
           ]}
         />
 
@@ -123,20 +150,20 @@ const Home = () => {
           label="Login"
           options={[
             { label: "For Users", href: "/login" },
-            { label: "For Hospital Admin", href: "/admin/login" }
+            { label: "For Hospital Admin", href: "/hospital-admin/login" }
           ]}
         />
       </div>
 
       {/* ✅ Image in separate div */}
       <div style={{ position: "relative", marginTop: "30px", left: "200px" }}>
-        <img 
-          src="/doctors.png" 
-          alt="Doctors" 
+        <img
+          src="/doctors.png"
+          alt="Doctors"
           style={{
             width: '700px',
             height: 'auto'
-          }} 
+          }}
         />
       </div>
     </div>
