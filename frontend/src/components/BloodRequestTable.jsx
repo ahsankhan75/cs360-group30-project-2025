@@ -1,11 +1,17 @@
 import React, { useState } from 'react';
 import BloodRequestRow from './ BloodRequestRow';
 import StarRating from '../components/Reviews/StarRating';
+import { useNavigate } from 'react-router-dom';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { toast } from 'react-toastify';
 
-const BloodRequestTable = ({ data }) => {
+const BloodRequestTable = ({ data, onRowClick }) => {
   const [page, setPage] = useState(1);
   const perPage = 10;
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
+  const navigate = useNavigate();
+  const { user, refreshUserToken } = useAuthContext();
+  const [acceptingRequestId, setAcceptingRequestId] = useState(null);
 
   // Column definitions for consistent usage
   const columns = [
@@ -50,6 +56,86 @@ const BloodRequestTable = ({ data }) => {
   const paginatedData = sortedData.slice(start, start + perPage);
   const totalPages = Math.ceil(data.length / perPage);
 
+  // Handle row click (navigate to detail page)
+  const handleRowClick = (requestId) => {
+    console.log("Clicked request ID:", requestId);
+    if (onRowClick) {
+      onRowClick(requestId);
+    } else {
+      navigate(`/blood-requests/${requestId}`);
+    }
+  };
+
+  // Handle accept request
+  const handleAcceptRequest = async (e, requestId) => {
+    e.stopPropagation(); // Prevent row click event
+    
+    // Check if user is logged in
+    if (!user) {
+      toast.error('You must be logged in to accept a blood donation request');
+      navigate('/login');
+      return;
+    }
+    
+    // Prevent multiple clicks while processing
+    if (acceptingRequestId) return;
+    
+    setAcceptingRequestId(requestId);
+    
+    try {
+      // First attempt with current token
+      let res = await fetch(`/api/blood-requests/${requestId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${user.token}`
+        }
+      });
+      
+      let data = await res.json();
+      
+      // If token is expired, try to refresh and retry request
+      if (res.status === 401 && data.code === 'TOKEN_EXPIRED') {
+        const newToken = await refreshUserToken();
+        
+        if (newToken) {
+          // Retry the request with the new token
+          res = await fetch(`/api/blood-requests/${requestId}/accept`, {
+            method: 'PATCH',
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': `Bearer ${newToken}`
+            }
+          });
+          
+          data = await res.json();
+        } else {
+          // Refresh failed, redirect to login
+          navigate('/login');
+          return;
+        }
+      }
+      
+      if (res.ok) {
+        // Update the request in the data array
+        const updatedData = data.map(req => {
+          if (req.requestId === requestId) {
+            return { ...req, accepted: true };
+          }
+          return req;
+        });
+        toast.success('Blood donation request accepted successfully!');
+      } else {
+        toast.error(data.error || 'Failed to accept request');
+      }
+    } catch (err) {
+      console.error(err);
+      toast.error('An error occurred. Please try again.');
+    } finally {
+      setAcceptingRequestId(null);
+    }
+  };
+
   return (
     <div className="w-full">
       {/* Table layout for large screens */}
@@ -89,7 +175,11 @@ const BloodRequestTable = ({ data }) => {
       {/* Card layout for small screens */}
       <div className="block md:hidden space-y-4">
         {paginatedData.map((req) => (
-          <div key={req.requestId} className="bg-white shadow rounded p-4 border">
+          <div 
+            key={req.requestId} 
+            className="bg-white shadow rounded p-4 border cursor-pointer"
+            onClick={() => handleRowClick(req.requestId)}
+          >
             <div className="text-lg font-semibold mb-2">{req.hospitalName}</div>
             {/* Rating display for mobile */}
             <div className="flex items-center mb-2">
@@ -114,11 +204,19 @@ const BloodRequestTable = ({ data }) => {
             <div className="mt-3 text-right">
               <button 
                 className={`px-3 py-1 rounded ${
-                  req.accepted ? 'bg-green-100 text-green-700' : 'bg-green-500 text-white hover:bg-green-600'
+                  req.accepted ? 'bg-green-100 text-green-700' : 
+                  acceptingRequestId === req.requestId ? 'bg-gray-400 text-white cursor-not-allowed' :
+                  'bg-green-500 text-white hover:bg-green-600'
                 } text-sm`}
-                disabled={req.accepted}
+                disabled={req.accepted || acceptingRequestId === req.requestId}
+                onClick={(e) => handleAcceptRequest(e, req.requestId)}
               >
-                {req.accepted ? 'Accepted' : 'Accept'}
+                {req.accepted 
+                  ? 'Accepted' 
+                  : acceptingRequestId === req.requestId 
+                    ? 'Processing...' 
+                    : 'Accept'
+                }
               </button>
             </div>
           </div>

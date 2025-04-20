@@ -68,6 +68,24 @@ export const getAdminToken = () => {
 };
 
 /**
+ * Check if user is an admin
+ * @returns {boolean} True if user is admin
+ */
+export const isUserAdmin = () => {
+  const admin = JSON.parse(localStorage.getItem('adminUser'));
+  return !!admin?.token;
+};
+
+/**
+ * Check if user is logged in
+ * @returns {boolean} True if user is logged in
+ */
+export const isUserLoggedIn = () => {
+  const user = JSON.parse(localStorage.getItem('user'));
+  return !!user?.token;
+};
+
+/**
  * Check if backend server is running
  * @returns {Promise<boolean>} True if server is running
  */
@@ -103,54 +121,188 @@ export const api = {
     return fetchWithErrorHandling(`/api/hospitals/${id}`);
   },
   
-  // Blood requests
+  // Blood Requests - Public methods (available to all users)
   getAllBloodRequests: async () => {
-    return fetchWithErrorHandling('/api/blood-requests');
-  },
-  
-  getUserBloodRequests: async () => {
-    const token = getUserToken();
-    if (!token) {
-      throw new Error('You must be logged in to view your requests');
-    }
-    
-    return fetchWithErrorHandling('/api/blood-requests/mine', {
-      headers: {
-        Authorization: `Bearer ${token}`
+    try {
+      const response = await fetch('/api/blood-requests');
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not fetch blood requests');
       }
-    });
+      return data;
+    } catch (error) {
+      console.error('Error fetching blood requests:', error);
+      throw error;
+    }
   },
   
   getBloodRequestById: async (id) => {
-    return fetchWithErrorHandling(`/api/blood-requests/${id}`);
+    try {
+      const response = await fetch(`/api/blood-requests/${id}`);
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not fetch blood request');
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching blood request:', error);
+      throw error;
+    }
+  },
+  
+  // User Blood Request methods (requires user authentication)
+  getUserBloodRequests: async () => {
+    const token = getUserToken();
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    
+    try {
+      const response = await fetch('/api/blood-requests/mine', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not fetch your blood requests');
+      }
+      return data;
+    } catch (error) {
+      console.error('Error fetching user blood requests:', error);
+      throw error;
+    }
   },
   
   acceptBloodRequest: async (requestId) => {
     const token = getUserToken();
     if (!token) {
-      throw new Error('You must be logged in to accept requests');
+      throw new Error('Authentication required');
     }
     
-    return fetchWithErrorHandling(`/api/blood-requests/${requestId}/accept`, {
-      method: 'PATCH',
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: `Bearer ${token}`
+    try {
+      const response = await fetch(`/api/blood-requests/${requestId}/accept`, {
+        method: 'PATCH',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not accept blood request');
       }
-    });
+      return data;
+    } catch (error) {
+      console.error('Error accepting blood request:', error);
+      throw error;
+    }
   },
   
   getAcceptedBloodRequests: async () => {
     const token = getUserToken();
     if (!token) {
-      throw new Error('You must be logged in to view your accepted requests');
+      throw new Error('Authentication required');
     }
     
-    return fetchWithErrorHandling('/api/blood-requests/accepted', {
-      headers: {
-        Authorization: `Bearer ${token}`
+    try {
+      const response = await fetch('/api/blood-requests/accepted', {
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not fetch accepted blood requests');
       }
-    });
+      return data;
+    } catch (error) {
+      console.error('Error fetching accepted blood requests:', error);
+      throw error;
+    }
+  },
+  
+  // Admin Blood Request methods (requires admin authentication)
+  adminCreateBloodRequest: async (bloodRequestData) => {
+    const token = getAdminToken();
+    if (!token) {
+      throw new Error('Admin authentication required');
+    }
+    
+    try {
+      const response = await fetch('/api/blood-requests', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(bloodRequestData)
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not create blood request');
+      }
+      return data;
+    } catch (error) {
+      console.error('Error creating blood request:', error);
+      throw error;
+    }
+  },
+  
+  adminAddMultipleBloodRequests: async (bloodRequestsData) => {
+    const token = getAdminToken();
+    if (!token) {
+      throw new Error('Admin authentication required');
+    }
+    
+    try {
+      const response = await fetch('/api/blood-requests/multiple', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ requests: bloodRequestsData })
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not add multiple blood requests');
+      }
+      return data;
+    } catch (error) {
+      console.error('Error adding multiple blood requests:', error);
+      throw error;
+    }
+  },
+  
+  adminDeleteBloodRequest: async (requestId) => {
+    const token = getAdminToken();
+    if (!token) {
+      throw new Error('Admin authentication required');
+    }
+    
+    try {
+      const response = await fetch(`/api/blood-requests/${requestId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        }
+      });
+      
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || 'Could not delete blood request');
+      }
+      return data;
+    } catch (error) {
+      console.error('Error deleting blood request:', error);
+      throw error;
+    }
   },
   
   // Reviews

@@ -1,73 +1,67 @@
-import { useState, useCallback } from 'react';
+import { useState } from 'react';
 import { useAuthContext } from './useAuthContext';
-import { toast } from 'react-toastify';
 
-/**
- * Hook for making authenticated API requests with loading and error handling
- */
 export const useFetch = () => {
-  const [loading, setLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
-  const { user } = useAuthContext();
+  const { user, refreshUserToken } = useAuthContext();
 
-  /**
-   * Make an authenticated request
-   * @param {string} url - API endpoint
-   * @param {Object} options - Fetch options
-   * @param {boolean} showToast - Whether to show error toast
-   * @returns {Promise<any>} Response data
-   */
-  const fetchData = useCallback(async (url, options = {}, showToast = true) => {
-    setLoading(true);
+  const fetchData = async (url, method = 'GET', body = null, requiresAuth = true) => {
+    setIsLoading(true);
     setError(null);
-
+    
     try {
-      // Add authentication header if user is logged in
-      const headers = options.headers || {};
-      if (user) {
+      const headers = {
+        'Content-Type': 'application/json'
+      };
+      
+      // Add authorization token if required and user is logged in
+      if (requiresAuth && user && user.token) {
         headers['Authorization'] = `Bearer ${user.token}`;
       }
-
-      const response = await fetch(url, {
-        ...options,
+      
+      const options = {
+        method,
         headers
-      });
-
-      // Handle non-successful responses
-      if (!response.ok) {
-        const errorText = await response.text();
-        let errorMessage;
+      };
+      
+      if (body && (method === 'POST' || method === 'PUT' || method === 'PATCH')) {
+        options.body = JSON.stringify(body);
+      }
+      
+      // First attempt with current token
+      let response = await fetch(url, options);
+      let data = await response.json();
+      
+      // Check if token is expired and refresh is needed
+      if (response.status === 401 && data.code === 'TOKEN_EXPIRED' && requiresAuth) {
+        // Try to refresh the token
+        const newToken = await refreshUserToken();
         
-        try {
-          // Try to parse as JSON for structured error
-          const errorData = JSON.parse(errorText);
-          errorMessage = errorData.message || errorData.error || `Error: ${response.status}`;
-        } catch {
-          // Use plain text if not JSON
-          errorMessage = errorText || `Error: ${response.status}`;
+        if (newToken) {
+          // Update the authorization header with the new token
+          options.headers['Authorization'] = `Bearer ${newToken}`;
+          
+          // Retry the request with the new token
+          response = await fetch(url, options);
+          data = await response.json();
         }
-
-        throw new Error(errorMessage);
       }
-
-      // Check if response is empty
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        return null;
+      
+      setIsLoading(false);
+      
+      // If still not successful, throw error
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
       }
-
-      const data = await response.json();
+      
       return data;
     } catch (err) {
-      setError(err.message);
-      if (showToast) {
-        toast.error(err.message);
-      }
+      setError(err.message || 'An error occurred');
+      setIsLoading(false);
       throw err;
-    } finally {
-      setLoading(false);
     }
-  }, [user]);
-
-  return { fetchData, loading, error };
+  };
+  
+  return { fetchData, isLoading, error };
 };

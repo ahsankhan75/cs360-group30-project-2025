@@ -4,6 +4,7 @@ import { useParams, Link, useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 import StarRating from '../components/Reviews/StarRating';
+import { api, isUserAdmin } from '../utils/api';
 
 const BloodRequestDetailPage = () => {
   const { requestId } = useParams();
@@ -13,6 +14,9 @@ const BloodRequestDetailPage = () => {
   const [hospital, setHospital] = useState(null);
   const { user } = useAuthContext();
   const navigate = useNavigate();
+  
+  // Check if user is an admin
+  const isAdmin = isUserAdmin();
 
   useEffect(() => {
     const fetchRequestData = async () => {
@@ -72,6 +76,26 @@ const BloodRequestDetailPage = () => {
       toast.error(error.message || 'Failed to accept request');
     } finally {
       setAccepting(false);
+    }
+  };
+  
+  const handleDeleteRequest = async () => {
+    if (!isAdmin) {
+      toast.error('Only administrators can delete blood requests');
+      return;
+    }
+
+    if (!window.confirm('Are you sure you want to delete this blood request?')) {
+      return;
+    }
+
+    try {
+      await api.adminDeleteBloodRequest(requestId);
+      toast.success('Blood request deleted successfully');
+      navigate('/admin/blood-requests');
+    } catch (err) {
+      console.error('Error deleting blood request:', err);
+      toast.error('Failed to delete blood request');
     }
   };
 
@@ -144,6 +168,22 @@ const BloodRequestDetailPage = () => {
             <strong>Request ID:</strong> {request.requestId}
           </p>
           
+          {/* Status indicator */}
+          <div className="mt-4">
+            <p className="text-gray-700 mb-2">
+              <strong>Status:</strong> 
+              {request.accepted ? (
+                <span className="ml-2 px-2 py-1 bg-green-100 text-green-800 rounded-full text-sm">
+                  Accepted
+                </span>
+              ) : (
+                <span className="ml-2 px-2 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm">
+                  Pending
+                </span>
+              )}
+            </p>
+          </div>
+          
           {/* Contact Information */}
           <div className="mt-4 p-4 bg-white rounded-md">
             <h3 className="font-semibold text-lg mb-2">Contact Information</h3>
@@ -157,8 +197,15 @@ const BloodRequestDetailPage = () => {
         </div>
 
         {/* Action Buttons */}
-        <div className="mt-6 flex gap-4">
-          {request && !request.accepted ? (
+        <div className="mt-6 flex flex-wrap gap-4">
+          {!user ? (
+            <Link
+              to="/login" 
+              className="px-4 py-2 bg-teal-500 text-white font-medium rounded hover:bg-teal-600"
+            >
+              Sign in to Accept Request
+            </Link>
+          ) : request && !request.accepted ? (
             <button 
               onClick={handleAcceptRequest}
               disabled={accepting}
@@ -174,14 +221,47 @@ const BloodRequestDetailPage = () => {
           
           {hospital && hospital._id && (
             <Link 
-              to={`/reviews?hospital=${hospital._id}`}
-              className="px-4 py-2 bg-teal-500 text-white font-medium rounded hover:bg-teal-600"
+              to={`/hospital/${hospital._id}`}
+              className="px-4 py-2 bg-blue-500 text-white font-medium rounded hover:bg-blue-600"
             >
-              View Hospital Reviews
+              View Hospital Details
             </Link>
+          )}
+          
+          {/* Admin-only actions */}
+          {isAdmin && (
+            <>
+              <Link 
+                to={`/admin/blood-requests/edit/${requestId}`}
+                className="px-4 py-2 bg-indigo-500 text-white font-medium rounded hover:bg-indigo-600"
+              >
+                Edit Request
+              </Link>
+              <button 
+                onClick={handleDeleteRequest}
+                className="px-4 py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600"
+              >
+                Delete Request
+              </button>
+            </>
           )}
         </div>
       </div>
+
+      {/* Information for Users */}
+      {!isAdmin && (
+        <div className="bg-blue-50 p-4 rounded-md border border-blue-200 mt-4">
+          <h3 className="font-medium text-blue-800 mb-2">About Blood Donation</h3>
+          <p className="text-blue-700 text-sm">
+            Blood donation is a vital community service that helps save lives. When you accept a blood request, 
+            you're committing to contact the hospital and arrange a time to donate.
+          </p>
+          <p className="text-blue-700 text-sm mt-2">
+            Only administrators can create or modify blood requests. If you need to add a blood request, 
+            please contact the hospital directly.
+          </p>
+        </div>
+      )}
 
       {/* Footer */}
       <footer className="text-center text-gray-500 text-sm mt-10">

@@ -4,6 +4,7 @@ const requireAuth = require('../middleware/requireAuth');
 const requireAdmin = require('../middleware/requireAdmin');
 const { loginAdmin, signupAdmin } = require('../controllers/userController');
 const { getDashboardStats, getAllUsers } = require('../controllers/adminController');
+const { getPendingHospitalAdmins, updateHospitalAdminStatus } = require('../controllers/hospitalAdminController');
 
 // Public admin routes
 router.post('/login', loginAdmin);
@@ -20,5 +21,9 @@ router.get('/health', (req, res) => {
 // Protected admin routes
 router.get('/dashboard', requireAuth, requireAdmin, getDashboardStats);
 router.get('/users', requireAuth, requireAdmin, getAllUsers);
+
+// Hospital admin management routes
+router.get('/hospital-admins/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);
+router.patch('/hospital-admins/:id/status', requireAuth, requireAdmin, updateHospitalAdminStatus);
 
 module.exports = router;

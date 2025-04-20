@@ -1,96 +1,106 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import ProfileIcon from '../components/profile-icon';
-import StarRating from '../components/Reviews/StarRating';
-import ReviewList from '../components/Reviews/ReviewList';
-import { formatDistanceToNow } from 'date-fns';
+import { useAuthContext } from '../hooks/useAuthContext';
+import { toast } from 'react-toastify';
 
 const BloodRequestDetail = () => {
   const { requestId } = useParams();
   const [request, setRequest] = useState(null);
   const [hospital, setHospital] = useState(null);
-  const [hospitalReviews, setHospitalReviews] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [reviewsLoading, setReviewsLoading] = useState(true);
+  const [accepting, setAccepting] = useState(false);
   const [error, setError] = useState(null);
-  const [accepted, setAccepted] = useState(false);
+  const { user } = useAuthContext();
+  const navigate = useNavigate();
+
+  console.log("BloodRequestDetail component - requestId:", requestId);
 
   useEffect(() => {
     const fetchRequestDetails = async () => {
       try {
+        console.log("Fetching blood request details for ID:", requestId);
         const response = await fetch(`/api/blood-requests/${requestId}`);
-        const data = await response.json();
         
-        if (response.ok) {
-          setRequest(data);
-          setAccepted(data.accepted || false);
-          // Once we have the request, fetch the hospital details
+        if (!response.ok) {
+          const errorData = await response.json();
+          console.error("Error response:", errorData);
+          throw new Error(errorData.error || 'Failed to fetch blood request details');
+        }
+        
+        const data = await response.json();
+        console.log("Blood request data received:", data);
+        
+        setRequest(data);
+        // Once we have the request, fetch the hospital details if needed
+        if (data.hospitalName) {
           fetchHospitalByName(data.hospitalName);
-        } else {
-          setError('Failed to fetch blood request details');
         }
       } catch (err) {
-        setError('Error connecting to the server');
-        console.error(err);
+        console.error("Error fetching request details:", err);
+        setError(err.message || 'Error connecting to the server');
       } finally {
         setLoading(false);
       }
     };
 
-    fetchRequestDetails();
+    const fetchHospitalByName = async (hospitalName) => {
+      try {
+        const response = await fetch(`/api/hospitals/by-name?name=${encodeURIComponent(hospitalName)}`);
+        if (response.ok) {
+          const data = await response.json();
+          setHospital(data);
+        }
+      } catch (err) {
+        console.error("Error fetching hospital details:", err);
+        // Non-critical error, don't set the main error state
+      }
+    };
+
+    if (requestId) {
+      fetchRequestDetails();
+    } else {
+      setError('Invalid request ID');
+      setLoading(false);
+    }
   }, [requestId]);
 
-  const fetchHospitalByName = async (hospitalName) => {
-    try {
-      const response = await fetch(`/api/hospitals/filter?name=${encodeURIComponent(hospitalName)}`);
-      const data = await response.json();
-      
-      if (response.ok && data.length > 0) {
-        const hospitalData = data[0]; // Assume the first match is the correct one
-        setHospital(hospitalData);
-        
-        // Now fetch reviews for this hospital
-        fetchHospitalReviews(hospitalData._id);
-      }
-    } catch (err) {
-      console.error('Error fetching hospital details:', err);
-    }
-  };
-
-  const fetchHospitalReviews = async (hospitalId) => {
-    setReviewsLoading(true);
-    try {
-      const response = await fetch(`/api/reviews/hospital/${hospitalId}`);
-      const data = await response.json();
-      
-      if (response.ok) {
-        setHospitalReviews(data);
-      }
-    } catch (err) {
-      console.error('Error fetching hospital reviews:', err);
-    } finally {
-      setReviewsLoading(false);
-    }
-  };
-
   const handleAcceptRequest = async () => {
+    if (!user) {
+      navigate('/login', { state: { from: `/blood-requests/${requestId}` } });
+      return;
+    }
+
     try {
+      setAccepting(true);
       const response = await fetch(`/api/blood-requests/${requestId}/accept`, {
         method: 'PATCH',
         headers: {
+          'Authorization': `Bearer ${user.token}`,
           'Content-Type': 'application/json'
         }
       });
-      
-      if (response.ok) {
-        setAccepted(true);
-      } else {
-        alert('Failed to accept request. Please try again.');
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to accept request');
       }
+
+      const updatedRequest = await response.json();
+      setRequest(updatedRequest);
+      toast.success('Blood donation request accepted successfully!');
     } catch (err) {
-      console.error('Error accepting request:', err);
-      alert('An error occurred. Please try again.');
+      console.error("Error accepting request:", err);
+      toast.error(err.message || 'Error accepting request');
+    } finally {
+      setAccepting(false);
     }
+  };
+
+  // Check if this request was accepted by the current user
+  const isAcceptedByCurrentUser = () => {
+    if (!user || !request) return false;
+    return request.accepted && request.acceptedBy && request.acceptedBy.toString() === user._id;
   };
 
   if (loading) {
@@ -122,144 +132,166 @@ const BloodRequestDetail = () => {
       </div>
       
       <div className="max-w-screen-lg mx-auto">
-        <div className="mb-6">
-          <Link 
-            to="/blood-requests" 
-            className="text-teal-600 hover:underline flex items-center"
-          >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
-              <path fillRule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clipRule="evenodd" />
-            </svg>
-            Back to All Requests
-          </Link>
-        </div>
+        <nav className="flex mb-6" aria-label="Breadcrumb">
+          <ol className="inline-flex items-center space-x-1 md:space-x-3">
+            <li className="inline-flex items-center">
+              <Link to="/" className="text-gray-600 hover:text-teal-600">Home</Link>
+            </li>
+            <li className="inline-flex items-center">
+              <span className="mx-2 text-gray-400">/</span>
+              <Link to="/blood-requests" className="text-gray-600 hover:text-teal-600">Blood Requests</Link>
+            </li>
+            <li aria-current="page">
+              <span className="mx-2 text-gray-400">/</span>
+              <span className="text-gray-500">Request {request.requestId}</span>
+            </li>
+          </ol>
+        </nav>
         
-        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-          <div className="p-6">
-            <div className="flex flex-wrap justify-between items-start gap-4 mb-6">
-              <div>
-                <h1 className="text-3xl font-bold text-gray-800">{request.bloodType} Blood Needed</h1>
-                <div className="mt-2 text-gray-600">
-                  Posted {formatDistanceToNow(new Date(request.datePosted), { addSuffix: true })}
-                </div>
-              </div>
+        <div className="bg-white rounded-lg shadow-md p-6 mb-8">
+          <div className="flex flex-col md:flex-row justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-teal-600 mb-2">Blood Donation Request</h1>
+              <p className="text-gray-700 mb-4">From {request.hospitalName}</p>
               
-              <div className={`px-4 py-2 rounded-full font-medium ${
-                request.urgencyLevel === 'Critical' 
-                  ? 'bg-red-100 text-red-800' 
-                  : request.urgencyLevel === 'Urgent' 
-                  ? 'bg-yellow-100 text-yellow-800' 
-                  : 'bg-green-100 text-green-800'
-              }`}>
-                {request.urgencyLevel} Priority
+              <div className="bg-gray-50 p-4 rounded-lg mb-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div>
+                    <h3 className="font-medium text-teal-600">Request Details</h3>
+                    <ul className="mt-2 space-y-2">
+                      <li><strong>Request ID:</strong> {request.requestId}</li>
+                      <li>
+                        <strong>Blood Type:</strong> 
+                        <span className="ml-2 inline-block px-3 py-1 bg-red-100 text-red-800 rounded-full font-medium">
+                          {request.bloodType}
+                        </span>
+                      </li>
+                      <li>
+                        <strong>Urgency Level:</strong> 
+                        <span className={`ml-2 inline-block px-3 py-1 rounded-full font-medium ${
+                          request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                          request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-green-100 text-green-800'
+                        }`}>
+                          {request.urgencyLevel}
+                        </span>
+                      </li>
+                      <li><strong>Units Needed:</strong> {request.unitsNeeded}</li>
+                      <li><strong>Date Posted:</strong> {new Date(request.datePosted).toLocaleDateString()}</li>
+                    </ul>
+                  </div>
+                  
+                  <div>
+                    <h3 className="font-medium text-teal-600">Location Information</h3>
+                    <ul className="mt-2">
+                      <li><strong>Location:</strong> {request.location}</li>
+                      {request.latitude && request.longitude && (
+                        <li className="mt-2">
+                          <strong>Coordinates:</strong> 
+                          <div className="mt-1 text-sm">
+                            Lat: {request.latitude.toFixed(6)}<br />
+                            Long: {request.longitude.toFixed(6)}
+                          </div>
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                </div>
               </div>
             </div>
+          </div>
+          
+          <div className="mt-6 flex justify-between items-center">
+            <Link 
+              to="/blood-requests" 
+              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
+            >
+              Back to All Requests
+            </Link>
             
-            <div className="grid md:grid-cols-2 gap-8">
-              <div>
-                <h2 className="text-xl font-semibold border-b pb-2 mb-4">Request Details</h2>
-                
-                <div className="space-y-3">
-                  <div>
-                    <span className="font-medium text-gray-700">Blood Type:</span> {request.bloodType}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Units Needed:</span> {request.unitsNeeded}
-                  </div>
-                  <div>
-                    <span className="font-medium text-gray-700">Location:</span> {request.location}
-                  </div>
-                  {request.contactNumber && (
-                    <div>
-                      <span className="font-medium text-gray-700">Contact Number:</span> {request.contactNumber}
-                    </div>
-                  )}
-                  {request.email && (
-                    <div>
-                      <span className="font-medium text-gray-700">Email:</span> {request.email}
-                    </div>
-                  )}
-                </div>
-                
-                <div className="mt-6">
-                  <button 
-                    onClick={handleAcceptRequest}
-                    disabled={accepted}
-                    className={`w-full px-6 py-3 font-medium rounded-md transition-colors ${
-                      accepted 
-                        ? 'bg-gray-300 text-gray-700 cursor-not-allowed' 
-                        : 'bg-red-600 text-white hover:bg-red-700'
-                    }`}
-                  >
-                    {accepted ? 'Request Accepted' : 'Respond to Request'}
-                  </button>
-                </div>
+            {!request.accepted ? (
+              <button
+                onClick={handleAcceptRequest}
+                disabled={accepting}
+                className="px-6 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 disabled:bg-gray-400 disabled:cursor-not-allowed"
+              >
+                {accepting ? 'Processing...' : 'Accept Request'}
+              </button>
+            ) : (
+              <div className="px-4 py-2 bg-green-100 text-green-800 rounded-md">
+                {isAcceptedByCurrentUser() ? 'You have accepted this request' : 'This request has been accepted'}
               </div>
-              
+            )}
+          </div>
+        </div>
+        
+        {hospital && (
+          <div className="bg-white rounded-lg shadow-md p-6">
+            <h2 className="text-xl font-semibold mb-4">Hospital Information</h2>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div>
-                <h2 className="text-xl font-semibold border-b pb-2 mb-4">Hospital Information</h2>
+                <h3 className="font-medium text-teal-600">About {hospital.name}</h3>
+                <p className="mt-2 text-gray-700">{hospital.description || 'No description available.'}</p>
                 
-                {hospital ? (
-                  <div>
-                    <h3 className="text-lg font-medium">{hospital.name}</h3>
-                    
-                    <div className="mt-2 flex items-center">
-                      <StarRating rating={hospital.ratings || 0} />
-                      <span className="ml-2">
-                        {hospital.ratings ? hospital.ratings.toFixed(1) : 'No ratings'} out of 5
-                      </span>
-                    </div>
-                    
-                    {hospital.location && (
-                      <div className="mt-3">
-                        <span className="font-medium text-gray-700">Address:</span> {hospital.location.address}
-                      </div>
-                    )}
-                    
-                    <div className="mt-4">
-                      <Link 
-                        to={`/reviews?hospital=${hospital._id}`} 
-                        className="text-teal-600 hover:underline"
-                      >
-                        See all reviews
-                      </Link>
-                    </div>
+                {hospital.resources && (
+                  <div className="mt-4">
+                    <h4 className="font-medium">Available Resources:</h4>
+                    <ul className="mt-1 list-disc list-inside text-gray-700">
+                      {hospital.resources.icu_beds && (
+                        <li>ICU Beds: {hospital.resources.icu_beds}</li>
+                      )}
+                      {hospital.resources.ventilators && (
+                        <li>Ventilators: {hospital.resources.ventilators}</li>
+                      )}
+                      {hospital.resources.blood_bank !== undefined && (
+                        <li>Blood Bank: {hospital.resources.blood_bank ? 'Available' : 'Not Available'}</li>
+                      )}
+                    </ul>
                   </div>
-                ) : (
-                  <div className="text-gray-500">Loading hospital information...</div>
                 )}
               </div>
-            </div>
-          </div>
-        </div>
-        
-        {/* Hospital Reviews Section */}
-        {hospital && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden mb-8">
-            <div className="p-6">
-              <div className="flex justify-between items-center mb-4">
-                <h2 className="text-xl font-semibold">Hospital Reviews</h2>
-                <Link 
-                  to={`/reviews?hospital=${hospital._id}`} 
-                  className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600 transition-colors text-sm"
-                >
-                  Write a Review
-                </Link>
-              </div>
-              <ReviewList reviews={hospitalReviews} loading={reviewsLoading} />
-            </div>
-          </div>
-        )}
-        
-        {/* Map/Location Section */}
-        {request.latitude && request.longitude && (
-          <div className="bg-white rounded-lg shadow-md overflow-hidden">
-            <div className="p-6">
-              <h2 className="text-xl font-semibold mb-4">Location Map</h2>
-              <div className="h-64 bg-gray-200 rounded-md">
-                {/* Map component would go here */}
-                <div className="flex items-center justify-center h-full text-gray-500">
-                  Map view of hospital location
+              
+              <div>
+                <h3 className="font-medium text-teal-600">Contact Information</h3>
+                {hospital.contact ? (
+                  <ul className="mt-2 text-gray-700">
+                    {hospital.contact.phone && (
+                      <li className="flex items-center mt-1">
+                        <span className="mr-2">📞</span>
+                        <span>{hospital.contact.phone}</span>
+                      </li>
+                    )}
+                    {hospital.contact.email && (
+                      <li className="flex items-center mt-1">
+                        <span className="mr-2">✉️</span>
+                        <span>{hospital.contact.email}</span>
+                      </li>
+                    )}
+                    {hospital.contact.website && (
+                      <li className="flex items-center mt-1">
+                        <span className="mr-2">🌐</span>
+                        <a 
+                          href={hospital.contact.website}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="text-blue-600 hover:underline"
+                        >
+                          {hospital.contact.website}
+                        </a>
+                      </li>
+                    )}
+                  </ul>
+                ) : (
+                  <p className="mt-2 text-gray-500">No contact information available.</p>
+                )}
+                
+                <div className="mt-4">
+                  <Link 
+                    to={`/hospitals/${hospital._id}`}
+                    className="text-teal-600 hover:underline"
+                  >
+                    View Full Hospital Profile
+                  </Link>
                 </div>
               </div>
             </div>

@@ -1,4 +1,5 @@
 import { toast } from 'react-toastify';
+import { getAdminToken, getUserToken } from './api';
 
 let backendChecked = false;
 let isBackendAvailable = false;
@@ -72,6 +73,77 @@ export const adminApiCall = async (url, options = {}, adminToken) => {
     const headers = {
       ...options.headers,
       'Authorization': `Bearer ${adminToken}`
+    };
+    
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'API request failed');
+    }
+    
+    return data;
+  } catch (error) {
+    toast.error(error.message || 'Something went wrong');
+    throw error;
+  }
+};
+
+/**
+ * User API call wrapper with error handling
+ * @param {string} url - API endpoint
+ * @param {object} options - Fetch options
+ * @param {string} userToken - User auth token (optional - will use from local storage if not provided)
+ * @returns {Promise} Response data or null on error
+ */
+export const userApiCall = async (url, options = {}, userToken = null) => {
+  try {
+    // Get token from params or from local storage
+    const token = userToken || getUserToken();
+    
+    if (!token) {
+      throw new Error('Authentication required');
+    }
+    
+    const headers = {
+      ...options.headers,
+      'Authorization': `Bearer ${token}`,
+      'Content-Type': 'application/json'
+    };
+    
+    const response = await fetch(url, {
+      ...options,
+      headers
+    });
+    
+    const data = await response.json();
+    
+    if (!response.ok) {
+      throw new Error(data.error || 'API request failed');
+    }
+    
+    return data;
+  } catch (error) {
+    toast.error(error.message || 'Something went wrong');
+    throw error;
+  }
+};
+
+/**
+ * Public API call without authentication
+ * @param {string} url - API endpoint
+ * @param {object} options - Fetch options
+ * @returns {Promise} Response data or null on error
+ */
+export const publicApiCall = async (url, options = {}) => {
+  try {
+    const headers = {
+      ...options.headers,
+      'Content-Type': 'application/json'
     };
     
     const response = await fetch(url, {

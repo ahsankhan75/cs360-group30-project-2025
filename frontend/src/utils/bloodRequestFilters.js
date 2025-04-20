@@ -5,7 +5,7 @@ export const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
   const toRad = (deg) => deg * (Math.PI / 180);
   const R = 6371; // Earth's radius in km
   const dLat = toRad(lat2 - lat1);
-  const dLon = toRad(lon2 - lon1);
+  const dLon = toRad(lat2 - lon1);
   const a =
     Math.sin(dLat / 2) ** 2 +
     Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLon / 2) ** 2;
@@ -13,7 +13,7 @@ export const getDistanceFromLatLonInKm = (lat1, lon1, lat2, lon2) => {
   return R * c;
 };
 
-// City coordinates lookup for fallback
+// Centralized city coordinates data
 export const cityCoordinates = {
   'Lahore': { lat: 31.5204, lon: 74.3587 },
   'Karachi': { lat: 24.8607, lon: 67.0011 },
@@ -29,17 +29,17 @@ export const cityCoordinates = {
   'Hyderabad': { lat: 25.396, lon: 68.3578 },
   'Sukkur': { lat: 27.7052, lon: 68.8574 },
   'Abbottabad': { lat: 34.1463, lon: 73.2117 },
-  'Mardan': { lat: 34.1982, lon: 72.0459 }
+  'Mardan': { lat: 34.1982, lon: 72.0459 },
+  'Okara': { lat: 30.8138, lon: 73.445 },
+  'RahimYarKhan': { lat: 28.4202, lon: 70.2956 },
+  'Jhelum': { lat: 32.9408, lon: 73.7276 },
+  'Sargodha': { lat: 32.0836, lon: 72.6711 },
+  'Mirpur': { lat: 33.1478, lon: 73.751 }
 };
 
 // Get coordinates for a city name
 export const getCityCoordinates = (locationName) => {
   if (!locationName) return null;
-  
-  // Direct match
-  if (cityCoordinates[locationName]) {
-    return cityCoordinates[locationName];
-  }
   
   // Partial match
   const cityName = Object.keys(cityCoordinates).find(city => 
@@ -105,20 +105,38 @@ export const filterRequests = (requests, filters) => {
         }
       }
       
-      // Calculate distance
-      const distance = getDistanceFromLatLonInKm(
+      // Calculate distance between user and request
+      const distance = calculateDistance(
         userLocation.latitude, 
-        userLocation.longitude, 
-        requestLat, 
+        userLocation.longitude,
+        requestLat,
         requestLon
       );
       
+      // Filter by distance
       if (distance > maxDistance) {
         return false;
       }
     }
     
-    // If all filters pass, include this request
+    // If the request passed all filters
     return true;
   });
 };
+
+// Helper function to calculate distance between two points using Haversine formula
+function calculateDistance(lat1, lon1, lat2, lon2) {
+  const R = 6371; // Radius of the Earth in km
+  const dLat = (lat2 - lat1) * Math.PI / 180;
+  const dLon = (lon2 - lon1) * Math.PI / 180;
+  
+  const a = 
+    Math.sin(dLat/2) * Math.sin(dLat/2) +
+    Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) * 
+    Math.sin(dLon/2) * Math.sin(dLon/2);
+  
+  const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+  const distance = R * c; // Distance in km
+  
+  return distance;
+}

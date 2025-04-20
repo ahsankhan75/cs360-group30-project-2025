@@ -17,6 +17,16 @@ const requireAuth = async (req, res, next) => {
     next();
   } catch (error) {
     console.log(error);
+    
+    // Provide a specific error message for token expiration
+    if (error.name === 'TokenExpiredError') {
+      return res.status(401).json({ 
+        error: "Your session has expired", 
+        code: "TOKEN_EXPIRED",
+        expiredAt: error.expiredAt
+      });
+    }
+    
     res.status(401).json({ error: "Request is not authorized" });
   }
 };
