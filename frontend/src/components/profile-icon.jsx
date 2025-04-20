@@ -1,12 +1,79 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useAuthContext } from "../hooks/useAuthContext";
 import { useLogout } from "../hooks/useLogout";
 import { Link } from "react-router-dom";
 
 const ProfileIcon = () => {
   const [showDropdown, setShowDropdown] = useState(false);
+  const [profilePicture, setProfilePicture] = useState(null);
+  const [userName, setUserName] = useState("");
+  const dropdownRef = useRef(null);
   const { user } = useAuthContext();
   const { logout } = useLogout();
+
+  // Handle clicking outside the dropdown to close it
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
+        setShowDropdown(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, []);
+
+  // Fetch user's medical card data to get profile picture
+  useEffect(() => {
+    const fetchMedicalCard = async () => {
+      if (!user) return;
+
+      try {
+        const response = await fetch(`/api/medical-card`, {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          // Always set the profile picture, even if it's empty
+          setProfilePicture(data?.profilePicture || null);
+          if (data && data.name) {
+            setUserName(data.name);
+          }
+        }
+      } catch (error) {
+        console.error("Error fetching medical card:", error);
+      }
+    };
+
+    // Fetch immediately when component mounts
+    fetchMedicalCard();
+
+    // Set up an interval to refresh the data every 5 seconds
+    const intervalId = setInterval(fetchMedicalCard, 5000);
+
+    // Clean up the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [user]);
+
+  // Listen for profile picture change events
+  useEffect(() => {
+    const handleProfilePictureChange = (event) => {
+      setProfilePicture(event.detail.profilePicture || null);
+    };
+
+    // Add event listener for profile picture changes
+    window.addEventListener('profilePictureChanged', handleProfilePictureChange);
+
+    // Clean up the event listener when the component unmounts
+    return () => {
+      window.removeEventListener('profilePictureChanged', handleProfilePictureChange);
+    };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -16,18 +83,28 @@ const ProfileIcon = () => {
   // Don't render if user is not logged in
   if (!user) return null;
 
-  // Extract first letter of email for avatar
-  const firstLetter = user.email.charAt(0).toUpperCase();
+  // Extract first letter of name or email for avatar fallback
+  const firstLetter = userName ? userName.charAt(0).toUpperCase() : user.email.charAt(0).toUpperCase();
 
   return (
-    <div className="relative inline-block text-left">
+    <div className="relative inline-block text-left" ref={dropdownRef}>
       <button
         onClick={() => setShowDropdown(!showDropdown)}
-        className="w-10 h-10 rounded-full bg-teal-600 text-white flex items-center justify-center focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+        className="w-10 h-10 rounded-full overflow-hidden focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
         aria-haspopup="true"
         aria-expanded={showDropdown}
       >
-        {firstLetter}
+        {profilePicture && profilePicture.length > 0 ? (
+          <img
+            src={profilePicture.startsWith('http') ? profilePicture : `${window.location.origin.includes('localhost') ? 'http://localhost:4000' : ''}${profilePicture}`}
+            alt="Profile"
+            className="w-full h-full object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-teal-600 text-white flex items-center justify-center">
+            {firstLetter}
+          </div>
+        )}
       </button>
 
       {/* Dropdown menu */}
@@ -38,10 +115,26 @@ const ProfileIcon = () => {
           aria-orientation="vertical"
         >
           <div className="py-1" role="none">
-            <div className="px-4 py-2 border-b">
-              <p className="text-sm font-medium text-gray-900 truncate">
-                {user.email}
-              </p>
+            <div className="px-4 py-3 border-b flex items-center">
+              <div className="mr-3">
+                {profilePicture && profilePicture.length > 0 ? (
+                  <img
+                    src={profilePicture.startsWith('http') ? profilePicture : `${window.location.origin.includes('localhost') ? 'http://localhost:4000' : ''}${profilePicture}`}
+                    alt="Profile"
+                    className="w-8 h-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-8 h-8 rounded-full bg-teal-600 text-white flex items-center justify-center">
+                    {firstLetter}
+                  </div>
+                )}
+              </div>
+              <div>
+                {userName && <p className="text-sm font-medium text-gray-900">{userName}</p>}
+                <p className="text-xs text-gray-500 truncate">
+                  {user.email}
+                </p>
+              </div>
             </div>
             <Link
               to="/dashboard"

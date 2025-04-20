@@ -44,14 +44,14 @@ try {
 } catch (error) {
   console.error('❌ CORS module not available. API will only be accessible from same origin.');
   console.error('   Run: npm install cors --save');
-  
+
   // Minimal CORS implementation as fallback
   app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
     res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
     res.header('Access-Control-Allow-Credentials', 'true');
-    
+
     if (req.method === 'OPTIONS') {
       return res.sendStatus(200);
     }
@@ -61,6 +61,9 @@ try {
 
 // Middleware for request parsing
 app.use(express.json());
+
+// Serve uploaded files statically
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 app.use((req, res, next) => {
   console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
@@ -78,8 +81,8 @@ app.use((err, req, res, next) => {
 
 // Health check endpoint
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'Server is running', 
+  res.status(200).json({
+    status: 'Server is running',
     time: new Date().toISOString(),
     env: process.env.NODE_ENV,
     apis: [
@@ -95,7 +98,7 @@ app.get('/health', (req, res) => {
 
 // API route for checking admin connectivity
 app.get('/api/admin/health', (req, res) => {
-  res.status(200).json({ 
+  res.status(200).json({
     status: 'Admin API is available',
     time: new Date().toISOString()
   });
@@ -120,9 +123,9 @@ app.post('/api/token/refresh', (req, res) => {
 // Static file serving for production
 if (process.env.NODE_ENV === 'production') {
   const buildPath = path.join(__dirname, '../frontend/build');
-  
+
   app.use(express.static(buildPath));
-  
+
   // Handle React routing by serving index.html for non-API routes
   app.get('*', (req, res) => {
     if (!req.path.startsWith('/api/')) {
@@ -150,8 +153,8 @@ const mongooseOptions = {
 // Connect to MongoDB
 console.log('📡 Attempting to connect to MongoDB...');
 // Sanitize the URI before logging to protect credentials
-const sanitizedUri = MONGO_URI.includes('@') ? 
-  MONGO_URI.replace(/:\/\/([^:]+):([^@]+)@/, '://***:***@') : 
+const sanitizedUri = MONGO_URI.includes('@') ?
+  MONGO_URI.replace(/:\/\/([^:]+):([^@]+)@/, '://***:***@') :
   MONGO_URI;
 console.log(`🔗 Using connection string: ${sanitizedUri}`);
 
@@ -160,7 +163,7 @@ mongoose
   .then(() => {
     console.log("✅ Connected to MongoDB Atlas");
     console.log(`📊 Database: ${mongoose.connection.db.databaseName}`);
-    
+
     // listen for requests
     const PORT = process.env.PORT || 4000;
     const server = app.listen(PORT, () => {
@@ -168,7 +171,7 @@ mongoose
       console.log(`🌐 API accessible at http://localhost:${PORT}/api/`);
       console.log(`💡 Health check: http://localhost:${PORT}/health`);
     });
-    
+
     // Handle server errors
     server.on('error', (error) => {
       if (error.code === 'EADDRINUSE') {

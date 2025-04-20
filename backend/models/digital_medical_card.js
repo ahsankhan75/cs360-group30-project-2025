@@ -14,6 +14,7 @@ const DigitalMedicalCardSchema = new mongoose.Schema(
     age: { type: Number },
     gender: { type: String, enum: ["Male", "Female", "Other"] },
     userContactNumber: { type: String },
+    profilePicture: { type: String, default: "" }, // URL to the profile picture
 
     bloodType: { type: String },
     organDonor: { type: Boolean },
