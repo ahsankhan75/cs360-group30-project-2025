@@ -1,22 +1,3 @@
-// import React from 'react';
-
-// const BloodRequestItem = ({ request }) => {
-//   return (
-//     <div className="bg-white shadow rounded p-4">
-//       <h2 className="text-xl font-semibold">{request.hospitalName}</h2>
-//       <p className="text-gray-600">Request ID: {request.requestId}</p>
-//       <p className="text-gray-600">Blood Type: {request.bloodType}</p>
-//       <p className="text-gray-600">Urgency Level: {request.urgencyLevel}</p>
-//       <p className="text-gray-600">Location: {request.location}</p>
-//       <p className="text-gray-600">
-//         Date Posted: {new Date(request.datePosted).toLocaleString()}
-//       </p>
-//       <p className="text-gray-600">Units Needed: {request.unitsNeeded}</p>
-//     </div>
-//   );
-// };
-
-// export default BloodRequestItem;
 
 import React, { useState } from 'react';
 

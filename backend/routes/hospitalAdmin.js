@@ -9,7 +9,8 @@ const {
   updateHospitalProfile,
   getPendingHospitalAdmins,
   updateHospitalAdminStatus,
-  getHospitalReviews
+  getHospitalReviews,
+  getAcceptedUserMedicalCard
 } = require('../controllers/hospitalAdminController');
 const requireHospitalAdminAuth = require('../middleware/requireHospitalAdminAuth');
 const requireAdmin = require('../middleware/requireAdmin');
@@ -37,5 +38,6 @@ router.get('/reviews', requireHospitalAdminAuth, getHospitalReviews);
 // Super admin routes for managing hospital admins
 router.get('/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);
 router.patch('/:id/status', requireAuth, requireAdmin, updateHospitalAdminStatus);
+router.get('/accepted-user-card/:requestId', requireHospitalAdminAuth, getAcceptedUserMedicalCard);
 
 module.exports = router;

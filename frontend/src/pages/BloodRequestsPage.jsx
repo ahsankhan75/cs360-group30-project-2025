@@ -13,14 +13,34 @@ const BloodRequestsPage = () => {
   const [userLocation, setUserLocation] = useState(null);
   const [locationFilter, setLocationFilter] = useState(false);
   const [locationError, setLocationError] = useState('');
+  const [filterByUserBloodType, setFilterByUserBloodType] = useState(false); // New state for user blood type filter
+  const [userBloodType, setUserBloodType] = useState(''); // Store user's blood type
   const [loading, setLoading] = useState(true);
   const navigate = useNavigate();
   const { user } = useAuthContext(); // Get user context
 
-  // Get current user's blood type (could be fetched from API or local storage)
-  const userBloodType = localStorage.getItem('userBloodType') || '';
-
   useEffect(() => {
+    const fetchUserBloodType = async () => {
+      if (!user) return;
+
+      try {
+        const response = await fetch('/api/medical-card', {
+          headers: {
+            Authorization: `Bearer ${user.token}`,
+          },
+        });
+
+        if (response.ok) {
+          const data = await response.json();
+          setUserBloodType(data.bloodType || ''); // Save the blood type from the medical card
+        } else {
+          console.error('Failed to fetch user medical card');
+        }
+      } catch (err) {
+        console.error('Error fetching user medical card:', err);
+      }
+    };
+
     const fetchRequests = async () => {
       setLoading(true);
       try {
@@ -74,15 +94,16 @@ const BloodRequestsPage = () => {
       }
     };
 
-    fetchRequests();
-  }, []);
+    fetchUserBloodType(); // Fetch the user's blood type
+    fetchRequests(); // Fetch the blood donation requests
+  }, [user]);
 
   useEffect(() => {
     // Apply filters whenever filter criteria change
     const applyFilters = () => {
       const filters = {
         search,
-        bloodType: bloodTypeFilter,
+        bloodType: filterByUserBloodType ? userBloodType : bloodTypeFilter, // Use user's blood type if checkbox is selected
         urgency: urgencyFilter,
         nearMe: locationFilter,
         userLocation,
@@ -94,7 +115,7 @@ const BloodRequestsPage = () => {
     };
     
     applyFilters();
-  }, [search, bloodTypeFilter, urgencyFilter, locationFilter, userLocation, requests]);
+  }, [search, bloodTypeFilter, urgencyFilter, locationFilter, userLocation, requests, filterByUserBloodType, userBloodType]);
 
   useEffect(() => {
     if (locationFilter && !userLocation) {
@@ -151,6 +172,7 @@ const BloodRequestsPage = () => {
               className="w-full border rounded px-4 py-2 text-md"
               value={bloodTypeFilter}
               onChange={e => setBloodTypeFilter(e.target.value)}
+              disabled={filterByUserBloodType} // Disable dropdown if filtering by user's blood type
             >
               <option value="">All Types</option>
               <option value="A+">A+</option>
@@ -201,6 +223,23 @@ const BloodRequestsPage = () => {
                 Using your location
               </p>
             )}
+          </div>
+
+          <div>
+            <label className="block text-gray-700 text-sm font-medium mb-1">
+              Filter by My Blood Type
+            </label>
+            <div className="flex items-center mt-2">
+              <input
+                type="checkbox"
+                className="h-4 w-4 text-teal-600 focus:ring-teal-500"
+                checked={filterByUserBloodType}
+                onChange={() => setFilterByUserBloodType((prev) => !prev)}
+              />
+              <span className="ml-2 text-sm">
+                {userBloodType ? `My Blood Type (${userBloodType})` : 'Not Set'}
+              </span>
+            </div>
           </div>
         </div>
       </div>
