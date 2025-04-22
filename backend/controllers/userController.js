@@ -151,24 +151,21 @@ const forgotPassword = async (req, res) => {
   const user = await User.findOne({ email });
   if (!user) return res.status(404).json({ error: 'No user with that email' });
 
-  // 1.1 Generate a token and hash it
   const resetToken = crypto.randomBytes(32).toString('hex');
   const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-  // 1.2 Set expiry (e.g. 1 hour)
   user.passwordResetToken = hashed;
   user.passwordResetExpires = Date.now() + 3600 * 1000;
   await user.save();
 
-  // 1.3 Send email with the plain token in the URL
   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,      // e.g. "smtp.gmail.com"
-    port: Number(process.env.SMTP_PORT),      // e.g. 587
-    secure: false,                    // true for port 465, false for 587
+    host: process.env.SMTP_HOST,
+    port: Number(process.env.SMTP_PORT),
+    secure: false,
     auth: {
-      user: process.env.SMTP_USER,    // your SMTP username
-      pass: process.env.SMTP_PASS     // your SMTP password (or app‑specific password)
+      user: process.env.SMTP_USER,
+      pass: process.env.SMTP_PASS
     }
   });
   await transporter.sendMail({
@@ -184,12 +181,10 @@ const resetPassword = async (req, res) => {
   const { token } = req.params;
   const { password } = req.body;
 
-  // ---- 0) Basic presence check ----
   if (!password) {
     return res.status(400).json({ error: 'Password is required' });
   }
 
-  // ---- 1) Same strength check as signup ----
   if (!validator.isStrongPassword(password)) {
     return res.status(400).json({
       error:
@@ -198,7 +193,6 @@ const resetPassword = async (req, res) => {
     });
   }
 
-  // 2.1 Hash the incoming token & find user
   const hashed = crypto.createHash('sha256').update(token).digest('hex');
   const user = await User.findOne({
     passwordResetToken: hashed,
@@ -206,7 +200,6 @@ const resetPassword = async (req, res) => {
   });
   if (!user) return res.status(400).json({ error: 'Token invalid or expired' });
 
-  // 2.2 Update password & clear reset fields
   user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
   user.passwordResetToken = undefined;
   user.passwordResetExpires = undefined;

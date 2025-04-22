@@ -1,38 +1,3 @@
-// import { useState } from 'react';
-// import { toast } from 'react-toastify';
-
-// export default function ForgotPassword() {
-//   const [email, setEmail] = useState('');
-//   const handleSubmit = async e => {
-//     e.preventDefault();
-//     const res = await fetch('/api/user/forgot-password', {
-//       method: 'POST',
-//       headers: { 'Content-Type':'application/json' },
-//       body: JSON.stringify({ email })
-//     });
-//     const json = await res.json();
-//     if (res.ok) toast.success(json.message);
-//     else toast.error(json.error);
-//   };
-
-//   return (
-//     <form onSubmit={handleSubmit} className="...">
-//       <h2>Forgot Password</h2>
-//       <input
-//         type="email"
-//         placeholder="Your email"
-//         value={email}
-//         onChange={e=>setEmail(e.target.value)}
-//         required
-//       />
-//       <button type="submit">Send Reset Link</button>
-//     </form>
-//   );
-// }
-
-
-
-
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import { toast } from 'react-toastify'
@@ -64,12 +29,9 @@ export default function ForgotPassword() {
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">
       <main className="flex-1 flex justify-end items-center p-6 relative">
-        {/* — SVG Background from Login.js — */}
         <div className="absolute left-0 top-0 h-full w-auto z-[1]">
-          {/* … copy all of Login.js’s <svg> shapes here … */}
         </div>
 
-        {/* — Card Container — */}
         <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full mx-auto md:ml-[40%] mt-48 text-left z-[20]">
           <h2 className="text-xl font-bold text-[#2a9fa7] mb-6 text-center">
             Forgot Password
