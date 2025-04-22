@@ -79,14 +79,6 @@ const HospitalAdminLogin = () => {
                 required
               />
             </div>
-            {/* <p className="text-sm text-gray-600">
-              <span
-                className="text-[#15aacf] cursor-pointer hover:underline"
-                onClick={() => navigate("/hospital-admin/signup")}
-              >
-                Create a hospital admin account?
-              </span>
-            </p> */}
             <div className="flex justify-between text-sm text-gray-600">
               <Link
                 to="/signup"

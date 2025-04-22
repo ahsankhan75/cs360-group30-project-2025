@@ -160,8 +160,10 @@ const forgotPassword = async (req, res) => {
 
   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
   const transporter = nodemailer.createTransport({
-    host: process.env.SMTP_HOST,
-    port: Number(process.env.SMTP_PORT),
+    // host: process.env.SMTP_HOST,
+    // port: Number(process.env.SMTP_PORT),
+    host: 'smtp.gmail.com', 
+    port: 587,
     secure: false,
     auth: {
       user: process.env.SMTP_USER,
