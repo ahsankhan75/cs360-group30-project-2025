@@ -1,6 +1,10 @@
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
+const crypto = require('crypto');
+const nodemailer = require('nodemailer');
+const bcrypt = require('bcrypt');
+const validator = require('validator');
 
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
@@ -142,11 +146,82 @@ const refreshToken = async (req, res) => {
   }
 };
 
+const forgotPassword = async (req, res) => {
+  const { email } = req.body;
+  const user = await User.findOne({ email });
+  if (!user) return res.status(404).json({ error: 'No user with that email' });
+
+  // 1.1 Generate a token and hash it
+  const resetToken = crypto.randomBytes(32).toString('hex');
+  const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+  // 1.2 Set expiry (e.g. 1 hour)
+  user.passwordResetToken = hashed;
+  user.passwordResetExpires = Date.now() + 3600 * 1000;
+  await user.save();
+
+  // 1.3 Send email with the plain token in the URL
+  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+  const transporter = nodemailer.createTransport({
+    host: process.env.SMTP_HOST,      // e.g. "smtp.gmail.com"
+    port: Number(process.env.SMTP_PORT),      // e.g. 587
+    secure: false,                    // true for port 465, false for 587
+    auth: {
+      user: process.env.SMTP_USER,    // your SMTP username
+      pass: process.env.SMTP_PASS     // your SMTP password (or app‑specific password)
+    }
+  });
+  await transporter.sendMail({
+    to: user.email,
+    subject: 'Your password reset link (valid 1 hour)',
+    html: `<p>Please click <a href="${resetURL}">here</a> to reset your password.</p>`
+  });
+
+  res.status(200).json({ message: 'Token sent to email' });
+};
+
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password } = req.body;
+
+  // ---- 0) Basic presence check ----
+  if (!password) {
+    return res.status(400).json({ error: 'Password is required' });
+  }
+
+  // ---- 1) Same strength check as signup ----
+  if (!validator.isStrongPassword(password)) {
+    return res.status(400).json({
+      error:
+        'Password not strong enough. ' +
+        'It must be at least 8 characters long and include lowercase, uppercase, numbers and symbols.'
+    });
+  }
+
+  // 2.1 Hash the incoming token & find user
+  const hashed = crypto.createHash('sha256').update(token).digest('hex');
+  const user = await User.findOne({
+    passwordResetToken: hashed,
+    passwordResetExpires: { $gt: Date.now() }
+  });
+  if (!user) return res.status(400).json({ error: 'Token invalid or expired' });
+
+  // 2.2 Update password & clear reset fields
+  user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+  user.passwordResetToken = undefined;
+  user.passwordResetExpires = undefined;
+  await user.save();
+
+  res.status(200).json({ message: 'Password has been reset.' });
+};
+
 module.exports = { 
   signupUser, 
   loginUser, 
   loginAdmin, 
   signupAdmin,
   refreshToken,
-  createToken: createTokenWithExpiry
+  createToken: createTokenWithExpiry,
+  forgotPassword,
+  resetPassword
 };

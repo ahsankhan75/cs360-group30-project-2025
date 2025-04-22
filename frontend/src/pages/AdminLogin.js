@@ -1,6 +1,6 @@
 // File: pages/AdminLogin.js
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from "react-router-dom";
 import { useAdminAuthContext } from '../hooks/useAdminAuthContext';
 import { toast } from 'react-toastify';
 
@@ -158,14 +158,28 @@ const AdminLogin = () => {
                 required
               />
             </div>
-            <p className="text-sm text-gray-600">
+            {/* <p className="text-sm text-gray-600">
               <span
                 className="text-[#15aacf] cursor-pointer hover:underline"
                 onClick={() => navigate("/admin/signup")}
               >
                 Create an admin account?
               </span>
-            </p>
+            </p> */}
+            <div className="flex justify-between text-sm text-gray-600">
+              <Link
+                to="/signup"
+                className="hover:underline text-[#15aacf]"
+              >
+                Create an admin account?
+              </Link>
+              <Link
+                to="/forgot-password"
+                className="hover:underline text-[#15aacf]"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <button
               type="submit"
               className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90 disabled:opacity-50"

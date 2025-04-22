@@ -25,6 +25,8 @@ import HospitalAdminNavbar from './components/HospitalAdmin/HospitalAdminNavbar'
 // Regular pages & components
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import ForgotPassword from "./pages/ForgotPassword";
+import ResetPassword from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
 import Hospitals from "./pages/Hospitals";
 import Home from "./pages/Home";
@@ -54,6 +56,9 @@ function App() {
                 <Route path="/admin/login" element={null} />
                 <Route path="/admin/signup" element={null} />
 
+                <Route path="/forgot-password" element={null} />
+                <Route path="/reset-password/:token" element={null} />
+
                 {/* Hospital Admin pages have their own navbar */}
                 <Route path="/hospital-admin/login" element={null} />
                 <Route path="/hospital-admin/signup" element={null} />
@@ -74,6 +79,8 @@ function App() {
                   <Route path="/hospitals" element={<Hospitals />} />
                   <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
                   <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/dashboard" />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password/:token" element={<ResetPassword />} />
                   <Route path="/reviews" element={<Reviews />} />
                   <Route path="/hospital/:id" element={<HospitalDetail />} />
                   <Route path="/medical-card" element={user ? <DigitalMedicalCardForm /> : <Navigate to="/login" />} />

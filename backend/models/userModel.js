@@ -26,7 +26,9 @@ const userSchema = new Schema({
     manageHospitals: { type: Boolean, default: false },
     manageReviews: { type: Boolean, default: false },
     manageBloodRequests: { type: Boolean, default: false }
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 }, { timestamps: true })
 
 // Static signup method
