@@ -14,6 +14,12 @@ const {
   hospitalAdminForgotPassword,
   resetPassword
 } = require('../controllers/hospitalAdminController');
+
+const {
+  getPendingUserAcceptances,
+  approveRejectUserAcceptance,
+  getUserMedicalCard
+} = require('../controllers/bloodRequestController');
 const requireHospitalAdminAuth = require('../middleware/requireHospitalAdminAuth');
 const requireAdmin = require('../middleware/requireAdmin');
 const requireAuth = require('../middleware/requireAuth');
@@ -38,6 +44,11 @@ router.get('/blood-requests', requireHospitalAdminAuth, getHospitalBloodRequests
 router.post('/blood-requests', requireHospitalAdminAuth, createBloodRequest);
 router.patch('/profile', requireHospitalAdminAuth, updateHospitalProfile);
 router.get('/reviews', requireHospitalAdminAuth, getHospitalReviews);
+
+// Blood request acceptance management routes
+router.get('/blood-requests/pending-acceptances', requireHospitalAdminAuth, getPendingUserAcceptances);
+router.patch('/blood-requests/:requestId/user-acceptance', requireHospitalAdminAuth, approveRejectUserAcceptance);
+router.get('/blood-requests/:requestId/user-medical-card', requireHospitalAdminAuth, getUserMedicalCard);
 
 // Super admin routes for managing hospital admins
 router.get('/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);

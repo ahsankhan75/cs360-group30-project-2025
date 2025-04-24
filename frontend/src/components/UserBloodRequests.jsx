@@ -56,7 +56,7 @@ const UserBloodRequests = () => {
       <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">My Blood Donation Commitments</h3>
         <p className="text-gray-600">
-          You haven't accepted any blood donation requests yet. 
+          You haven't accepted any blood donation requests yet.
           <Link to="/blood-requests" className="text-teal-600 hover:underline ml-1">
             Browse available requests
           </Link>
@@ -70,8 +70,8 @@ const UserBloodRequests = () => {
       <h3 className="text-lg font-semibold text-gray-800 mb-4">My Blood Donation Commitments</h3>
       <div className="space-y-4">
         {requests.map((request) => (
-          <div 
-            key={request._id} 
+          <div
+            key={request._id}
             className="border border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow"
           >
             <div className="flex justify-between items-start">
@@ -82,12 +82,23 @@ const UserBloodRequests = () => {
                 <h4 className="font-medium">{request.hospitalName}</h4>
                 <p className="text-sm text-gray-600 mt-1">{request.location}</p>
                 <div className="mt-2">
-                  <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs">
-                    Accepted
+                  <span className={`px-2 py-1 rounded-full text-xs ${
+                    request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' :
+                    request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' :
+                    'bg-yellow-100 text-yellow-800'
+                  }`}>
+                    {request.hospitalApproved === 'approved' ? 'Accepted' :
+                     request.hospitalApproved === 'rejected' ? 'Rejected' :
+                     'Pending Approval'}
                   </span>
                 </div>
+                {request.hospitalApproved === 'rejected' && request.hospitalRejectionReason && (
+                  <p className="text-xs text-red-600 mt-1">
+                    Reason: {request.hospitalRejectionReason}
+                  </p>
+                )}
               </div>
-              <Link 
+              <Link
                 to={`/blood-requests/${request._id}`}
                 className="inline-flex items-center px-3 py-1 border border-transparent text-sm font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700"
               >
@@ -98,8 +109,8 @@ const UserBloodRequests = () => {
         ))}
       </div>
       <div className="mt-6">
-        <Link 
-          to="/blood-requests" 
+        <Link
+          to="/blood-requests"
           className="text-teal-600 hover:underline text-sm"
         >
           Browse more blood donation requests
