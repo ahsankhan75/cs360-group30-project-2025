@@ -87,7 +87,7 @@ const HospitalAdminLogin = () => {
                 Create a hospital admin account?
               </Link>
               <Link
-                to="/forgot-password"
+                to="/hospital-admin/forgot-password"
                 className="hover:underline text-[#15aacf]"
               >
                 Forgot password?

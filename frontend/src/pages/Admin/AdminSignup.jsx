@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAdminSignup } from '../../hooks/useAdminSignup'
+import { toast } from "react-toastify";
 
 const AdminSignup = () => {
   const [fullName, setFullName] = useState('')
@@ -9,14 +10,34 @@ const AdminSignup = () => {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [adminSecret, setAdminSecret] = useState('')
   const { signup, error, isLoading } = useAdminSignup()
+  const [done, setDone] = useState(false)
   const navigate = useNavigate()
   
   const handleSubmit = async (e) => {
     e.preventDefault()
     const success = await signup(fullName, email, password, confirmPassword, adminSecret)
-    if (success) {
-      navigate('/admin/dashboard')
+    // if (success) {
+    //   navigate('/admin/dashboard')
+    // }
+    if (success?.message) {
+      toast.success(success.message)
+      setDone(true)
     }
+  }
+
+  if (done) {
+    return (
+      <div className="…card layout…">
+        <h2 className="text-xl font-bold mb-4">Almost there!</h2>
+        <p>Check your email (<strong>{email}</strong>) for a verification link.</p>
+        <button
+          onClick={() => navigate("/admin/login")}
+          className="mt-6 py-2 px-4 bg-[#2a9fa7] text-white rounded"
+        >
+          Back to login
+        </button>
+      </div>
+    )
   }
   
   return (

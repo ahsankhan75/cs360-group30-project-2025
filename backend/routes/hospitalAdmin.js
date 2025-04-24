@@ -10,7 +10,9 @@ const {
   getPendingHospitalAdmins,
   updateHospitalAdminStatus,
   getHospitalReviews,
-  getAcceptedUserMedicalCard
+  getAcceptedUserMedicalCard,
+  hospitalAdminForgotPassword,
+  resetPassword
 } = require('../controllers/hospitalAdminController');
 const requireHospitalAdminAuth = require('../middleware/requireHospitalAdminAuth');
 const requireAdmin = require('../middleware/requireAdmin');
@@ -19,6 +21,8 @@ const requireAuth = require('../middleware/requireAuth');
 // Public routes
 router.post('/login', loginHospitalAdmin);
 router.post('/signup', signupHospitalAdmin);
+router.post('/forgot-password', hospitalAdminForgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

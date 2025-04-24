@@ -168,13 +168,13 @@ const AdminLogin = () => {
             </p> */}
             <div className="flex justify-between text-sm text-gray-600">
               <Link
-                to="/signup"
+                to="/admin/signup"
                 className="hover:underline text-[#15aacf]"
               >
                 Create an admin account?
               </Link>
               <Link
-                to="/forgot-password"
+                to="/admin/forgot-password"
                 className="hover:underline text-[#15aacf]"
               >
                 Forgot password?

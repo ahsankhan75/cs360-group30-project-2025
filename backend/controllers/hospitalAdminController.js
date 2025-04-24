@@ -4,6 +4,10 @@ const Hospital = require('../models/hospitalModel');
 const BloodRequest = require('../models/blood_request');
 const Review = require('../models/reviewModel');
 const MedicalCard = require('../models/medicalCardModel');
+const crypto     = require('crypto');
+const validator = require('validator');
+const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
@@ -299,6 +303,90 @@ const getAcceptedUserMedicalCard = async (req, res) => {
   }
 };
 
+const hospitalAdminForgotPassword = async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await HospitalAdmin.findOne({ email });
+    if (!user) return res.status(404).json({ error: 'No user with that email' });
+
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+
+    user.passwordResetToken = hashed;
+    user.passwordResetExpires = Date.now() + 3600 * 1000;
+    await user.save();
+
+    const resetURL = `http://localhost:3000/hospital-admin/reset-password/${resetToken}`;
+    // if (user.isAdmin) {
+    //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
+    // }// else {
+    //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+    // }
+    // const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+    const transporter = nodemailer.createTransport({
+      // host: process.env.SMTP_HOST,
+      // port: Number(process.env.SMTP_PORT),
+      host: 'smtp.gmail.com', 
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS
+      }
+    });
+    await transporter.sendMail({
+      to: user.email,
+      subject: 'Your password reset link (valid 1 hour)',
+      html: `<p>Please click <a href="${resetURL}">here</a> to reset your password.</p>`
+    });
+
+    res.status(200).json({ message: 'Token sent to email' });
+  } catch (err) {
+    console.error('hospitalAdminForgotPassword error:', err)
+    return res
+      .status(500)
+      .json({ error: 'Unable to send reset link. Please try again later.' })
+  }
+};
+
+const resetPassword = async (req, res) => {
+  try {
+    const { token } = req.params;
+    const { password } = req.body;
+
+    if (!password) {
+      return res.status(400).json({ error: 'Password is required' });
+    }
+
+    if (!validator.isStrongPassword(password)) {
+      return res.status(400).json({
+        error:
+          'Password not strong enough. ' +
+          'It must be at least 8 characters long and include lowercase, uppercase, numbers and symbols.'
+      });
+    }
+
+    const hashed = crypto.createHash('sha256').update(token).digest('hex');
+    const user = await HospitalAdmin.findOne({
+      passwordResetToken: hashed,
+      passwordResetExpires: { $gt: Date.now() }
+    });
+    if (!user) return res.status(400).json({ error: 'Token invalid or expired' });
+
+    user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+    user.passwordResetToken = undefined;
+    user.passwordResetExpires = undefined;
+    await user.save();
+
+    res.status(200).json({ message: 'Password has been reset.' });
+  } catch (err) {
+    console.error('resetPassword error:', err)
+    return res
+      .status(500)
+      .json({ error: 'Unable to reset password. Please try again later.' })
+  }
+};
+
 module.exports = {
   loginHospitalAdmin,
   signupHospitalAdmin,
@@ -309,5 +397,7 @@ module.exports = {
   getPendingHospitalAdmins,
   updateHospitalAdminStatus,
   getHospitalReviews,
-  getAcceptedUserMedicalCard
+  getAcceptedUserMedicalCard,
+  resetPassword,
+  hospitalAdminForgotPassword
 };

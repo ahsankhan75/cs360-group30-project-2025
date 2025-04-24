@@ -10,11 +10,16 @@ import AdminDashboard from './pages/AdminDashboard';
 import AdminRequireAuth from './components/Admin/AdminRequireAuth';
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
 import AdminSignup from "./pages/Admin/AdminSignup";
+import AdminForgotPassword from "./pages/Admin/AdminForgotPassword";
+import AdminResetPassword from "./pages/Admin/AdminResetPassword";
+import VerifyAdminEmail from "./pages/VerifyEmailAdmin";
 import AdminHospitalAdminsPage from "./pages/Admin/AdminHospitalAdminsPage";
 
 // Hospital Admin pages & components
 import HospitalAdminLogin from './pages/HospitalAdmin/HospitalAdminLogin';
 import HospitalAdminSignup from './pages/HospitalAdmin/HospitalAdminSignup';
+import HospitalAdminForgotPassword from './pages/HospitalAdmin/HospitalAdminForgotPassword';
+import HospitalAdminResetPassword from './pages/HospitalAdmin/HospitalAdminResetPassword';
 import HospitalAdminDashboard from './pages/HospitalAdmin/HospitalAdminDashboard';
 import HospitalAdminBloodRequests from './pages/HospitalAdmin/HospitalAdminBloodRequests';
 import HospitalAdminProfile from './pages/HospitalAdmin/HospitalAdminProfile';
@@ -25,6 +30,7 @@ import HospitalAdminNavbar from './components/HospitalAdmin/HospitalAdminNavbar'
 // Regular pages & components
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
+import VerifyEmail from "./pages/VerifyEmail"
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import Navbar from "./components/Navbar";
@@ -56,6 +62,7 @@ function App() {
                 <Route path="/admin/login" element={null} />
                 <Route path="/admin/signup" element={null} />
 
+                <Route path="/verify-email/:token" element={null} />
                 <Route path="/forgot-password" element={null} />
                 <Route path="/reset-password/:token" element={null} />
 
@@ -79,6 +86,7 @@ function App() {
                   <Route path="/hospitals" element={<Hospitals />} />
                   <Route path="/login" element={!user ? <Login /> : <Navigate to="/dashboard" />} />
                   <Route path="/signup" element={!user ? <Signup /> : <Navigate to="/dashboard" />} />
+                  <Route path="/verify-email/:token" element={<VerifyEmail />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password/:token" element={<ResetPassword />} />
                   <Route path="/reviews" element={<Reviews />} />
@@ -99,6 +107,9 @@ function App() {
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/signup" element={<AdminSignup />} />
                   <Route path="/signupasadmin" element={<Navigate to="/hospital-admin/signup" replace />} />
+                  <Route path="/admin/forgot-password"      element={<AdminForgotPassword />} />
+                  <Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
+                  <Route path="/admin/verify-email/:token"  element={<VerifyAdminEmail />} />
 
                   {/* Protected Admin Routes */}
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
@@ -112,6 +123,8 @@ function App() {
                   {/* Hospital Admin Authentication Routes - Public */}
                   <Route path="/hospital-admin/login" element={<HospitalAdminLogin />} />
                   <Route path="/hospital-admin/signup" element={<HospitalAdminSignup />} />
+                  <Route path="/hospital-admin/forgot-password" element={<HospitalAdminForgotPassword />} />
+                  <Route path="/hospital-admin/reset-password/:token" element={<HospitalAdminResetPassword />} />
 
                   {/* Protected Hospital Admin Routes */}
                   <Route path="/hospital-admin" element={<Navigate to="/hospital-admin/dashboard" replace />} />
