@@ -220,7 +220,8 @@ const createBloodRequest = async (req, res) => {
       bloodType,
       urgencyLevel: urgencyLevel || 'Normal',
       unitsNeeded: parseInt(unitsNeeded) || 1,
-      location: hospital.location?.address || 'Unknown location',
+      location: hospital.location?.address || 'Unknown location', // Use the hospital's stored city
+      cityu: hospital.cityu || null, // Add the hospital's cityu field for filtering
       datePosted: now,
       expiryDate: expiryDate,
       contactNumber: contactNumber || 'Not provided',
@@ -248,7 +249,7 @@ const createBloodRequest = async (req, res) => {
 const updateHospitalProfile = async (req, res) => {
   try {
     const hospitalId = req.hospitalAdmin.hospitalId;
-    const { resources, contact, services, insurance_accepted } = req.body;
+    const { resources, contact, services, insurance_accepted, location, cityu } = req.body;
 
     // Find hospital
     const hospital = await Hospital.findById(hospitalId);
@@ -273,6 +274,28 @@ const updateHospitalProfile = async (req, res) => {
         ...(hospital.contact ? hospital.contact.toObject() : {}),
         ...contact
       };
+    }
+
+    // Update location (address/city) if provided
+    if (location && location.address) {
+      updateData.location = {
+        ...(hospital.location ? hospital.location.toObject() : { type: 'Point', coordinates: [0, 0] }),
+        address: location.address
+      };
+    }
+
+    // Update cityu field if provided
+    if (cityu !== undefined) {
+      updateData.cityu = cityu;
+      // Also update the location.address with the same city value
+      if (!updateData.location) {
+        updateData.location = {
+          ...(hospital.location ? hospital.location.toObject() : { type: 'Point', coordinates: [0, 0] }),
+          address: cityu
+        };
+      } else {
+        updateData.location.address = cityu;
+      }
     }
 
     // Update services (specializations) if provided

@@ -15,7 +15,8 @@ const BloodRequestSchema = new mongoose.Schema({
   hospitalName: { type: String, required: true },
   bloodType: { type: String, required: true },
   urgencyLevel: { type: String, required: true, enum: ['Normal', 'Urgent', 'Critical'] },
-  location: { type: String, required: true },
+  location: { type: String, required: true }, // This stores the hospital's main address/city
+  cityu: { type: String }, // Add the cityu field for filtering
   datePosted: { type: Date, required: true },
   expiryDate: { type: Date, default: function() {
     // Default expiry date is 7 days from posting

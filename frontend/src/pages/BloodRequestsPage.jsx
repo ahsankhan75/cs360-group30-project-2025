@@ -5,12 +5,17 @@ import { filterRequests } from '../utils/bloodRequestFilters';
 import { useAuthContext } from '../hooks/useAuthContext';
 import FallbackErrorComponent from '../components/FallbackErrorComponent';
 
+// Define a list of possible cities for the filter.
+// In a real app, you might fetch these unique values from the backend.
+const CITIES_FOR_FILTER = ['Lahore', 'Karachi', 'Islamabad', 'Rawalpindi', 'Faisalabad', 'Multan', 'Peshawar', 'Quetta', 'Other']; // Add more as needed
+
 const BloodRequestsPage = () => {
   const [requests, setRequests] = useState([]);
   const [filteredRequests, setFilteredRequests] = useState([]);
   const [search, setSearch] = useState('');
   const [bloodTypeFilter, setBloodTypeFilter] = useState('');
   const [urgencyFilter, setUrgencyFilter] = useState('');
+  const [cityuFilter, setCityuFilter] = useState(''); // Add state for the new cityu filter
   const [userLocation, setUserLocation] = useState(null);
   const [locationFilter, setLocationFilter] = useState(false);
   const [locationError, setLocationError] = useState('');
@@ -153,6 +158,7 @@ const BloodRequestsPage = () => {
         search,
         bloodType: bloodTypeFilter,
         urgency: urgencyFilter,
+        cityu: cityuFilter, // Pass the new cityu filter
         nearMe: locationFilter,
         userLocation,
         maxDistance: 50 // 50km radius
@@ -163,7 +169,8 @@ const BloodRequestsPage = () => {
     };
 
     applyFilters();
-  }, [search, bloodTypeFilter, urgencyFilter, locationFilter, userLocation, requests]);
+    // Add cityuFilter to dependency array
+  }, [search, bloodTypeFilter, urgencyFilter, cityuFilter, locationFilter, userLocation, requests]);
 
   useEffect(() => {
     if (locationFilter && !userLocation) {
@@ -217,7 +224,9 @@ const BloodRequestsPage = () => {
             <h2 className="text-lg font-semibold text-gray-800">Filter Blood Requests</h2>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Updated grid layout to accommodate 5 filters */}
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+              {/* Search Input */}
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
                   Search Hospital or Location
@@ -230,7 +239,7 @@ const BloodRequestsPage = () => {
                   </div>
                   <input
                     type="text"
-                    placeholder="Search..."
+                    placeholder="Hospital or Address..."
                     className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
                     value={search}
                     onChange={e => setSearch(e.target.value)}
@@ -238,6 +247,7 @@ const BloodRequestsPage = () => {
                 </div>
               </div>
 
+              {/* Blood Type Select */}
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
                   Blood Type
@@ -259,6 +269,7 @@ const BloodRequestsPage = () => {
                 </select>
               </div>
 
+              {/* Urgency Select */}
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
                   Urgency Level
@@ -275,11 +286,34 @@ const BloodRequestsPage = () => {
                 </select>
               </div>
 
+              {/* New CityU Filter - Changed from dropdown to text input */}
               <div>
                 <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Location
+                  City (Tag)
                 </label>
-                <div className="flex items-center mt-2 bg-gray-50 p-3 rounded-md border border-gray-200">
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg className="h-5 w-5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                  </div>
+                  <input
+                    type="text"
+                    placeholder="Enter city name..."
+                    className="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-teal-500"
+                    value={cityuFilter}
+                    onChange={e => setCityuFilter(e.target.value)}
+                  />
+                </div>
+              </div>
+
+              {/* Location Checkbox */}
+              <div>
+                <label className="block text-gray-700 text-sm font-medium mb-2">
+                  Proximity
+                </label>
+                <div className="flex items-center mt-2 bg-gray-50 p-3 rounded-md border border-gray-200 h-[42px]"> {/* Match height */}
                   <input
                     type="checkbox"
                     id="locationFilter"
@@ -287,7 +321,7 @@ const BloodRequestsPage = () => {
                     checked={locationFilter}
                     onChange={() => setLocationFilter(prev => !prev)}
                   />
-                  <label htmlFor="locationFilter" className="ml-2 text-sm text-gray-700">Near me (within 50km)</label>
+                  <label htmlFor="locationFilter" className="ml-2 text-sm text-gray-700">Near me (50km)</label>
                 </div>
                 {locationError && (
                   <p className="text-red-500 text-xs mt-1">{locationError}</p>
