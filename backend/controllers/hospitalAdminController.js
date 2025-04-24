@@ -145,45 +145,40 @@ const getHospitalBloodRequests = async (req, res) => {
     // Get blood requests with optional filtering
     const { status, bloodType } = req.query;
 
-    // Build query
-    const query = { hospitalName: hospital.name };
+    // Build a more efficient query that combines both hospitalId and hospitalName
+    const query = {
+      $or: [
+        { hospitalId: hospitalId },
+        { hospitalName: hospital.name }
+      ]
+    };
+
+    // Add filters if provided
     if (status === 'pending') query.accepted = false;
     if (status === 'accepted') query.accepted = true;
     if (bloodType) query.bloodType = bloodType;
 
     console.log('Blood request query:', JSON.stringify(query));
 
-    // Try to find by hospital ID as well
-    const bloodRequestsByHospitalId = await BloodRequest.find({ hospitalId })
+    // Use a single query with a timeout to prevent long-running operations
+    const bloodRequests = await BloodRequest.find(query)
       .populate('acceptedBy', 'email fullName profilePicture')
-      .sort({ datePosted: -1 });
+      .sort({ datePosted: -1 })
+      .maxTimeMS(10000) // 10 second timeout for the database query
+      .lean(); // Use lean() for better performance
 
-    console.log(`Found ${bloodRequestsByHospitalId.length} blood requests by hospitalId`);
+    console.log(`Found ${bloodRequests.length} blood requests`);
 
-    // Find by hospital name
-    const bloodRequestsByName = await BloodRequest.find(query)
-      .populate('acceptedBy', 'email fullName profilePicture')
-      .sort({ datePosted: -1 });
-
-    console.log(`Found ${bloodRequestsByName.length} blood requests by hospitalName`);
-
-    // Combine results, removing duplicates
-    const combinedRequests = [...bloodRequestsByHospitalId];
-
-    // Add requests from name query that aren't already included (by ID)
-    bloodRequestsByName.forEach(request => {
-      if (!combinedRequests.some(r => r._id.toString() === request._id.toString())) {
-        combinedRequests.push(request);
-      }
-    });
-
-    // Sort by date
-    combinedRequests.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
-
-    console.log(`Returning ${combinedRequests.length} total blood requests`);
-    res.status(200).json(combinedRequests);
+    // Return the results directly
+    res.status(200).json(bloodRequests);
   } catch (error) {
     console.error('Error getting hospital blood requests:', error);
+
+    // Check if it's a timeout error
+    if (error.name === 'MongooseError' && error.message.includes('timeout')) {
+      return res.status(408).json({ error: 'Request timed out. Please try again later.' });
+    }
+
     res.status(400).json({ error: error.message || 'Failed to get blood requests' });
   }
 };

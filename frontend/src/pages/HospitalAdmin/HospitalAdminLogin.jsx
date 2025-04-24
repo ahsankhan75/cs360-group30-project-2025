@@ -1,22 +1,41 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useHospitalAdminLogin } from '../../hooks/useHospitalAdminLogin';
+import ErrorPage from '../../components/ErrorPage';
 
 const HospitalAdminLogin = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [connectionError, setConnectionError] = useState(false);
   const { login, isLoading, error } = useHospitalAdminLogin();
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
-    const success = await login(email, password);
-    
-    if (success) {
-      navigate('/hospital-admin/dashboard');
+    setConnectionError(false);
+
+    try {
+      const success = await login(email, password);
+
+      if (success) {
+        navigate('/hospital-admin/dashboard');
+      }
+    } catch (err) {
+      console.error('Connection error:', err);
+      setConnectionError(true);
     }
   };
+
+  const handleRetry = async () => {
+    setConnectionError(false);
+    // Return a promise that resolves after a delay to show loading animation
+    return new Promise(resolve => setTimeout(resolve, 1500));
+  };
+
+  // Show error page if there's a connection error
+  if (connectionError) {
+    return <ErrorPage onRetry={handleRetry} />;
+  }
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">
@@ -56,46 +75,54 @@ const HospitalAdminLogin = () => {
           <h2 className="text-xl font-bold text-[#2a9fa7] mb-4 text-center">
             Hospital Admin Login
           </h2>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block font-medium">Email</label>
-              <input
-                type="email"
-                placeholder="Enter your email"
-                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-              />
+
+          {isLoading ? (
+            <div className="flex flex-col items-center justify-center py-8">
+              <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500 mb-4"></div>
+              <p className="text-gray-600">Logging in...</p>
             </div>
-            <div>
-              <label className="block font-medium">Password</label>
-              <input
-                type="password"
-                placeholder="Enter your password"
-                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-              />
-            </div>
-            <p className="text-sm text-gray-600">
-              <span
-                className="text-[#15aacf] cursor-pointer hover:underline"
-                onClick={() => navigate("/hospital-admin/signup")}
+          ) : (
+            <form onSubmit={handleSubmit} className="space-y-4">
+              <div>
+                <label className="block font-medium">Email</label>
+                <input
+                  type="email"
+                  placeholder="Enter your email"
+                  className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                />
+              </div>
+              <div>
+                <label className="block font-medium">Password</label>
+                <input
+                  type="password"
+                  placeholder="Enter your password"
+                  className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                />
+              </div>
+              <p className="text-sm text-gray-600">
+                <span
+                  className="text-[#15aacf] cursor-pointer hover:underline"
+                  onClick={() => navigate("/hospital-admin/signup")}
+                >
+                  Create a hospital admin account?
+                </span>
+              </p>
+              <button
+                type="submit"
+                className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90"
               >
-                Create a hospital admin account?
-              </span>
-            </p>
-            <button
-              type="submit"
-              className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90 disabled:opacity-50"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Logging in...' : 'Log In'}
-            </button>
-            {error && <div className="text-red-500 mt-2">{error}</div>}
-          </form>
+                Log In
+              </button>
+              {error && <div className="text-red-500 mt-2">{error}</div>}
+            </form>
+          )}
+
           <div className="mt-4 text-center">
             <Link to="/" className="text-[#15aacf] hover:underline">
               Back to home

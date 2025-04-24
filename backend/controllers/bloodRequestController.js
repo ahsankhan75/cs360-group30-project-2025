@@ -361,15 +361,33 @@ const getAcceptedBloodRequests = async (req, res) => {
 const getPendingUserAcceptances = async (req, res) => {
   try {
     const hospitalId = req.hospitalAdmin.hospitalId;
+    const { bloodType, status } = req.query;
 
-    // Find blood requests for this hospital that have been accepted by users but not yet approved/rejected by hospital
-    const pendingRequests = await BloodRequest.find({
+    console.log('Fetching pending acceptances with filters:', { bloodType, status });
+
+    // Build the query with required conditions
+    const query = {
       hospitalId: hospitalId,
       userAccepted: true,
       hospitalApproved: 'pending'
-    }).populate('acceptedBy', 'email fullName profilePicture');
+    };
 
-    console.log('Found pending requests:', pendingRequests);
+    // Add blood type filter if provided
+    if (bloodType) {
+      query.bloodType = bloodType;
+    }
+
+    // Note: status filter is not applied here since we're already filtering for pending status
+    // But we could add more status filters if needed in the future
+
+    console.log('Query for pending acceptances:', query);
+
+    // Find blood requests for this hospital that have been accepted by users but not yet approved/rejected by hospital
+    const pendingRequests = await BloodRequest.find(query)
+      .populate('acceptedBy', 'email fullName profilePicture')
+      .sort({ acceptedAt: -1 }); // Sort by most recently accepted first
+
+    console.log(`Found ${pendingRequests.length} pending requests`);
 
     res.json(pendingRequests);
   } catch (error) {

@@ -8,23 +8,46 @@ export const hospitalAdminAuthReducer = (state, action) => {
       return { hospitalAdmin: action.payload };
     case 'LOGOUT':
       return { hospitalAdmin: null };
+    case 'UPDATE_TOKEN':
+      return {
+        hospitalAdmin: {
+          ...state.hospitalAdmin,
+          token: action.payload
+        }
+      };
     default:
       return state;
   }
 };
 
 export const HospitalAdminAuthContextProvider = ({ children }) => {
-  const [state, dispatch] = useReducer(hospitalAdminAuthReducer, {
-    hospitalAdmin: null
-  });
-
-  // Check if we have a hospital admin in localStorage
-  useEffect(() => {
-    const hospitalAdmin = JSON.parse(localStorage.getItem('hospitalAdmin'));
-    if (hospitalAdmin) {
-      dispatch({ type: 'LOGIN', payload: hospitalAdmin });
+  // Initialize state with data from localStorage if available
+  const initialState = () => {
+    try {
+      const storedHospitalAdmin = localStorage.getItem('hospitalAdmin');
+      if (storedHospitalAdmin) {
+        const parsedAdmin = JSON.parse(storedHospitalAdmin);
+        if (parsedAdmin && parsedAdmin.token) {
+          return { hospitalAdmin: parsedAdmin };
+        }
+      }
+    } catch (error) {
+      console.error('Error parsing stored hospital admin data:', error);
+      localStorage.removeItem('hospitalAdmin');
     }
-  }, []);
+    return { hospitalAdmin: null };
+  };
+
+  const [state, dispatch] = useReducer(hospitalAdminAuthReducer, initialState());
+
+  // Update localStorage when state changes
+  useEffect(() => {
+    if (state.hospitalAdmin) {
+      localStorage.setItem('hospitalAdmin', JSON.stringify(state.hospitalAdmin));
+    } else {
+      localStorage.removeItem('hospitalAdmin');
+    }
+  }, [state.hospitalAdmin]);
 
   console.log('HospitalAdminAuthContext state:', state);
 
