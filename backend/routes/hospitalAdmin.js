@@ -9,7 +9,10 @@ const {
   updateHospitalProfile,
   getPendingHospitalAdmins,
   updateHospitalAdminStatus,
-  getHospitalReviews
+  getHospitalReviews,
+  getAcceptedUserMedicalCard,
+  hospitalAdminForgotPassword,
+  resetPassword
 } = require('../controllers/hospitalAdminController');
 
 const {
@@ -24,6 +27,8 @@ const requireAuth = require('../middleware/requireAuth');
 // Public routes
 router.post('/login', loginHospitalAdmin);
 router.post('/signup', signupHospitalAdmin);
+router.post('/forgot-password', hospitalAdminForgotPassword);
+router.post('/reset-password/:token', resetPassword);
 
 // Public health check endpoint
 router.get('/health', (req, res) => {
@@ -61,5 +66,6 @@ router.get('/blood-requests/:requestId/user-medical-card', requireHospitalAdminA
 // Super admin routes for managing hospital admins
 router.get('/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);
 router.patch('/:id/status', requireAuth, requireAdmin, updateHospitalAdminStatus);
+router.get('/accepted-user-card/:requestId', requireHospitalAdminAuth, getAcceptedUserMedicalCard);
 
 module.exports = router;

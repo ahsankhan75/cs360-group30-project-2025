@@ -149,7 +149,7 @@ app.use((req, res) => {
 const mongooseOptions = {
   useNewUrlParser: true,
   useUnifiedTopology: true,
-  serverSelectionTimeoutMS: 10000, // Increase timeout for Atlas connections
+  serverSelectionTimeoutMS: 30000, // Increase timeout for Atlas connections
   socketTimeoutMS: 45000, // Close sockets after 45 seconds of inactivity
 };
 

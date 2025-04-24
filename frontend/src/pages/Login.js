@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useLogin } from "../hooks/useLogin";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 
 function Login() {
   const [email, setEmail] = useState("");
@@ -113,6 +113,16 @@ function Login() {
                 onChange={(e) => setEmail(e.target.value)}
               />
             </div>
+            {/* <div>
+              <label className="block font-medium">Password</label>
+              <input
+                type="password"
+                className="w-full p-2 border rounded-md focus:ring focus:ring-[#15aacf]"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+              />
+            </div> */}
             <div>
               <label className="block font-medium">Password</label>
               <input
@@ -123,6 +133,17 @@ function Login() {
                 onChange={(e) => setPassword(e.target.value)}
               />
             </div>
+
+            {/* → Add this forgot‑password link: */}
+            {/* <div className="text-right">
+              <Link
+                to="/forgot-password"
+                className="text-sm text-[#15aacf] hover:underline"
+              >
+                Forgot password?
+              </Link>
+            </div>
+
             <p className="text-sm text-gray-600">
               <span
                 className="text-[#15aacf] cursor-pointer hover:underline"
@@ -130,7 +151,21 @@ function Login() {
               >
                 Create an account?
               </span>
-            </p>
+            </p> */}
+            <div className="flex justify-between text-sm text-gray-600">
+              <Link
+                to="/signup"
+                className="hover:underline text-[#15aacf]"
+              >
+                Create an account?
+              </Link>
+              <Link
+                to="/forgot-password"
+                className="hover:underline text-[#15aacf]"
+              >
+                Forgot password?
+              </Link>
+            </div>
             <button
               type="submit"
               className="w-full py-2 bg-[#2a9fa7] text-white font-semibold rounded-lg hover:bg-opacity-90 disabled:opacity-50"

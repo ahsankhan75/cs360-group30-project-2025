@@ -39,7 +39,15 @@ const hospitalAdminSchema = new Schema({
     manageHospitalInfo: { type: Boolean, default: true },
     manageBloodRequests: { type: Boolean, default: true },
     viewHospitalStats: { type: Boolean, default: true }
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
 }, { timestamps: true });
 
 // Static signup method

@@ -3,6 +3,7 @@ import Select from 'react-select';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
 
+
 const cityCoordinates = {
   Lahore: { lat: 31.5204, lon: 74.3587 },
   Karachi: { lat: 24.8607, lon: 67.0011 },

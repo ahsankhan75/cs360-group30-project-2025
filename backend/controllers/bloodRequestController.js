@@ -132,24 +132,42 @@ function getCityCoordinates(locationName) {
 
 // Create a new blood request
 const createBloodRequest = async (req, res) => {
-  const bloodRequest = new BloodRequest({
-    requestId: req.body.requestId,
-    hospitalName: req.body.hospitalName,
-    bloodType: req.body.bloodType,
-    urgencyLevel: req.body.urgencyLevel,
-    location: req.body.location,
-    datePosted: req.body.datePosted,
-    unitsNeeded: req.body.unitsNeeded,
-    contactNumber: req.body.contactNumber || '',
-    email: req.body.email || '',
-    latitude: req.body.latitude || null,
-    longitude: req.body.longitude || null
-  });
-
   try {
+    console.log('Request body:', req.body); // Log the incoming request body
+
+    // Validate and convert hospitalId to ObjectId if provided
+    let hospitalId = null;
+    if (req.body.hospitalId) {
+      console.log('Validating hospitalId:', req.body.hospitalId); // Log the hospitalId being validated
+      if (!mongoose.Types.ObjectId.isValid(req.body.hospitalId)) {
+        console.error('Invalid hospital ID:', req.body.hospitalId); // Log invalid hospitalId
+        return res.status(400).json({ message: 'Invalid hospital ID' });
+      }
+      hospitalId = new mongoose.Types.ObjectId(req.body.hospitalId); // Correct usage of ObjectId
+      console.log('Converted hospitalId to ObjectId:', hospitalId); // Log the converted ObjectId
+    }
+
+    // Create a new blood request
+    const bloodRequest = new BloodRequest({
+      requestId: req.body.requestId,
+      hospitalId, // Use the validated and converted ObjectId
+      hospitalName: req.body.hospitalName,
+      bloodType: req.body.bloodType,
+      urgencyLevel: req.body.urgencyLevel,
+      location: req.body.location,
+      datePosted: req.body.datePosted,
+      unitsNeeded: req.body.unitsNeeded,
+      contactNumber: req.body.contactNumber || '',
+      email: req.body.email || '',
+      latitude: req.body.latitude || null,
+      longitude: req.body.longitude || null,
+    });
+
     const newRequest = await bloodRequest.save();
+    console.log('Blood request created successfully:', newRequest); // Log the created blood request
     res.status(201).json(newRequest);
   } catch (error) {
+    console.error('Error creating blood request:', error.message); // Log the error message
     res.status(400).json({ message: error.message });
   }
 };

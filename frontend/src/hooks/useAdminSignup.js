@@ -30,26 +30,28 @@ export const useAdminSignup = () => {
       if (!response.ok) {
         setIsLoading(false)
         setError(json.error || 'Failed to create admin account')
-        return false
+        // return false
+        return
       }
 
       // save the admin user to local storage
-      localStorage.setItem('adminUser', JSON.stringify(json))
+      // localStorage.setItem('adminUser', JSON.stringify(json))
 
-      // update the auth context
-      dispatch({type: 'LOGIN', payload: json})
+      // // update the auth context
+      // dispatch({type: 'LOGIN', payload: json})
 
-      // Success notification
-      toast.success('Admin account created successfully')
+      // // Success notification
+      // toast.success('Admin account created successfully')
 
-      // update loading state
-      setIsLoading(false)
-      return true
+      // // update loading state
+      // setIsLoading(false)
+      // return true
+      return { message: json.message }
     } catch (err) {
       console.error('Admin signup error:', err)
       setError('Network error. Please check if the server is running.')
       setIsLoading(false)
-      return false
+      return
     }
   }
 

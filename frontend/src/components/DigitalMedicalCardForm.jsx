@@ -5,18 +5,35 @@ import Notification from "./Notification";
 
 // Simple icon components to replace react-icons
 const CameraIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z"/>
-    <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z"/>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    viewBox="0 0 16 16"
+  >
+    <path d="M15 12a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h1.172a3 3 0 0 0 2.12-.879l.83-.828A1 1 0 0 1 6.827 3h2.344a1 1 0 0 1 .707.293l.828.828A3 3 0 0 0 12.828 5H14a1 1 0 0 1 1 1v6zM2 4a2 2 0 0 0-2 2v6a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2h-1.172a2 2 0 0 1-1.414-.586l-.828-.828A2 2 0 0 0 9.172 2H6.828a2 2 0 0 0-1.414.586l-.828.828A2 2 0 0 1 3.172 4H2z" />
+    <path d="M8 11a2.5 2.5 0 1 1 0-5 2.5 2.5 0 0 1 0 5zm0 1a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7zM3 6.5a.5.5 0 1 1-1 0 .5.5 0 0 1 1 0z" />
   </svg>
 );
 
 const EditIcon = () => (
-  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/>
+  <svg
+    xmlns="http://www.w3.org/2000/svg"
+    width="16"
+    height="16"
+    fill="currentColor"
+    viewBox="0 0 16 16"
+  >
+    <path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207 11.207 2.5zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293l6.5-6.5zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z" />
   </svg>
 );
-const ProfileIcon = ({ profilePicture, onEditPicture = null, onRemovePicture = null, name = "" }) => {
+const ProfileIcon = ({
+  profilePicture,
+  onEditPicture = null,
+  onRemovePicture = null,
+  name = "",
+}) => {
   // Get first letter of name for avatar fallback
   const firstLetter = name ? name.charAt(0).toUpperCase() : "";
 
@@ -26,7 +43,15 @@ const ProfileIcon = ({ profilePicture, onEditPicture = null, onRemovePicture = n
       <div className="w-40 h-40 bg-blue-100 rounded-lg overflow-hidden mb-3 flex items-center justify-center">
         {profilePicture && profilePicture.length > 0 ? (
           <img
-            src={profilePicture.startsWith('http') ? profilePicture : `${window.location.origin.includes('localhost') ? 'http://localhost:4000' : ''}${profilePicture}`}
+            src={
+              profilePicture.startsWith("http")
+                ? profilePicture
+                : `${
+                    window.location.origin.includes("localhost")
+                      ? "http://localhost:4000"
+                      : ""
+                  }${profilePicture}`
+            }
             alt="Profile"
             className="w-full h-full object-cover"
           />
@@ -50,9 +75,18 @@ const ProfileIcon = ({ profilePicture, onEditPicture = null, onRemovePicture = n
               className="bg-red-600 text-white p-2 rounded-full hover:bg-red-700 transition-colors shadow-md"
               title="Remove profile picture"
             >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/>
-                <path fillRule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5zm3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z" />
+                <path
+                  fillRule="evenodd"
+                  d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"
+                />
               </svg>
             </button>
           )}
@@ -84,10 +118,13 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           {/* Profile Section */}
-          <div className="bg-orange-50 p-4 rounded-lg">
+          <div className="bg-orange-200 p-4 rounded-lg">
             <div className="flex flex-col items-center mb-4">
-              <ProfileIcon profilePicture={data.profilePicture} name={data.name} />
-              <h2 className="text-xl font-bold text-gray-800">{data.name}</h2>
+              <ProfileIcon
+                profilePicture={data.profilePicture}
+                name={data.name}
+              />
+              <h2 className="text-xl font-bold text-teal-600">{data.name}</h2>
             </div>
 
             <div className="mt-4">
@@ -107,13 +144,15 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
               </div>
               <div className="mb-2">
                 <p className="text-gray-600 text-sm">Contact:</p>
-                <p className="text-gray-800 font-medium">{data.userContactNumber}</p>
+                <p className="text-gray-800 font-medium">
+                  {data.userContactNumber}
+                </p>
               </div>
             </div>
           </div>
 
           {/* Medical Information */}
-          <div className="bg-orange-50 p-4 rounded-lg">
+          <div className="bg-orange-200 p-4 rounded-lg">
             <h3 className="text-teal-600 font-bold text-lg mb-3">
               Medical Information
             </h3>
@@ -125,7 +164,9 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Organ Donor:</span>
-              <span className="text-gray-700 ml-2">{data.organDonor ? "Yes" : "No"}</span>
+              <span className="text-gray-700 ml-2">
+                {data.organDonor ? "Yes" : "No"}
+              </span>
             </div>
 
             <div className="mb-2">
@@ -134,30 +175,43 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
             </div>
 
             <div className="mb-2">
-              <span className="text-gray-700 font-medium">Medical Devices & Implants:</span>
-              <span className="text-gray-700 ml-2">{data.medicalDevicesImplants || "None"}</span>
+              <span className="text-gray-700 font-medium">
+                Medical Devices & Implants:
+              </span>
+              <span className="text-gray-700 ml-2">
+                {data.medicalDevicesImplants || "None"}
+              </span>
             </div>
 
             <div className="mb-2">
-              <span className="text-gray-700 font-medium">Recent Surgeries:</span>
-              <span className="text-gray-700 ml-2">{data.recentSurgeryHospitalization || "None"}</span>
+              <span className="text-gray-700 font-medium">
+                Recent Surgeries:
+              </span>
+              <span className="text-gray-700 ml-2">
+                {data.recentSurgeryHospitalization || "None"}
+              </span>
             </div>
 
             <div className="mb-2">
-              <span className="text-gray-700 font-medium">Dietary Restrictions:</span>
-              <span className="text-gray-700 ml-2">{data.dietaryRestrictions || "None"}</span>
+              <span className="text-gray-700 font-medium">
+                Dietary Restrictions:
+              </span>
+              <span className="text-gray-700 ml-2">
+                {data.dietaryRestrictions || "None"}
+              </span>
             </div>
           </div>
 
           {/* Current Medications & Emergency Contacts */}
           <div className="space-y-6">
             {/* Current Medications */}
-            <div className="bg-orange-50 p-4 rounded-lg">
+            <div className="bg-orange-200 p-4 rounded-lg">
               <h3 className="text-teal-600 font-bold text-lg mb-3">
                 Current Medications
               </h3>
 
-              {data.currentMedications && data.currentMedications.split(",").length > 0 ? (
+              {data.currentMedications &&
+              data.currentMedications.split(",").length > 0 ? (
                 data.currentMedications.split(",").map((med, idx) => (
                   <div key={idx} className="mb-2">
                     <p className="text-gray-700">{med.trim()}</p>
@@ -169,7 +223,7 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
             </div>
 
             {/* Emergency Contacts */}
-            <div className="bg-orange-50 p-4 rounded-lg">
+            <div className="bg-orange-200 p-4 rounded-lg">
               <h3 className="text-teal-600 font-bold text-lg mb-3">
                 Emergency Contacts
               </h3>
@@ -179,15 +233,23 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
                 <div className="ml-2">
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Name:</span>
-                    <span className="text-gray-700 ml-2">{data.primaryEmergencyContact?.name}</span>
+                    <span className="text-gray-700 ml-2">
+                      {data.primaryEmergencyContact?.name}
+                    </span>
                   </div>
                   <div className="mb-1">
-                    <span className="text-gray-700 font-medium">Relationship:</span>
-                    <span className="text-gray-700 ml-2">{data.primaryEmergencyContact?.relationship}</span>
+                    <span className="text-gray-700 font-medium">
+                      Relationship:
+                    </span>
+                    <span className="text-gray-700 ml-2">
+                      {data.primaryEmergencyContact?.relationship}
+                    </span>
                   </div>
                   <div className="mb-1">
                     <span className="text-gray-700 font-medium">Phone:</span>
-                    <span className="text-gray-700 ml-2">{data.primaryEmergencyContact?.number}</span>
+                    <span className="text-gray-700 ml-2">
+                      {data.primaryEmergencyContact?.number}
+                    </span>
                   </div>
                 </div>
               </div>
@@ -198,67 +260,88 @@ const DigitalMedicalCardDisplay = ({ data, onEdit }) => (
                   <div className="ml-2">
                     <div className="mb-1">
                       <span className="text-gray-700 font-medium">Name:</span>
-                      <span className="text-gray-700 ml-2">{data.secondaryEmergencyContact?.name}</span>
+                      <span className="text-gray-700 ml-2">
+                        {data.secondaryEmergencyContact?.name}
+                      </span>
                     </div>
                     <div className="mb-1">
-                      <span className="text-gray-700 font-medium">Relationship:</span>
-                      <span className="text-gray-700 ml-2">{data.secondaryEmergencyContact?.relationship}</span>
+                      <span className="text-gray-700 font-medium">
+                        Relationship:
+                      </span>
+                      <span className="text-gray-700 ml-2">
+                        {data.secondaryEmergencyContact?.relationship}
+                      </span>
                     </div>
                     <div className="mb-1">
                       <span className="text-gray-700 font-medium">Phone:</span>
-                      <span className="text-gray-700 ml-2">{data.secondaryEmergencyContact?.number}</span>
+                      <span className="text-gray-700 ml-2">
+                        {data.secondaryEmergencyContact?.number}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
             </div>
           </div>
-
         </div>
 
         {/* Second row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
           {/* Insurance Information */}
-          <div className="bg-orange-50 p-4 rounded-lg">
+          <div className="bg-orange-200 p-4 rounded-lg">
             <h3 className="text-teal-600 font-bold text-lg mb-3">
               Insurance Information
             </h3>
 
             <div className="mb-2">
-              <span className="text-gray-700 font-medium">Insurance Provider:</span>
-              <span className="text-gray-700 ml-2">{data.insurance?.provider}</span>
+              <span className="text-gray-700 font-medium">
+                Insurance Provider:
+              </span>
+              <span className="text-gray-700 ml-2">
+                {data.insurance?.provider}
+              </span>
             </div>
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Policy Number:</span>
-              <span className="text-gray-700 ml-2">{data.insurance?.policyNumber}</span>
+              <span className="text-gray-700 ml-2">
+                {data.insurance?.policyNumber}
+              </span>
             </div>
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Group Number:</span>
-              <span className="text-gray-700 ml-2">{data.insurance?.groupNumber}</span>
+              <span className="text-gray-700 ml-2">
+                {data.insurance?.groupNumber}
+              </span>
             </div>
           </div>
 
           {/* Primary Physician */}
-          <div className="bg-orange-50 p-4 rounded-lg">
+          <div className="bg-orange-200 p-4 rounded-lg">
             <h3 className="text-teal-600 font-bold text-lg mb-3">
               Primary Physician
             </h3>
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Name:</span>
-              <span className="text-gray-700 ml-2">{data.primaryPhysician?.name}</span>
+              <span className="text-gray-700 ml-2">
+                {data.primaryPhysician?.name}
+              </span>
             </div>
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Specialty:</span>
-              <span className="text-gray-700 ml-2">{data.primaryPhysician?.specialization}</span>
+              <span className="text-gray-700 ml-2">
+                {data.primaryPhysician?.specialization}
+              </span>
             </div>
 
             <div className="mb-2">
               <span className="text-gray-700 font-medium">Contact:</span>
-              <span className="text-gray-700 ml-2">{data.primaryPhysician?.contact}</span>
+              <span className="text-gray-700 ml-2">
+                {data.primaryPhysician?.contact}
+              </span>
             </div>
           </div>
         </div>
@@ -405,7 +488,10 @@ const DigitalMedicalCardForm = () => {
     e.preventDefault();
 
     if (!user) {
-      setNotification({ message: "You must be logged in to submit the form.", type: 'error' });
+      setNotification({
+        message: "You must be logged in to submit the form.",
+        type: "error",
+      });
       return;
     }
 
@@ -431,7 +517,7 @@ const DigitalMedicalCardForm = () => {
       }
 
       // Show custom notification instead of alert
-      setNotification({ message: successMessage, type: 'success' });
+      setNotification({ message: successMessage, type: "success" });
 
       // If we were editing, exit edit mode and update the existing card
       if (isEditing) {
@@ -440,14 +526,17 @@ const DigitalMedicalCardForm = () => {
       }
     } catch (error) {
       console.error("Submission error: ", error.message);
-      setNotification({ message: error.message, type: 'error' });
+      setNotification({ message: error.message, type: "error" });
     }
   };
 
   // Function to handle profile picture upload
   const handleProfilePictureUpload = async (e) => {
     if (!user) {
-      setNotification({ message: "You must be logged in to upload a profile picture.", type: 'error' });
+      setNotification({
+        message: "You must be logged in to upload a profile picture.",
+        type: "error",
+      });
       return;
     }
 
@@ -455,24 +544,30 @@ const DigitalMedicalCardForm = () => {
     if (!file) return;
 
     // Check if file is an image
-    if (!file.type.startsWith('image/')) {
-      setNotification({ message: 'Please upload an image file', type: 'error' });
+    if (!file.type.startsWith("image/")) {
+      setNotification({
+        message: "Please upload an image file",
+        type: "error",
+      });
       return;
     }
 
     // Check file size (max 5MB)
     if (file.size > 5 * 1024 * 1024) {
-      setNotification({ message: 'File size should be less than 5MB', type: 'error' });
+      setNotification({
+        message: "File size should be less than 5MB",
+        type: "error",
+      });
       return;
     }
 
     try {
       setIsUploading(true);
       const formData = new FormData();
-      formData.append('profilePicture', file);
+      formData.append("profilePicture", file);
 
-      const response = await fetch('/api/medical-card/profile-picture', {
-        method: 'POST',
+      const response = await fetch("/api/medical-card/profile-picture", {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -481,19 +576,24 @@ const DigitalMedicalCardForm = () => {
 
       const json = await response.json();
       if (!response.ok) {
-        throw new Error(json.error || 'Failed to upload profile picture');
+        throw new Error(json.error || "Failed to upload profile picture");
       }
 
       // Update the existing card with the new profile picture
       setExistingCard(json.card);
-      setNotification({ message: 'Profile picture uploaded successfully!', type: 'success' });
+      setNotification({
+        message: "Profile picture uploaded successfully!",
+        type: "success",
+      });
 
       // Dispatch a custom event to notify other components that the profile picture has changed
-      const event = new CustomEvent('profilePictureChanged', { detail: { profilePicture: json.card.profilePicture } });
+      const event = new CustomEvent("profilePictureChanged", {
+        detail: { profilePicture: json.card.profilePicture },
+      });
       window.dispatchEvent(event);
     } catch (error) {
-      console.error('Upload error:', error.message);
-      setNotification({ message: error.message, type: 'error' });
+      console.error("Upload error:", error.message);
+      setNotification({ message: error.message, type: "error" });
     } finally {
       setIsUploading(false);
     }
@@ -502,15 +602,18 @@ const DigitalMedicalCardForm = () => {
   // Function to handle removing the profile picture
   const handleRemoveProfilePicture = async () => {
     if (!user) {
-      setNotification({ message: "You must be logged in to remove your profile picture.", type: 'error' });
+      setNotification({
+        message: "You must be logged in to remove your profile picture.",
+        type: "error",
+      });
       return;
     }
 
     try {
       setIsUploading(true);
 
-      const response = await fetch('/api/medical-card/profile-picture', {
-        method: 'DELETE',
+      const response = await fetch("/api/medical-card/profile-picture", {
+        method: "DELETE",
         headers: {
           Authorization: `Bearer ${user.token}`,
         },
@@ -518,19 +621,24 @@ const DigitalMedicalCardForm = () => {
 
       const json = await response.json();
       if (!response.ok) {
-        throw new Error(json.error || 'Failed to remove profile picture');
+        throw new Error(json.error || "Failed to remove profile picture");
       }
 
       // Update the existing card with the removed profile picture
       setExistingCard(json.card);
-      setNotification({ message: 'Profile picture removed successfully!', type: 'success' });
+      setNotification({
+        message: "Profile picture removed successfully!",
+        type: "success",
+      });
 
       // Dispatch a custom event to notify other components that the profile picture has changed
-      const event = new CustomEvent('profilePictureChanged', { detail: { profilePicture: '' } });
+      const event = new CustomEvent("profilePictureChanged", {
+        detail: { profilePicture: "" },
+      });
       window.dispatchEvent(event);
     } catch (error) {
-      console.error('Remove picture error:', error.message);
-      setNotification({ message: error.message, type: 'error' });
+      console.error("Remove picture error:", error.message);
+      setNotification({ message: error.message, type: "error" });
     } finally {
       setIsUploading(false);
     }
@@ -547,7 +655,9 @@ const DigitalMedicalCardForm = () => {
     if (existingCard) {
       setFormData({
         name: existingCard.name || "",
-        dateOfBirth: existingCard.dateOfBirth ? new Date(existingCard.dateOfBirth).toISOString().split('T')[0] : "",
+        dateOfBirth: existingCard.dateOfBirth
+          ? new Date(existingCard.dateOfBirth).toISOString().split("T")[0]
+          : "",
         age: existingCard.age || "",
         gender: existingCard.gender || "",
         userContactNumber: existingCard.userContactNumber || "",
@@ -557,18 +667,21 @@ const DigitalMedicalCardForm = () => {
         allergies: existingCard.allergies || "",
         currentMedications: existingCard.currentMedications || "",
         medicalDevicesImplants: existingCard.medicalDevicesImplants || "",
-        recentSurgeryHospitalization: existingCard.recentSurgeryHospitalization || "",
+        recentSurgeryHospitalization:
+          existingCard.recentSurgeryHospitalization || "",
         dietaryRestrictions: existingCard.dietaryRestrictions || "",
 
         primaryEmergencyContact: {
           name: existingCard.primaryEmergencyContact?.name || "",
-          relationship: existingCard.primaryEmergencyContact?.relationship || "",
+          relationship:
+            existingCard.primaryEmergencyContact?.relationship || "",
           number: existingCard.primaryEmergencyContact?.number || "",
         },
 
         secondaryEmergencyContact: {
           name: existingCard.secondaryEmergencyContact?.name || "",
-          relationship: existingCard.secondaryEmergencyContact?.relationship || "",
+          relationship:
+            existingCard.secondaryEmergencyContact?.relationship || "",
           number: existingCard.secondaryEmergencyContact?.number || "",
         },
 
@@ -611,10 +724,7 @@ const DigitalMedicalCardForm = () => {
           className="hidden"
           accept="image/*"
         />
-        <DigitalMedicalCardDisplay
-          data={existingCard}
-          onEdit={handleEdit}
-        />
+        <DigitalMedicalCardDisplay data={existingCard} onEdit={handleEdit} />
       </>
     );
   }
@@ -634,7 +744,11 @@ const DigitalMedicalCardForm = () => {
             profilePicture={existingCard?.profilePicture}
             name={existingCard?.name || ""}
             onEditPicture={isEditing ? triggerFileInput : null}
-            onRemovePicture={isEditing && existingCard?.profilePicture ? handleRemoveProfilePicture : null}
+            onRemovePicture={
+              isEditing && existingCard?.profilePicture
+                ? handleRemoveProfilePicture
+                : null
+            }
           />
           <input
             type="file"
@@ -644,11 +758,15 @@ const DigitalMedicalCardForm = () => {
             accept="image/*"
           />
           {isUploading && (
-            <div className="text-sm text-teal-600 mt-1 text-center">Uploading...</div>
+            <div className="text-sm text-teal-600 mt-1 text-center">
+              Uploading...
+            </div>
           )}
         </div>
         <h2 className="text-2xl font-bold text-teal-500 ml-4">
-          {isEditing ? "Edit Digital Medical Card" : "Create Digital Medical Card"}
+          {isEditing
+            ? "Edit Digital Medical Card"
+            : "Create Digital Medical Card"}
         </h2>
       </div>
 
@@ -847,7 +965,7 @@ const DigitalMedicalCardForm = () => {
 
         <button
           type="submit"
-          className="w-full bg-teal-600 text-white py-3 rounded"
+          className="w-full bg-teal-600 text-white py-3 rounded-xl"
         >
           {isEditing ? "Update Card" : "Submit Card"}
         </button>

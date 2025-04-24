@@ -26,20 +26,35 @@ const userSchema = new Schema({
     manageHospitals: { type: Boolean, default: false },
     manageReviews: { type: Boolean, default: false },
     manageBloodRequests: { type: Boolean, default: false }
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
 }, { timestamps: true })
 
 // Static signup method
-userSchema.statics.signup = async function(email, password, fullName = '') {
+userSchema.statics.signup = async function(email, password, fullName, confirmPassword) {
   // validation
-  if (!email || !password) {
-    throw Error('All fields must be filled')
+  if (!fullName || !email || !password || !confirmPassword) {
+    throw Error('All fields must be filled');
   }
+  // if (!email || !password) {
+  //   throw Error('All fields must be filled')
+  // }
   if (!validator.isEmail(email)) {
+    console.log("HERE")
     throw Error('Email is not valid')
   }
   if (!validator.isStrongPassword(password)) {
     throw Error('Password not strong enough')
+  }
+  if (password !== confirmPassword) {
+    throw Error('Passwords do not match');
   }
 
   const exists = await this.findOne({ email })
