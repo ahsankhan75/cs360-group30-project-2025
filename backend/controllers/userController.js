@@ -142,6 +142,12 @@ const loginAdmin = async (req, res) => {
     if (!user.isAdmin) {
       throw Error("Not authorized as admin");
     }
+    
+    if (!user.emailVerified) {
+      return res
+        .status(403)
+        .json({ error: 'Please verify your email before logging in.' });
+    }
 
     const token = createToken(user._id);
 

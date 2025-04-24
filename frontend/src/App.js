@@ -20,6 +20,7 @@ import HospitalAdminLogin from './pages/HospitalAdmin/HospitalAdminLogin';
 import HospitalAdminSignup from './pages/HospitalAdmin/HospitalAdminSignup';
 import HospitalAdminForgotPassword from './pages/HospitalAdmin/HospitalAdminForgotPassword';
 import HospitalAdminResetPassword from './pages/HospitalAdmin/HospitalAdminResetPassword';
+import VerifyHospitalAdminEmail from './pages/HospitalAdmin/VerifyHospitalAdminEmail';
 import HospitalAdminDashboard from './pages/HospitalAdmin/HospitalAdminDashboard';
 import HospitalAdminBloodRequests from './pages/HospitalAdmin/HospitalAdminBloodRequests';
 import HospitalAdminProfile from './pages/HospitalAdmin/HospitalAdminProfile';
@@ -125,6 +126,7 @@ function App() {
                   <Route path="/hospital-admin/signup" element={<HospitalAdminSignup />} />
                   <Route path="/hospital-admin/forgot-password" element={<HospitalAdminForgotPassword />} />
                   <Route path="/hospital-admin/reset-password/:token" element={<HospitalAdminResetPassword />} />
+                  <Route path="/hospital-admin/verify-email/:token" element={<VerifyHospitalAdminEmail />} />
 
                   {/* Protected Hospital Admin Routes */}
                   <Route path="/hospital-admin" element={<Navigate to="/hospital-admin/dashboard" replace />} />

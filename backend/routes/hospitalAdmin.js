@@ -12,7 +12,8 @@ const {
   getHospitalReviews,
   getAcceptedUserMedicalCard,
   hospitalAdminForgotPassword,
-  resetPassword
+  resetPassword,
+  verifyHospitalAdminEmail
 } = require('../controllers/hospitalAdminController');
 
 const {
@@ -29,6 +30,7 @@ router.post('/login', loginHospitalAdmin);
 router.post('/signup', signupHospitalAdmin);
 router.post('/forgot-password', hospitalAdminForgotPassword);
 router.post('/reset-password/:token', resetPassword);
+router.get('/verify-email/:token', verifyHospitalAdminEmail);
 
 // Health check endpoint
 router.get('/health', (req, res) => {

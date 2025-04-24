@@ -12,6 +12,7 @@ const HospitalAdminSignup = () => {
   const [hospitals, setHospitals] = useState([]);
   const [loadingHospitals, setLoadingHospitals] = useState(true);
   const [hospitalError, setHospitalError] = useState('');
+  const [done, setDone] = useState(false)
   
   const { signup, isLoading, error } = useHospitalAdminSignup();
   const navigate = useNavigate();
@@ -56,11 +57,31 @@ const HospitalAdminSignup = () => {
     
     const success = await signup(email, password, fullName, selectedHospital);
     
-    if (success) {
-      // After successful signup, redirect to login with a message
-      navigate('/hospital-admin/login');
+    // if (success) {
+    //   // After successful signup, redirect to login with a message
+    //   navigate('/hospital-admin/login');
+    // }
+    if (success?.message) {
+      toast.success(success.message)
+      setDone(true)
     }
   };
+
+  if (done) {
+    return (
+      <div className="…card layout…">
+        <h2 className="text-xl font-bold mb-4">Almost there!</h2>
+        <p>Check your email (<strong>{email}</strong>) for a verification link.</p>
+        <button
+          onClick={() => navigate("/hospital-admin/login")}
+          className="mt-6 py-2 px-4 bg-[#2a9fa7] text-white rounded"
+        >
+          Back to login
+        </button>
+      </div>
+    )
+  }
+  
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">

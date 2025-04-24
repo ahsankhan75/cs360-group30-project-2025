@@ -61,29 +61,144 @@ const signupHospitalAdmin = async (req, res) => {
       return res.status(400).json({ error: 'Invalid Hospital ID format.' });
   }
 
-  try {
-      const hospitalExists = await Hospital.findById(hospitalId);
-      if (!hospitalExists) {
-          return res.status(404).json({ error: 'Selected hospital does not exist.' });
-      }
+  let existing = await HospitalAdmin.findOne({ email });
+  if (existing) {
+    // 2a) If they haven’t verified, resend a fresh link
+    if (!existing.emailVerified) {
+      const vToken  = crypto.randomBytes(32).toString('hex');
+      const vHashed = crypto.createHash('sha256').update(vToken).digest('hex');
+      existing.emailVerificationToken   = vHashed;
+      existing.emailVerificationExpires = Date.now() + 24*3600*1000;
+      await existing.save();
 
-      const hospitalAdmin = await HospitalAdmin.signup(email, password, fullName, hospitalId);
-
-      res.status(201).json({
-        email: hospitalAdmin.email,
-        fullName: hospitalAdmin.fullName,
-        hospitalId: hospitalAdmin.hospitalId,
-        // Use the fetched hospital name directly
-        hospitalName: hospitalExists.name,
-        status: hospitalAdmin.status, // Should be 'pending' initially
-        message: 'Registration successful. Your account is pending approval by a superadmin.'
+      const verifyURL = `http://localhost:3000/hospital-admin/verify-email/${vToken}`;
+      const transporter = nodemailer.createTransport({
+        host: 'smtp.gmail.com', port: 587, secure: false,
+        auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
       });
-  } catch (error) {
-    // Log the error for debugging on the server
-    console.error("Signup Error:", error.message);
-    res.status(400).json({ error: error.message });
+      await transporter.sendMail({
+        to:      existing.email,
+        subject: 'Your new Hospital-Admin verification link',
+        html:    `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON Hospital-Admin account.</p>`
+      });
+
+      return res
+        .status(200)
+        .json({ message: 'Verification link resent. Please check your email.' });
+    }
+
+    // 2b) Already verified & in use
+    return res
+      .status(400)
+      .json({ error: 'Email already in use' });
   }
+
+  try {
+    const hospitalExists = await Hospital.findById(hospitalId);
+    if (!hospitalExists) {
+        return res.status(404).json({ error: 'Selected hospital does not exist.' });
+    }
+
+    const hospitalAdmin = await HospitalAdmin.signup(email, password, fullName, hospitalId);
+    const vToken  = crypto.randomBytes(32).toString('hex');
+    const vHashed = crypto.createHash('sha256').update(vToken).digest('hex');
+    hospitalAdmin.emailVerificationToken   = vHashed;
+    hospitalAdmin.emailVerificationExpires = Date.now() + 24*3600*1000;
+    await hospitalAdmin.save();
+
+    // 3c) Send the email
+    const verifyURL = `http://localhost:3000/hospital-admin/verify-email/${vToken}`;
+    const transporter = nodemailer.createTransport({
+      host: 'smtp.gmail.com', port: 587, secure: false,
+      auth: { user: process.env.SMTP_USER, pass: process.env.SMTP_PASS }
+    });
+    await transporter.sendMail({
+      to:      hospitalAdmin.email,
+      subject: 'Verify your EMCON Hospital-Admin account',
+      html:    `
+        <h3>Welcome, ${hospitalAdmin.fullName}!</h3>
+        <p>Please verify your email by clicking the link below:</p>
+        <a href="${verifyURL}">Verify Hospital-Admin account</a>
+        <p>This link expires in 24 hours.</p>
+      `
+    });
+
+    // 3d) Respond to client
+    return res
+      .status(201)
+      .json({ message: 'Registration successful! Check your email to verify your account.'});
+
+  } catch (error) {
+    console.error('signupHospitalAdmin error:', error);
+    return res
+      .status(400)
+      .json({ error: error.message });
+  }
+
+  //     res.status(201).json({
+  //       email: hospitalAdmin.email,
+  //       fullName: hospitalAdmin.fullName,
+  //       hospitalId: hospitalAdmin.hospitalId,
+  //       // Use the fetched hospital name directly
+  //       hospitalName: hospitalExists.name,
+  //       status: hospitalAdmin.status, // Should be 'pending' initially
+  //       message: 'Registration successful. Your account is pending approval by a superadmin.'
+  //     });
+  // } catch (error) {
+  //   // Log the error for debugging on the server
+  //   console.error("Signup Error:", error.message);
+  //   res.status(400).json({ error: error.message });
+  // }
 };
+
+const verifyHospitalAdminEmail = async (req, res) => {
+  try {
+    const { token } = req.params
+
+    // 1) Hash the incoming token and look up the record
+    const hashed = crypto
+      .createHash('sha256')
+      .update(token)
+      .digest('hex')
+
+    const admin = await HospitalAdmin.findOne({
+      emailVerificationToken:   hashed,
+      emailVerificationExpires: { $gt: Date.now() }
+    })
+
+    if (!admin) {
+      return res
+        .status(400)
+        .json({ error: 'Verification link invalid or expired.' })
+    }
+
+    // 2) Mark as verified
+    admin.emailVerified            = true
+    admin.emailVerificationToken   = undefined
+    admin.emailVerificationExpires = undefined
+    await admin.save()
+
+    // 3) Issue a JWT
+    // const tokenToSend = createToken(admin._id)
+
+    // 4) Send back the same shape your login/signup returns
+    res.status(201).json({
+      email: admin.email,
+      fullName: admin.fullName,
+      hospitalId: admin.hospitalId,
+      // Use the fetched hospital name directly
+      hospitalName: admin.name,
+      status: admin.status, // Should be 'pending' initially
+      message: 'Registration successful. Your account is pending approval by a superadmin.'
+    });
+
+  } catch (err) {
+    console.error('verifyHospitalAdminEmail error:', err)
+    return res
+      .status(500)
+      .json({ error: 'Failed to verify email. Please try again later.' })
+  }
+}
 
 // Hospital dashboard data
 const getHospitalAdminDashboard = async (req, res) => {
@@ -365,7 +480,7 @@ const updateHospitalProfile = async (req, res) => {
 const getPendingHospitalAdmins = async (req, res) => {
   // This should be protected by a superadmin role check middleware
   try {
-    const pendingAdmins = await HospitalAdmin.find({ status: 'pending' })
+    const pendingAdmins = await HospitalAdmin.find({ status: 'pending', emailVerified: true })
       .populate('hospitalId', 'name location') // Populate hospital name and location
       .sort({ createdAt: -1 }); // Show newest first
 
@@ -549,8 +664,9 @@ const hospitalAdminForgotPassword = async (req, res) => {
 
     user.passwordResetToken = hashed;
     user.passwordResetExpires = Date.now() + 3600 * 1000;
+    console.log("Up")
     await user.save();
-
+    console.log("Down")
     const resetURL = `http://localhost:3000/hospital-admin/reset-password/${resetToken}`;
     // if (user.isAdmin) {
     //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
@@ -634,5 +750,6 @@ module.exports = {
   getHospitalReviews,
   getAcceptedUserMedicalCard,
   resetPassword,
-  hospitalAdminForgotPassword
+  hospitalAdminForgotPassword,
+  verifyHospitalAdminEmail
 };

@@ -23,19 +23,22 @@ export const useHospitalAdminSignup = () => {
       if (!response.ok) {
         setIsLoading(false);
         setError(json.error || 'Failed to create hospital admin account');
-        return false;
+        // return false;
+        return;
       }
 
       // We don't login automatically since hospital admin accounts require approval
-      toast.success(json.message || 'Registration successful. Your account is pending approval.');
+      // toast.success(json.message || 'Registration successful. Your account is pending approval.');
 
-      setIsLoading(false);
-      return true;
+      // setIsLoading(false);
+      // return true;
+      return { message: json.message }
     } catch (err) {
       console.error('Hospital admin signup error:', err);
       setError('Network error. Please check your connection and try again.');
       setIsLoading(false);
-      return false;
+      // return false;
+      return;
     }
   };
 

@@ -107,6 +107,10 @@ hospitalAdminSchema.statics.login = async function(email, password) {
   if (!hospitalAdmin) {
     throw Error('Incorrect email');
   }
+
+  if (hospitalAdmin.emailVerified === false) {
+    throw Error('Please verify your email before logging in.');
+  }
   
   // Check if the hospital admin is approved
   if (hospitalAdmin.status !== 'approved') {
