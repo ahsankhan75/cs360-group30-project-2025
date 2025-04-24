@@ -355,14 +355,14 @@ const BloodRequestsPage = () => {
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      <div className="bg-gradient-to-r from-teal-600 to-teal-800 text-white py-8 px-6 shadow-md">
+      
         <div className="max-w-screen-xl mx-auto">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <div>
-              <h1 className="text-3xl md:text-4xl font-bold text-center sm:text-left">
-                Blood Donation Requests
-              </h1>
-              <p className="mt-2 text-teal-100 text-center sm:text-left">
+            <h1 className="text-3xl md:text-4xl font-bold text-center sm:text-left text-teal-600 sm:ml-4">
+              Blood Donation Requests
+            </h1>
+              <p className="mt-2 text-teal-600 text-center sm:text-left sm:ml-2">
                 Find and respond to blood donation needs
               </p>
             </div>
@@ -376,7 +376,7 @@ const BloodRequestsPage = () => {
             )}
           </div>
         </div>
-      </div>
+      
 
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filter Card */}
@@ -387,7 +387,7 @@ const BloodRequestsPage = () => {
             </h2>
           </div>
           <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6">
               {/* Search Filter */}
               <div>
                 <label
@@ -446,36 +446,6 @@ const BloodRequestsPage = () => {
                   <option value="O-">O-</option>
                 </select>
               </div>
-              {/* User Blood Type Filter */}
-              {user && (
-                <div className="pt-2 flex flex-col justify-end">
-                  <div className="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200 h-[42px]">
-                    <input
-                      type="checkbox"
-                      id="filterByUserBloodType"
-                      className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
-                      checked={filterByUserBloodType}
-                      onChange={() => setFilterByUserBloodType((prev) => !prev)}
-                      disabled={!userBloodType}
-                    />
-                    <label
-                      htmlFor="filterByUserBloodType"
-                      className={`ml-2 text-sm ${
-                        !userBloodType ? "text-gray-500" : "text-gray-700"
-                      }`}
-                    >
-                      {userBloodType
-                        ? `My Type (${userBloodType})`
-                        : "My Type (N/A)"}
-                    </label>
-                  </div>
-                  {!userBloodType && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Blood type not set.
-                    </p>
-                  )}
-                </div>
-              )}
               {/* Urgency Filter */}
               <div>
                 <label
@@ -536,46 +506,36 @@ const BloodRequestsPage = () => {
                   />
                 </div>
               </div>
-              {/* Proximity Filter */}
-              <div>
-                <label className="block text-gray-700 text-sm font-medium mb-2">
-                  Proximity
-                </label>
-                <div className="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200 h-[42px]">
-                  <input
-                    type="checkbox"
-                    id="locationFilterCheckbox"
-                    className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
-                    checked={locationFilter}
-                    onChange={() => setLocationFilter((prev) => !prev)}
-                  />
-                  <label
-                    htmlFor="locationFilterCheckbox"
-                    className="ml-2 text-sm text-gray-700"
-                  >
-                    Near me (within {proximityDistanceKm}km)
-                  </label>
-                </div>
-                {locationError && (
-                  <p className="text-red-500 text-xs mt-1">{locationError}</p>
-                )}
-                {locationFilter && userLocation && !locationError && (
-                  <p className="text-green-600 text-xs mt-1 flex items-center">
-                    <svg
-                      className="h-4 w-4 mr-1"
-                      fill="currentColor"
-                      viewBox="0 0 20 20"
+              {/* User Blood Type Filter */}
+              {user && (
+                <div className="pt-2 flex flex-col justify-end">
+                  <div className="flex items-center bg-gray-50 p-3 rounded-md border border-gray-200 h-[42px]">
+                    <input
+                      type="checkbox"
+                      id="filterByUserBloodType"
+                      className="h-4 w-4 text-teal-600 focus:ring-teal-500 border-gray-300 rounded"
+                      checked={filterByUserBloodType}
+                      onChange={() => setFilterByUserBloodType((prev) => !prev)}
+                      disabled={!userBloodType}
+                    />
+                    <label
+                      htmlFor="filterByUserBloodType"
+                      className={`ml-2 text-sm ${
+                        !userBloodType ? "text-gray-500" : "text-gray-700"
+                      }`}
                     >
-                      <path
-                        fillRule="evenodd"
-                        d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
-                        clipRule="evenodd"
-                      />
-                    </svg>
-                    Using your current location
-                  </p>
-                )}
-              </div>
+                      {userBloodType
+                        ? `My Type (${userBloodType})`
+                        : "My Type (N/A)"}
+                    </label>
+                  </div>
+                  {!userBloodType && (
+                    <p className="text-xs text-gray-500 mt-1">
+                      Blood type not set.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
           </div>
         </div>
