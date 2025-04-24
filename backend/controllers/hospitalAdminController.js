@@ -621,7 +621,7 @@ const resetPassword = async (req, res) => {
       .json({ error: 'Unable to reset password. Please try again later.' })
   }
 };
-ForgotResetPassword
+// ForgotResetPassword
 module.exports = {
   loginHospitalAdmin,
   signupHospitalAdmin,
