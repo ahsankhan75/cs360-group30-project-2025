@@ -1,7 +1,7 @@
 const express = require('express')
 
 // controller functions
-const { loginUser, signupUser, loginAdmin, signupAdmin, refreshToken, forgotPassword, resetPassword } = require('../controllers/userController')
+const { loginUser, signupUser, loginAdmin, signupAdmin, refreshToken, forgotPassword, resetPassword, verifyEmail } = require('../controllers/userController')
 
 const router = express.Router()
 
@@ -16,6 +16,8 @@ router.post('/refresh-token', refreshToken)
 
 router.post('/forgot-password', forgotPassword)
 router.post('/reset-password/:token', resetPassword)
+
+router.get('/verify-email/:token', verifyEmail)
 
 // Admin routes
 router.post('/adminLogin', loginAdmin)

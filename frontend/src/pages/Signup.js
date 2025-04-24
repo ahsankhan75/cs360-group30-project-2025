@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useSignup } from "../hooks/useSignup";
 import { useNavigate } from "react-router-dom";
+import { toast }          from "react-toastify"
 
 function Signup() {
   const [fullName, setFullName] = useState("");
@@ -8,12 +9,32 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const { signup, error, isLoading } = useSignup();
+  const [done, setDone] = useState(false)
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    await signup(fullName, email, password, confirmPassword);
+    const result = await signup(fullName, email, password, confirmPassword);
+    if (result?.message) {
+      toast.success(result.message)
+      setDone(true)
+    }
   };
+
+  if (done) {
+    return (
+      <div className="…card layout…">
+        <h2 className="text-xl font-bold mb-4">Almost there!</h2>
+        <p>Check your email (<strong>{email}</strong>) for a verification link.</p>
+        <button
+          onClick={() => navigate("/login")}
+          className="mt-6 py-2 px-4 bg-[#2a9fa7] text-white rounded"
+        >
+          Back to login
+        </button>
+      </div>
+    )
+  }
 
   return (
     <div className="relative flex flex-col min-h-screen bg-gray-100">

@@ -21,7 +21,7 @@ export default function ForgotPassword() {
         toast.error(json.error)
       }
     } catch (err) {
-      console.error('Forgot password error:', err)
+      // console.error('Forgot password error:', err)
       toast.error('Unable to send reset link. Please try again.')
     }
   }

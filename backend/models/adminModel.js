@@ -38,7 +38,15 @@ const adminSchema = new Schema({
       type: Boolean,
       default: true
     }
-  }
+  },
+  passwordResetToken: String,
+  passwordResetExpires: Date,
+  emailVerified: {
+    type: Boolean,
+    default: false
+  },
+  emailVerificationToken: String,
+  emailVerificationExpires: Date,
 }, { timestamps: true })
 
 // Static signup method

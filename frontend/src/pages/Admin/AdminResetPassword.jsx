@@ -10,7 +10,7 @@ export default function ResetPassword() {
   const handleSubmit = async e => {
     e.preventDefault()
     try {
-      const res = await fetch(`/api/user/reset-password/${token}`, {
+      const res = await fetch(`/api/admin/reset-password/${token}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ password }),
@@ -18,7 +18,7 @@ export default function ResetPassword() {
       const json = await res.json()
       if (res.ok) {
         toast.success(json.message)
-        navigate('/login')
+        navigate('/admin/login')
       } else {
         toast.error(json.error)
       }
@@ -62,7 +62,7 @@ export default function ResetPassword() {
             </button>
 
             <div className="text-center text-sm">
-              <Link to="/login" className="text-[#15aacf] hover:underline">
+              <Link to="/admin/login" className="text-[#15aacf] hover:underline">
                 ← Back to login
               </Link>
             </div>
