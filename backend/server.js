@@ -49,19 +49,12 @@ const app = express();
 const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:3000"];
 try {
   const cors = require("cors");
-
   app.use(
     cors({
-      origin: function (origin, callback) {
-        if (!origin || allowedOrigins.includes(origin)) {
-          return callback(null, true);
-        }
-        callback(new Error("Not allowed by CORS"));
-      },
+      origin: ["http://localhost:3000", process.env.FRONTEND_URL],
       credentials: true,
     })
   );
-
   console.log("✅ CORS middleware enabled");
 } catch (error) {
   console.error(
