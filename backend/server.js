@@ -7,25 +7,36 @@ const hospitalRoutes = require("./routes/emCon");
 const bloodRequestRoutes = require("./routes/bloodRequestRoutes");
 const medicalCardRoutes = require("./routes/digitalMedicalCardRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
-const adminRoutes = require('./routes/admin');
-const hospitalAdminRoutes = require('./routes/hospitalAdmin'); // Add hospital admin routes
-const path = require('path');
+const adminRoutes = require("./routes/admin");
+const hospitalAdminRoutes = require("./routes/hospitalAdmin"); // Add hospital admin routes
+const path = require("path");
 
 // Check for required environment variables
-const requiredEnvVars = ['PORT', 'MONGO_URI', 'SECRET'];
-const missingEnvVars = requiredEnvVars.filter(varName => !process.env[varName]);
+const requiredEnvVars = ["PORT", "MONGO_URI", "SECRET"];
+const missingEnvVars = requiredEnvVars.filter(
+  (varName) => !process.env[varName]
+);
 
 if (missingEnvVars.length > 0) {
-  console.error(`Error: Missing required environment variables: ${missingEnvVars.join(', ')}`);
-  console.error('Please create a .env file with these variables defined');
+  console.error(
+    `Error: Missing required environment variables: ${missingEnvVars.join(
+      ", "
+    )}`
+  );
+  console.error("Please create a .env file with these variables defined");
   process.exit(1);
 }
 
 // Validate MongoDB URI format
 const MONGO_URI = process.env.MONGO_URI;
-if (!MONGO_URI.startsWith('mongodb://') && !MONGO_URI.startsWith('mongodb+srv://')) {
-  console.error('Error: Invalid MongoDB URI format');
-  console.error('The MONGO_URI must start with "mongodb://" or "mongodb+srv://"');
+if (
+  !MONGO_URI.startsWith("mongodb://") &&
+  !MONGO_URI.startsWith("mongodb+srv://")
+) {
+  console.error("Error: Invalid MongoDB URI format");
+  console.error(
+    'The MONGO_URI must start with "mongodb://" or "mongodb+srv://"'
+  );
   console.error(`Current value: ${MONGO_URI}`);
   process.exit(1);
 }
@@ -34,25 +45,41 @@ if (!MONGO_URI.startsWith('mongodb://') && !MONGO_URI.startsWith('mongodb+srv://
 const app = express();
 
 // CORS configuration with fallback for missing module
+
+const allowedOrigins = [process.env.FRONTEND_URL, "http://localhost:3000"];
 try {
-  const cors = require('cors');
-  app.use(cors({
-    origin: ['http://localhost:3000', 'http://127.0.0.1:3000'],
-    credentials: true
-  }));
-  console.log('✅ CORS middleware enabled');
+  const cors = require("cors");
+
+  app.use(
+    cors({
+      origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+          return callback(null, true);
+        }
+        callback(new Error("Not allowed by CORS"));
+      },
+      credentials: true,
+    })
+  );
+
+  console.log("✅ CORS middleware enabled");
 } catch (error) {
-  console.error('❌ CORS module not available. API will only be accessible from same origin.');
-  console.error('   Run: npm install cors --save');
+  console.error(
+    "❌ CORS module not available. API will only be accessible from same origin."
+  );
+  console.error("   Run: npm install cors --save");
 
   // Minimal CORS implementation as fallback
   app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', 'http://localhost:3000');
-    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH');
-    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header("Access-Control-Allow-Origin", "http://localhost:3000");
+    res.header(
+      "Access-Control-Allow-Headers",
+      "Origin, X-Requested-With, Content-Type, Accept, Authorization"
+    );
+    res.header("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, PATCH");
+    res.header("Access-Control-Allow-Credentials", "true");
 
-    if (req.method === 'OPTIONS') {
+    if (req.method === "OPTIONS") {
       return res.sendStatus(200);
     }
     next();
@@ -63,7 +90,7 @@ try {
 app.use(express.json());
 
 // Serve uploaded files statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Logging middleware
 app.use((req, res, next) => {
@@ -74,27 +101,27 @@ app.use((req, res, next) => {
 // Error handling middleware will be added after routes
 
 // Health check endpoint
-app.get('/health', (req, res) => {
+app.get("/health", (req, res) => {
   res.status(200).json({
-    status: 'Server is running',
+    status: "Server is running",
     time: new Date().toISOString(),
     env: process.env.NODE_ENV,
     apis: [
-      '/api/hospitals',
-      '/api/user',
-      '/api/blood-requests',
-      '/api/medical-card',
-      '/api/reviews',
-      '/api/admin'
-    ]
+      "/api/hospitals",
+      "/api/user",
+      "/api/blood-requests",
+      "/api/medical-card",
+      "/api/reviews",
+      "/api/admin",
+    ],
   });
 });
 
 // API route for checking admin connectivity
-app.get('/api/admin/health', (req, res) => {
+app.get("/api/admin/health", (req, res) => {
   res.status(200).json({
-    status: 'Admin API is available',
-    time: new Date().toISOString()
+    status: "Admin API is available",
+    time: new Date().toISOString(),
   });
 });
 
@@ -104,44 +131,44 @@ app.use("/api/user", userRoutes);
 app.use("/api/blood-requests", bloodRequestRoutes);
 app.use("/api/medical-card", medicalCardRoutes);
 app.use("/api/reviews", reviewRoutes);
-app.use('/api/admin', adminRoutes);
-app.use('/api/hospital-admin', hospitalAdminRoutes); // Add this line
+app.use("/api/admin", adminRoutes);
+app.use("/api/hospital-admin", hospitalAdminRoutes); // Add this line
 
 // Add this below the routes section
-app.post('/api/token/refresh', (req, res) => {
+app.post("/api/token/refresh", (req, res) => {
   // Import the controller function since we're outside the routes file
-  const { refreshToken } = require('./controllers/userController');
+  const { refreshToken } = require("./controllers/userController");
   return refreshToken(req, res);
 });
 
 // Static file serving for production
-if (process.env.NODE_ENV === 'production') {
-  const buildPath = path.join(__dirname, '../frontend/build');
+if (process.env.NODE_ENV === "production") {
+  const buildPath = path.join(__dirname, "../frontend/build");
 
   app.use(express.static(buildPath));
 
   // Handle React routing by serving index.html for non-API routes
-  app.get('*', (req, res) => {
-    if (!req.path.startsWith('/api/')) {
-      res.sendFile(path.join(buildPath, 'index.html'));
+  app.get("*", (req, res) => {
+    if (!req.path.startsWith("/api/")) {
+      res.sendFile(path.join(buildPath, "index.html"));
     }
   });
 }
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-  console.error('Server error:', err.stack);
+  console.error("Server error:", err.stack);
   res.status(500).json({
-    error: 'Something went wrong!',
-    message: err.message
+    error: "Something went wrong!",
+    message: err.message,
   });
 });
 
 // 404 handler
 app.use((req, res) => {
   res.status(404).json({
-    error: 'Not Found',
-    message: `The requested endpoint ${req.method} ${req.path} does not exist`
+    error: "Not Found",
+    message: `The requested endpoint ${req.method} ${req.path} does not exist`,
   });
 });
 
@@ -154,11 +181,11 @@ const mongooseOptions = {
 };
 
 // Connect to MongoDB
-console.log('📡 Attempting to connect to MongoDB...');
+console.log("📡 Attempting to connect to MongoDB...");
 // Sanitize the URI before logging to protect credentials
-const sanitizedUri = MONGO_URI.includes('@') ?
-  MONGO_URI.replace(/:\/\/([^:]+):([^@]+)@/, '://***:***@') :
-  MONGO_URI;
+const sanitizedUri = MONGO_URI.includes("@")
+  ? MONGO_URI.replace(/:\/\/([^:]+):([^@]+)@/, "://***:***@")
+  : MONGO_URI;
 console.log(`🔗 Using connection string: ${sanitizedUri}`);
 
 mongoose
@@ -176,36 +203,44 @@ mongoose
     });
 
     // Handle server errors
-    server.on('error', (error) => {
-      if (error.code === 'EADDRINUSE') {
+    server.on("error", (error) => {
+      if (error.code === "EADDRINUSE") {
         console.error(`❌ Port ${PORT} is already in use. Please:
 1. Stop any running server instances
 2. Or change the PORT value in your .env file`);
       } else {
-        console.error('Server error:', error);
+        console.error("Server error:", error);
       }
       process.exit(1);
     });
   })
   .catch((error) => {
-    console.error('❌ MongoDB connection error:', error);
-    console.error('\n🔍 MongoDB Atlas troubleshooting steps:');
-    console.error('1️⃣  Check your network connection');
-    console.error('2️⃣  Make sure your IP address is whitelisted in MongoDB Atlas');
-    console.error('3️⃣  Verify the username, password, and cluster name in your connection string');
-    console.error('4️⃣  Check if your Atlas cluster is active');
-    console.error('5️⃣  Try using the MongoDB Atlas connection string from the Atlas UI');
-    console.error(`   Example: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>`);
+    console.error("❌ MongoDB connection error:", error);
+    console.error("\n🔍 MongoDB Atlas troubleshooting steps:");
+    console.error("1️⃣  Check your network connection");
+    console.error(
+      "2️⃣  Make sure your IP address is whitelisted in MongoDB Atlas"
+    );
+    console.error(
+      "3️⃣  Verify the username, password, and cluster name in your connection string"
+    );
+    console.error("4️⃣  Check if your Atlas cluster is active");
+    console.error(
+      "5️⃣  Try using the MongoDB Atlas connection string from the Atlas UI"
+    );
+    console.error(
+      `   Example: mongodb+srv://<username>:<password>@<cluster>.mongodb.net/<dbname>`
+    );
     process.exit(1);
   });
 
 // Handle uncaught exceptions
-process.on('uncaughtException', (error) => {
-  console.error('Uncaught Exception:', error);
+process.on("uncaughtException", (error) => {
+  console.error("Uncaught Exception:", error);
   process.exit(1);
 });
 
-process.on('unhandledRejection', (reason, promise) => {
-  console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+process.on("unhandledRejection", (reason, promise) => {
+  console.error("Unhandled Rejection at:", promise, "reason:", reason);
   process.exit(1);
 });
