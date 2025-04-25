@@ -1,20 +1,11 @@
 {
-  "version": 2,
-  "builds": [
+  "projects": [],
+  "rewrites": [
     {
-      "src": "frontend/package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "build" }
+      "source": "/api/:path*",
+      "destination": "https://emcon-cchs.onrender.com/api/:path*"
     }
   ],
-  "routes": [
-    {
-      "src": "/api/(.*)",
-      "dest": "https://your-backend.onrender.com/api/$1"
-    },
-    {
-      "src": "/(.*)",
-      "dest": "/index.html"
-    }
-  ]
+  "ignoreCommand": "cd frontend && npm run build",
+  "outputDirectory": "frontend/build"
 }
