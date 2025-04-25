@@ -135,12 +135,6 @@ const HospitalAdminLogin = () => {
                 >
                   Create admin account?
                 </Link>
-                <Link
-                  to="/hospital-admin/forgot-password" // Link to the forgot password page
-                  className="hover:underline text-[#15aacf] font-medium"
-                >
-                  Forgot password?
-                </Link>
               </div>
 
               {/* Submit Button */}
