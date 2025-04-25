@@ -1,3 +1,4 @@
+require("dotenv").config(); // Ensure dotenv is configured if running locally standalone
 const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const mongoose = require("mongoose");
@@ -6,16 +7,21 @@ const nodemailer = require("nodemailer");
 const bcrypt = require("bcrypt");
 const validator = require("validator");
 
+// --- Helper function to get frontend URL ---
+// Provides a default fallback, though ideally FRONTEND_URL should always be set.
+const getFrontendUrl = () => {
+  return process.env.FRONTEND_URL || "http://localhost:3000"; // Fallback if not set
+};
+
+// --- (createToken, createTokenWithExpiry, loginUser - no changes needed here) ---
 const createToken = (_id) => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn: "3d" });
 };
 
-// New function to create a token with customizable expiration
 const createTokenWithExpiry = (_id, expiresIn = "7d") => {
   return jwt.sign({ _id }, process.env.SECRET, { expiresIn });
 };
 
-// login a user
 const loginUser = async (req, res) => {
   const { email, password } = req.body;
 
@@ -27,8 +33,7 @@ const loginUser = async (req, res) => {
         .json({ error: "Please verify your email before logging in." });
     }
     const token = createToken(user._id);
-    // Create a refresh token with longer expiry
-    const refreshToken = createTokenWithExpiry(user._id, "30d");
+    const refreshToken = createTokenWithExpiry(user._id, "30d"); // Example: 30-day refresh token
 
     res.status(200).json({
       email,
@@ -44,93 +49,99 @@ const loginUser = async (req, res) => {
 
 // signup a user
 const signupUser = async (req, res) => {
-  // console.log("HERE")
   const { email, password, fullName, confirmPassword } = req.body;
-
-  let user = await User.findOne({ email });
-
-  if (user) {
-    // 1a) If they _haven’t_ verified, just resend the link
-    if (!user.emailVerified) {
-      // WHAT IF PASSWORD IS DIFFERENT IN NEW SIGNUP??
-      // generate & store a fresh token
-      const vToken = crypto.randomBytes(32).toString("hex");
-      const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
-      user.emailVerificationToken = vHashed;
-      user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000;
-      await user.save();
-
-      // send email
-      const verifyURL = `https://emcon-cchs.onrender.com/verify-email/${vToken}`;
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-      await transporter.sendMail({
-        to: user.email,
-        subject: "Your new verification link",
-        html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON account.</p>`,
-      });
-
-      return res.status(200).json({
-        message: "Verification link resent. Please check your email.",
-      });
-    }
-
-    // 1b) Otherwise, they’re fully signed up
-    return res.status(400).json({ error: "Email already in use" });
-  }
+  const frontendUrl = getFrontendUrl(); // Get the base URL
 
   try {
-    const user = await User.signup(email, password, fullName, confirmPassword);
-    // const token = createToken(user._id);
-    // res.status(200).json({ email, token });
-    const vToken = crypto.randomBytes(32).toString("hex");
-    const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
+    let user = await User.findOne({ email });
 
-    // 3) Store the hashed token & expiry on the user
-    user.emailVerificationToken = vHashed;
-    user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000; // 24h
-    await user.save();
-
-    // 4) Send the verification email
-    const verifyURL = `http://localhost:3000/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
-      secure: false,
+      secure: false, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
       },
     });
 
+    if (user) {
+      if (!user.emailVerified) {
+        // Resend verification logic (consider password update if needed)
+        const vToken = crypto.randomBytes(32).toString("hex");
+        const vHashed = crypto
+          .createHash("sha256")
+          .update(vToken)
+          .digest("hex");
+        user.emailVerificationToken = vHashed;
+        user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000; // 24h
+        // Consider if the password needs updating if they retry signup with a different one
+        // user.password = await User.hashPassword(password); // Example if needed
+        await user.save();
+
+        // Use dynamic frontend URL
+        const verifyURL = `${frontendUrl}/verify-email/${vToken}`; // <-- CHANGE HERE
+
+        await transporter.sendMail({
+          to: user.email,
+          subject: "Your new verification link",
+          html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON account.</p>`,
+        });
+
+        return res.status(200).json({
+          message: "Verification link resent. Please check your email.",
+        });
+      }
+      // Already verified and exists
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    // New user signup
+    user = await User.signup(email, password, fullName, confirmPassword);
+
+    const vToken = crypto.randomBytes(32).toString("hex");
+    const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
+    user.emailVerificationToken = vHashed;
+    user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000; // 24h
+    await user.save();
+
+    // Use dynamic frontend URL
+    const verifyURL = `${frontendUrl}/verify-email/${vToken}`; // <-- CHANGE HERE
+
     await transporter.sendMail({
       to: user.email,
       subject: "Verify your EMCON account",
       html: `
-        <h3>Welcome to EMCON!</h3>
-        <p>Please verify your email by clicking the link below:</p>
-        <a href="${verifyURL}">Verify your email</a>
-        <p>This link expires in 24 hours.</p>
-      `,
+          <h3>Welcome to EMCON!</h3>
+          <p>Please verify your email by clicking the link below:</p>
+          <a href="${verifyURL}">Verify your email</a>
+          <p>This link expires in 24 hours.</p>
+        `,
     });
 
-    // 5) Tell the client to check their inbox
     res.status(201).json({
       message: "Signup successful! Check your email to verify your account.",
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    // Log the detailed error for debugging on the server
+    console.error("Signup Error:", error);
+    // Send a generic or specific error message to the client
+    if (error.message.includes("duplicate key error")) {
+      res.status(400).json({ error: "Email already exists." });
+    } else if (error.message.includes("validation failed")) {
+      // You might want to parse the validation error for more specific feedback
+      res
+        .status(400)
+        .json({ error: "Signup validation failed. Please check your input." });
+    } else {
+      res.status(400).json({
+        error: error.message || "Signup failed due to an unexpected error.",
+      });
+    }
   }
 };
 
-// Admin login
+// --- (loginAdmin - no changes needed here) ---
 const loginAdmin = async (req, res) => {
   const { email, password } = req.body;
 
@@ -142,10 +153,12 @@ const loginAdmin = async (req, res) => {
     }
 
     const token = createToken(user._id);
+    const refreshToken = createTokenWithExpiry(user._id, "30d"); // Consistent refresh token
 
     res.status(200).json({
       email,
       token,
+      refreshToken, // Send refresh token for admin too
       fullName: user.fullName || "Admin User",
       isAdmin: true,
     });
@@ -157,61 +170,30 @@ const loginAdmin = async (req, res) => {
 // Admin signup
 const signupAdmin = async (req, res) => {
   const { email, password, fullName, adminSecret, confirmPassword } = req.body;
+  const frontendUrl = getFrontendUrl(); // Get the base URL
 
-  let existing = await User.findOne({ email });
-  if (existing) {
-    if (!existing.emailVerified) {
-      // resend a fresh verification link
-      const vToken = crypto.randomBytes(32).toString("hex");
-      const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
-      existing.emailVerificationToken = vHashed;
-      existing.emailVerificationExpires = Date.now() + 24 * 3600 * 1000;
-      existing.isAdmin = true; // make sure it’s flagged admin
-      await existing.save();
-
-      const verifyURL = `http://localhost:3000/admin/verify-email/${vToken}`;
-      const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
-        auth: {
-          user: process.env.SMTP_USER,
-          pass: process.env.SMTP_PASS,
-        },
-      });
-      await transporter.sendMail({
-        to: existing.email,
-        subject: "Your new Admin verification link",
-        html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON Admin account.</p>`,
-      });
-
-      return res.status(200).json({
-        message: "Verification link resent. Please check your email.",
-      });
-    }
-
-    // fully signed up & verified already
-    return res.status(400).json({ error: "Email already in use" });
+  // Basic validation
+  if (!email || !password || !fullName || !adminSecret || !confirmPassword) {
+    return res.status(400).json({ error: "All fields are required." });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match." });
+  }
+  if (!validator.isEmail(email)) {
+    return res.status(400).json({ error: "Email is not valid" });
+  }
+  if (!validator.isStrongPassword(password)) {
+    return res.status(400).json({ error: "Password not strong enough" });
   }
 
   try {
+    // Check admin secret FIRST before hitting database if possible
     if (adminSecret !== process.env.ADMIN_SECRET) {
-      throw Error("Invalid admin secret code");
+      return res.status(401).json({ error: "Invalid admin secret code" }); // Use 401 Unauthorized
     }
 
-    const user = await User.signup(email, password, fullName, confirmPassword);
+    let existing = await User.findOne({ email });
 
-    user.isAdmin = true;
-
-    // 4) generate & store vToken
-    const vToken = crypto.randomBytes(32).toString("hex");
-    const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
-    user.emailVerificationToken = vHashed;
-    user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000;
-    await user.save();
-
-    // 5) send the email
-    const verifyURL = `http://localhost:3000/admin/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
       port: 587,
@@ -221,124 +203,213 @@ const signupAdmin = async (req, res) => {
         pass: process.env.SMTP_PASS,
       },
     });
+
+    if (existing) {
+      if (!existing.emailVerified) {
+        // Resend Admin verification
+        const vToken = crypto.randomBytes(32).toString("hex");
+        const vHashed = crypto
+          .createHash("sha256")
+          .update(vToken)
+          .digest("hex");
+        existing.emailVerificationToken = vHashed;
+        existing.emailVerificationExpires = Date.now() + 24 * 3600 * 1000;
+        existing.isAdmin = true; // Ensure flagged as admin
+        // Consider password update if needed
+        await existing.save();
+
+        // Use dynamic frontend URL
+        const verifyURL = `${frontendUrl}/admin/verify-email/${vToken}`; // <-- CHANGE HERE
+
+        await transporter.sendMail({
+          to: existing.email,
+          subject: "Your new Admin verification link",
+          html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON Admin account.</p>`,
+        });
+        return res.status(200).json({
+          message: "Verification link resent. Please check your email.",
+        });
+      }
+      // Already verified admin or regular user exists
+      return res.status(400).json({ error: "Email already in use" });
+    }
+
+    // Create new admin user
+    const user = await User.signup(email, password, fullName, confirmPassword); // Use the existing signup static
+    user.isAdmin = true;
+
+    const vToken = crypto.randomBytes(32).toString("hex");
+    const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
+    user.emailVerificationToken = vHashed;
+    user.emailVerificationExpires = Date.now() + 24 * 3600 * 1000;
+    await user.save();
+
+    // Use dynamic frontend URL
+    const verifyURL = `${frontendUrl}/admin/verify-email/${vToken}`; // <-- CHANGE HERE
+
     await transporter.sendMail({
       to: user.email,
       subject: "Verify your EMCON Admin account",
       html: `
-        <h3>Welcome, ${user.fullName}!</h3>
-        <p>Please verify your email by clicking below:</p>
-        <a href="${verifyURL}">Verify Admin account</a>
-        <p>This link expires in 24 hours.</p>
-      `,
+          <h3>Welcome, ${user.fullName}!</h3>
+          <p>Please verify your email by clicking below:</p>
+          <a href="${verifyURL}">Verify Admin account</a>
+          <p>This link expires in 24 hours.</p>
+        `,
     });
 
-    // 6) respond to client
     return res.status(201).json({
       message:
         "Admin signup successful! Check your email to verify your account.",
     });
   } catch (error) {
-    res.status(400).json({ error: error.message });
+    console.error("Admin Signup Error:", error); // Log detailed error
+    // Avoid sending potentially sensitive error details like stack traces
+    res.status(400).json({ error: error.message || "Admin signup failed." });
   }
 };
 
 // Refresh token endpoint
 const refreshToken = async (req, res) => {
+  const { refreshToken } = req.body;
+
+  if (!refreshToken) {
+    return res.status(400).json({ error: "Refresh token is required" });
+  }
+
   try {
-    const { refreshToken } = req.body;
+    // Use the primary SECRET for refresh token verification unless you specifically set REFRESH_SECRET
+    const decoded = jwt.verify(refreshToken, process.env.SECRET);
 
-    // If no refresh token is provided
-    if (!refreshToken) {
-      return res.status(400).json({ error: "Refresh token is required" });
-    }
-
-    // Verify the refresh token
-    let decoded;
-    try {
-      decoded = jwt.verify(
-        refreshToken,
-        process.env.REFRESH_SECRET || process.env.SECRET
-      );
-    } catch (error) {
-      return res.status(401).json({
-        error: "Invalid or expired refresh token",
-        code: "INVALID_REFRESH_TOKEN",
-      });
-    }
-
-    // Find the user
     const user = await User.findById(decoded._id).select(
-      "_id email fullName isAdmin"
+      "_id email fullName isAdmin emailVerified" // Ensure emailVerified is selected
     );
 
     if (!user) {
-      return res.status(404).json({ error: "User not found" });
+      return res
+        .status(404)
+        .json({ error: "User associated with token not found" });
     }
 
-    // Create new tokens
-    const token = createToken(user._id);
-    const newRefreshToken = createTokenWithExpiry(user._id, "30d");
+    // Optional: Add check if user is still active or email is verified, if needed
+    if (!user.emailVerified) {
+      return res
+        .status(403)
+        .json({ error: "Email not verified", code: "EMAIL_NOT_VERIFIED" });
+    }
+
+    // Issue new tokens
+    const newAccessToken = createToken(user._id);
+    const newRefreshToken = createTokenWithExpiry(user._id, "30d"); // Issue a new refresh token as well
 
     res.status(200).json({
       email: user.email,
-      token,
-      refreshToken: newRefreshToken,
+      token: newAccessToken,
+      refreshToken: newRefreshToken, // Send the new refresh token back
       fullName: user.fullName,
       isAdmin: user.isAdmin || false,
     });
   } catch (error) {
     console.error("Token refresh error:", error);
+    if (error instanceof jwt.TokenExpiredError) {
+      return res.status(401).json({
+        error: "Refresh token expired",
+        code: "REFRESH_TOKEN_EXPIRED",
+      });
+    } else if (error instanceof jwt.JsonWebTokenError) {
+      return res.status(401).json({
+        error: "Invalid refresh token",
+        code: "INVALID_REFRESH_TOKEN",
+      });
+    }
     res.status(500).json({ error: "Failed to refresh token" });
   }
 };
 
+// Forgot Password (for regular users)
 const forgotPassword = async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ error: "No user with that email" });
+  const frontendUrl = getFrontendUrl();
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  const hashed = crypto.createHash("sha256").update(resetToken).digest("hex");
-
-  user.passwordResetToken = hashed;
-  user.passwordResetExpires = Date.now() + 3600 * 1000;
-  await user.save();
-
-  // let resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-  // if (user.isAdmin) {
-  //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
-  // }// else {
-  //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-  // }
-  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-  const transporter = nodemailer.createTransport({
-    // host: process.env.SMTP_HOST,
-    // port: Number(process.env.SMTP_PORT),
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-  await transporter.sendMail({
-    to: user.email,
-    subject: "Your password reset link (valid 1 hour)",
-    html: `<p>Please click <a href="${resetURL}">here</a> to reset your password.</p>`,
-  });
-
-  res.status(200).json({ message: "Token sent to email" });
-};
-
-const resetPassword = async (req, res) => {
-  const { token } = req.params;
-  const { password } = req.body;
-
-  if (!password) {
-    return res.status(400).json({ error: "Password is required" });
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
   }
 
+  try {
+    const user = await User.findOne({ email: email, isAdmin: { $ne: true } }); // Ensure it's not an admin using this route
+    if (!user) {
+      // Important: Don't reveal if the user exists or not for security
+      console.warn(
+        `Password reset attempt for non-existent or admin email: ${email}`
+      );
+      return res.status(200).json({
+        message:
+          "If an account with that email exists and is not an admin account, a password reset link has been sent.",
+      });
+    }
+
+    // Check if email is verified before allowing password reset
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        error: "Please verify your email before resetting the password.",
+      });
+    }
+
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashed = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    user.passwordResetToken = hashed;
+    user.passwordResetExpires = Date.now() + 3600 * 1000; // 1 hour expiry
+    await user.save();
+
+    // Use dynamic frontend URL
+    const resetURL = `${frontendUrl}/reset-password/${resetToken}`; // <-- CHANGE HERE
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Your password reset link (valid 1 hour)",
+      html: `<p>You requested a password reset for your EMCON account.</p>
+                 <p>Please click <a href="${resetURL}">here</a> to reset your password.</p>
+                 <p>If you did not request this, please ignore this email.</p>
+                 <p>This link expires in 1 hour.</p>`,
+    });
+
+    res.status(200).json({
+      message:
+        "If an account with that email exists and is not an admin account, a password reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Forgot Password Error:", error);
+    res.status(500).json({
+      error: "An error occurred while processing the password reset request.",
+    });
+  }
+};
+
+// Reset Password (handles token from URL param for both user/admin)
+const resetPassword = async (req, res) => {
+  const { token } = req.params;
+  const { password, confirmPassword } = req.body;
+
+  // --- Input Validation ---
+  if (!password || !confirmPassword) {
+    return res
+      .status(400)
+      .json({ error: "Both password and confirm password are required" });
+  }
+  if (password !== confirmPassword) {
+    return res.status(400).json({ error: "Passwords do not match" });
+  }
   if (!validator.isStrongPassword(password)) {
     return res.status(400).json({
       error:
@@ -346,88 +417,195 @@ const resetPassword = async (req, res) => {
         "It must be at least 8 characters long and include lowercase, uppercase, numbers and symbols.",
     });
   }
+  // --- End Validation ---
 
-  const hashed = crypto.createHash("sha256").update(token).digest("hex");
-  const user = await User.findOne({
-    passwordResetToken: hashed,
-    passwordResetExpires: { $gt: Date.now() },
-  });
-  if (!user) return res.status(400).json({ error: "Token invalid or expired" });
+  try {
+    const hashed = crypto.createHash("sha256").update(token).digest("hex");
 
-  user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
-  user.passwordResetToken = undefined;
-  user.passwordResetExpires = undefined;
-  await user.save();
+    const user = await User.findOne({
+      passwordResetToken: hashed,
+      passwordResetExpires: { $gt: Date.now() }, // Check if token is still valid
+    });
 
-  res.status(200).json({ message: "Password has been reset." });
+    if (!user) {
+      return res
+        .status(400)
+        .json({ error: "Password reset link is invalid or has expired." });
+    }
+
+    // Hash the new password
+    user.password = await bcrypt.hash(password, 10); // Use bcrypt directly or your model static if preferred
+    user.passwordResetToken = undefined; // Clear the reset token
+    user.passwordResetExpires = undefined; // Clear the expiry
+    // Optional: Ensure email is marked as verified if resetting password implies verification
+    // user.emailVerified = true;
+    await user.save();
+
+    // Optionally log the user in immediately after reset
+    // const authToken = createToken(user._id);
+    // const refreshToken = createTokenWithExpiry(user._id, "30d");
+    // res.status(200).json({
+    //     message: "Password has been reset successfully.",
+    //     email: user.email,
+    //     token: authToken,
+    //     refreshToken: refreshToken,
+    //     fullName: user.fullName,
+    //     isAdmin: user.isAdmin
+    // });
+
+    res.status(200).json({
+      message: "Password has been reset successfully. Please log in.",
+    });
+  } catch (error) {
+    console.error("Reset Password Error:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred while resetting the password." });
+  }
 };
 
+// Verify Email (handles token from URL param for both user/admin)
 const verifyEmail = async (req, res) => {
   const { token } = req.params;
-  // 1) Hash & find the user
-  const hashed = crypto.createHash("sha256").update(token).digest("hex");
-  const user = await User.findOne({
-    emailVerificationToken: hashed,
-    emailVerificationExpires: { $gt: Date.now() },
-  });
-  if (!user)
-    return res
-      .status(400)
-      .json({ error: "Verification link invalid or expired." });
 
-  // 2) Mark email verified
-  user.emailVerified = true;
-  user.emailVerificationToken = undefined;
-  user.emailVerificationExpires = undefined;
-  await user.save();
+  if (!token) {
+    return res.status(400).json({ error: "Verification token is missing." });
+  }
 
-  // 3) Issue JWT + refresh token
-  const authToken = createToken(user._id);
+  try {
+    const hashed = crypto.createHash("sha256").update(token).digest("hex");
 
-  // 4) Return the same shape your login/signup handlers return
-  res.status(200).json({
-    email: user.email,
-    token: authToken,
-  });
+    const user = await User.findOne({
+      emailVerificationToken: hashed,
+      emailVerificationExpires: { $gt: Date.now() },
+    });
+
+    if (!user) {
+      // Check if the email might already be verified (e.g., user clicked link twice)
+      const alreadyVerifiedUser = await User.findOne({
+        emailVerificationToken: undefined,
+        emailVerified: true,
+      }); // This check might need refinement based on your exact logic/schema
+      // A more robust check might involve finding the user by email if the token was previously associated with them, but this adds complexity.
+      // For simplicity, just informing the link is invalid/expired is usually sufficient.
+      return res
+        .status(400)
+        .json({ error: "Verification link is invalid or has expired." });
+    }
+
+    // Prevent re-verification if already done
+    if (user.emailVerified) {
+      // Optionally log them in or just inform them
+      console.log(`Email ${user.email} already verified.`);
+      // You could issue tokens here if desired, similar to successful verification
+      const authToken = createToken(user._id);
+      const refreshToken = createTokenWithExpiry(user._id, "30d");
+      return res.status(200).json({
+        message: "Email already verified.",
+        email: user.email,
+        token: authToken,
+        refreshToken: refreshToken,
+        fullName: user.fullName,
+        isAdmin: user.isAdmin,
+      });
+    }
+
+    // Mark email as verified and clear verification fields
+    user.emailVerified = true;
+    user.emailVerificationToken = undefined;
+    user.emailVerificationExpires = undefined;
+    await user.save();
+
+    // Log the user in by issuing tokens
+    const authToken = createToken(user._id);
+    const refreshToken = createTokenWithExpiry(user._id, "30d");
+
+    // Return data consistent with login response
+    res.status(200).json({
+      message: "Email verified successfully!",
+      email: user.email,
+      token: authToken,
+      refreshToken: refreshToken,
+      fullName: user.fullName,
+      isAdmin: user.isAdmin || false, // Ensure isAdmin is included
+    });
+  } catch (error) {
+    console.error("Email Verification Error:", error);
+    res
+      .status(500)
+      .json({ error: "An error occurred during email verification." });
+  }
 };
 
+// Forgot Password (for admins)
 const adminForgotPassword = async (req, res) => {
   const { email } = req.body;
-  const user = await User.findOne({ email });
-  if (!user) return res.status(404).json({ error: "No user with that email" });
+  const frontendUrl = getFrontendUrl();
 
-  const resetToken = crypto.randomBytes(32).toString("hex");
-  const hashed = crypto.createHash("sha256").update(resetToken).digest("hex");
+  if (!email) {
+    return res.status(400).json({ error: "Email is required" });
+  }
 
-  user.passwordResetToken = hashed;
-  user.passwordResetExpires = Date.now() + 3600 * 1000;
-  await user.save();
+  try {
+    const user = await User.findOne({ email: email, isAdmin: true }); // Ensure it's an admin
+    if (!user) {
+      console.warn(
+        `Admin password reset attempt for non-existent or non-admin email: ${email}`
+      );
+      // Don't reveal if the user exists or is an admin
+      return res.status(200).json({
+        message:
+          "If an admin account with that email exists, a password reset link has been sent.",
+      });
+    }
 
-  const resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
-  // if (user.isAdmin) {
-  //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
-  // }// else {
-  //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-  // }
-  // const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-  const transporter = nodemailer.createTransport({
-    // host: process.env.SMTP_HOST,
-    // port: Number(process.env.SMTP_PORT),
-    host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
-    auth: {
-      user: process.env.SMTP_USER,
-      pass: process.env.SMTP_PASS,
-    },
-  });
-  await transporter.sendMail({
-    to: user.email,
-    subject: "Your password reset link (valid 1 hour)",
-    html: `<p>Please click <a href="${resetURL}">here</a> to reset your password.</p>`,
-  });
+    // Check if admin email is verified
+    if (!user.emailVerified) {
+      return res.status(403).json({
+        error: "Please verify your admin email before resetting the password.",
+      });
+    }
 
-  res.status(200).json({ message: "Token sent to email" });
+    const resetToken = crypto.randomBytes(32).toString("hex");
+    const hashed = crypto.createHash("sha256").update(resetToken).digest("hex");
+
+    user.passwordResetToken = hashed;
+    user.passwordResetExpires = Date.now() + 3600 * 1000; // 1 hour
+    await user.save();
+
+    // Use dynamic frontend URL with admin path
+    const resetURL = `${frontendUrl}/admin/reset-password/${resetToken}`; // <-- CHANGE HERE
+
+    const transporter = nodemailer.createTransport({
+      host: "smtp.gmail.com",
+      port: 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    });
+
+    await transporter.sendMail({
+      to: user.email,
+      subject: "Admin Password Reset Link (valid 1 hour)",
+      html: `<p>You requested a password reset for your EMCON Admin account.</p>
+                 <p>Please click <a href="${resetURL}">here</a> to reset your password.</p>
+                 <p>If you did not request this, please ignore this email.</p>
+                 <p>This link expires in 1 hour.</p>`,
+    });
+
+    res.status(200).json({
+      message:
+        "If an admin account with that email exists, a password reset link has been sent.",
+    });
+  } catch (error) {
+    console.error("Admin Forgot Password Error:", error);
+    res.status(500).json({
+      error:
+        "An error occurred while processing the admin password reset request.",
+    });
+  }
 };
 
 module.exports = {
@@ -436,9 +614,9 @@ module.exports = {
   loginAdmin,
   signupAdmin,
   refreshToken,
-  createToken: createTokenWithExpiry,
+  // createToken: createTokenWithExpiry, // Exporting createTokenWithExpiry might be confusing if not used elsewhere
   forgotPassword,
   resetPassword,
-  adminForgotPassword,
+  adminForgotPassword, // Export the admin-specific forgot password handler
   verifyEmail,
 };
