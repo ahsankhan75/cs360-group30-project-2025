@@ -300,23 +300,7 @@ const BloodRequestDetailPage = () => {
             </Link>
           )}
 
-          {/* Admin-only actions */}
-          {isAdmin && (
-            <>
-              <Link
-                to={`/admin/blood-requests/edit/${requestId}`}
-                className="px-4 py-2 bg-indigo-500 text-white font-medium rounded hover:bg-indigo-600"
-              >
-                Edit Request
-              </Link>
-              <button
-                onClick={handleDeleteRequest}
-                className="px-4 py-2 bg-red-500 text-white font-medium rounded hover:bg-red-600"
-              >
-                Delete Request
-              </button>
-            </>
-          )}
+
         </div>
       </div>
 
