@@ -101,7 +101,18 @@ module.exports = {
     'text-purple-100',
     'text-yellow-500',
     'animate-fade-in-down',
-    'animate-fade-out-up'
+    'animate-fade-out-up',
+    'bg-orange-100',
+    'text-orange-800',
+    'bg-green-50',
+    'text-green-800',
+    'bg-red-50',
+    'text-red-500',
+    'bg-teal-50',
+    'text-teal-800',
+    'text-teal-700',
+    'border-red-500',
+    'border-green-500'
   ],
   plugins: [],
 }

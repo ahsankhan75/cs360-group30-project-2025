@@ -22,13 +22,15 @@ const HospitalAdminNavbar = () => {
 
   return (
     <nav className="bg-teal-700 text-white shadow-md">
+      {/* Main navbar container - using grid layout for better mobile positioning */}
       <div className="max-w-7xl mx-auto px-2 sm:px-6 lg:px-8">
-        <div className="relative flex items-center justify-between h-16">
-          {/* Mobile menu button */}
-          <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
+        <div className="grid grid-cols-3 items-center h-16">
+          {/* Left column - Mobile menu button on mobile & Logo on desktop */}
+          <div className="flex items-center">
+            {/* Mobile menu button - visible only on small screens */}
             <button
               type="button"
-              className="inline-flex items-center justify-center p-2 rounded-md text-teal-200 hover:text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
+              className="sm:hidden inline-flex items-center justify-center p-2 rounded-md text-teal-200 hover:text-white hover:bg-teal-600 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white"
               aria-controls="mobile-menu"
               aria-expanded="false"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
@@ -67,67 +69,66 @@ const HospitalAdminNavbar = () => {
                 />
               </svg>
             </button>
+            
+            {/* Logo - shown on all screen sizes, centered on mobile, left on desktop */}
+            <Link to="/hospital-admin/dashboard" className="flex items-center sm:ml-0 mx-auto sm:mx-0">
+              <img src="/kk.png" alt="EMCON" className="h-8 w-auto mr-2" />
+              <span className="text-xl font-bold hidden sm:inline">Hospital Admin</span>
+            </Link>
           </div>
 
-          {/* Logo and desktop navigation */}
-          <div className="flex-1 flex items-center justify-center sm:items-stretch sm:justify-start">
-            <div className="flex-shrink-0 flex items-center">
-              <Link to="/hospital-admin/dashboard" className="flex items-center">
-                <img src="/kk.png" alt="EMCON" className="h-8 w-auto mr-2" />
-                <span className="text-xl font-bold">Hospital Admin</span>
+          {/* Center column - Empty on desktop, used for spacing in mobile */}
+          <div className="hidden sm:flex items-center justify-start">
+            {/* Desktop navigation */}
+            <div className="flex space-x-4">
+              <Link
+                to="/hospital-admin/dashboard"
+                className={`${
+                  isActive('/hospital-admin/dashboard')
+                    ? 'bg-teal-800 text-white'
+                    : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+                } px-3 py-2 rounded-md text-sm font-medium`}
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/hospital-admin/blood-requests"
+                className={`${
+                  isActive('/hospital-admin/blood-requests')
+                    ? 'bg-teal-800 text-white'
+                    : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+                } px-3 py-2 rounded-md text-sm font-medium`}
+              >
+                Blood Requests
+              </Link>
+              <Link
+                to="/hospital-admin/reviews"
+                className={`${
+                  isActive('/hospital-admin/reviews')
+                    ? 'bg-teal-800 text-white'
+                    : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+                } px-3 py-2 rounded-md text-sm font-medium`}
+              >
+                Reviews
+              </Link>
+              <Link
+                to="/hospital-admin/profile"
+                className={`${
+                  isActive('/hospital-admin/profile')
+                    ? 'bg-teal-800 text-white'
+                    : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+                } px-3 py-2 rounded-md text-sm font-medium`}
+              >
+                Hospital Profile
               </Link>
             </div>
-            <div className="hidden sm:block sm:ml-6">
-              <div className="flex space-x-4">
-                <Link
-                  to="/hospital-admin/dashboard"
-                  className={`${
-                    isActive('/hospital-admin/dashboard')
-                      ? 'bg-teal-800 text-white'
-                      : 'text-teal-100 hover:bg-teal-600 hover:text-white'
-                  } px-3 py-2 rounded-md text-sm font-medium`}
-                >
-                  Dashboard
-                </Link>
-                <Link
-                  to="/hospital-admin/blood-requests"
-                  className={`${
-                    isActive('/hospital-admin/blood-requests')
-                      ? 'bg-teal-800 text-white'
-                      : 'text-teal-100 hover:bg-teal-600 hover:text-white'
-                  } px-3 py-2 rounded-md text-sm font-medium`}
-                >
-                  Blood Requests
-                </Link>
-                <Link
-                  to="/hospital-admin/reviews"
-                  className={`${
-                    isActive('/hospital-admin/reviews')
-                      ? 'bg-teal-800 text-white'
-                      : 'text-teal-100 hover:bg-teal-600 hover:text-white'
-                  } px-3 py-2 rounded-md text-sm font-medium`}
-                >
-                  Reviews
-                </Link>
-                <Link
-                  to="/hospital-admin/profile"
-                  className={`${
-                    isActive('/hospital-admin/profile')
-                      ? 'bg-teal-800 text-white'
-                      : 'text-teal-100 hover:bg-teal-600 hover:text-white'
-                  } px-3 py-2 rounded-md text-sm font-medium`}
-                >
-                  Hospital Profile
-                </Link>
-              </div>
-            </div>
           </div>
 
-          {/* User menu */}
-          <div className="absolute inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
+          {/* Right column - User menu (sign out button) */}
+          <div className="flex items-center justify-end">
             {hospitalAdmin ? (
-              <div className="flex items-center">
-                <span className="hidden md:block text-sm mr-3">
+              <div className="flex items-center space-x-2">
+                <span className="hidden md:block text-sm">
                   {hospitalAdmin.hospitalName}
                 </span>
                 <button
@@ -176,6 +177,17 @@ const HospitalAdminNavbar = () => {
             onClick={() => setMobileMenuOpen(false)}
           >
             Blood Requests
+          </Link>
+          <Link
+            to="/hospital-admin/reviews"
+            className={`${
+              isActive('/hospital-admin/reviews')
+                ? 'bg-teal-800 text-white'
+                : 'text-teal-100 hover:bg-teal-600 hover:text-white'
+            } block px-3 py-2 rounded-md text-base font-medium`}
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Reviews
           </Link>
           <Link
             to="/hospital-admin/profile"
