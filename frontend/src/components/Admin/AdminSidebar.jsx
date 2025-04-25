@@ -16,6 +16,10 @@ const AdminSidebar = () => {
   ];
 
   const isActive = (path) => {
+    // Enhanced to handle sub-pages (e.g., /admin/add-blood-request should highlight blood-requests)
+    if (path === '/admin/blood-requests') {
+      return location.pathname === path || location.pathname === '/admin/add-blood-request' || location.pathname.startsWith('/admin/blood-requests/');
+    }
     return location.pathname === path;
   };
 

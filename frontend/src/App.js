@@ -14,6 +14,8 @@ import AdminForgotPassword from "./pages/Admin/AdminForgotPassword";
 import AdminResetPassword from "./pages/Admin/AdminResetPassword";
 import VerifyAdminEmail from "./pages/VerifyEmailAdmin";
 import AdminHospitalAdminsPage from "./pages/Admin/AdminHospitalAdminsPage";
+import AdminAddBloodRequestPage from "./pages/Admin/AdminAddBloodRequestPage";
+import AdminReviewsPage from "./pages/Admin/AdminReviewsPage";
 
 // Hospital Admin pages & components
 import HospitalAdminLogin from './pages/HospitalAdmin/HospitalAdminLogin';
@@ -25,7 +27,12 @@ import HospitalAdminBloodRequests from './pages/HospitalAdmin/HospitalAdminBlood
 import HospitalAdminProfile from './pages/HospitalAdmin/HospitalAdminProfile';
 import HospitalAdminReviews from './pages/HospitalAdmin/HospitalAdminReviews';
 import HospitalAdminRequireAuth from './components/HospitalAdmin/HospitalAdminRequireAuth';
-import HospitalAdminNavbar from './components/HospitalAdmin/HospitalAdminNavbar';
+// import HospitalAdminNavbar from './components/HospitalAdmin/HospitalAdminNavbar';
+// import HospitalAdminBloodRequestDetail from './pages/HospitalAdmin/HospitalAdminBloodRequestDetail';
+
+import AdminBloodRequestsPage from "./pages/Admin/AdminBloodRequestsPage";
+
+
 
 // Regular pages & components
 import Login from "./pages/Login";
@@ -117,8 +124,9 @@ function App() {
                   <Route path="/admin/users" element={<AdminRequireAuth><AdminUsersPage /></AdminRequireAuth>} />
                   <Route path="/admin/hospitals" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
                   <Route path="/admin/hospital-admins" element={<AdminRequireAuth><AdminHospitalAdminsPage /></AdminRequireAuth>} />
-                  <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
-                  <Route path="/admin/reviews" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
+                  <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminBloodRequestsPage /></AdminRequireAuth>} />
+                  <Route path="/admin/add-blood-request" element={<AdminRequireAuth><AdminAddBloodRequestPage /></AdminRequireAuth>} />
+                  <Route path="/admin/reviews" element={<AdminRequireAuth><AdminReviewsPage /></AdminRequireAuth>} />
 
                   {/* Hospital Admin Authentication Routes - Public */}
                   <Route path="/hospital-admin/login" element={<HospitalAdminLogin />} />

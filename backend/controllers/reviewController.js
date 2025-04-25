@@ -145,6 +145,42 @@ const updateReview = async (req, res) => {
   }
 };
 
+// Update a review (admin version)
+const adminUpdateReview = async (req, res) => {
+  const { reviewId } = req.params;
+  const { rating, comment } = req.body;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(404).json({ error: 'Invalid review ID' });
+    }
+
+    // Find the review
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    // Update the review - ensure we properly handle both fields
+    review.rating = rating !== undefined ? rating : review.rating;
+    review.comment = comment !== undefined ? comment : review.comment;
+    await review.save();
+
+    // Update hospital rating
+    await updateHospitalRating(review.hospitalId);
+
+    // Return the updated review with populated fields
+    const updatedReview = await Review.findById(reviewId)
+      .populate('hospitalId', 'name location ratings')
+      .populate('userId', 'email fullName');
+
+    res.status(200).json(updatedReview);
+  } catch (error) {
+    console.error('Error updating review:', error);
+    res.status(400).json({ error: error.message });
+  }
+};
+
 // Delete a review
 const deleteReview = async (req, res) => {
   const { id } = req.params;
@@ -171,6 +207,36 @@ const deleteReview = async (req, res) => {
 
     // Delete the review
     await Review.findByIdAndDelete(id);
+
+    // Update hospital rating
+    await updateHospitalRating(hospitalId);
+
+    res.status(200).json({ message: 'Review deleted successfully' });
+  } catch (error) {
+    res.status(400).json({ error: error.message });
+  }
+};
+
+// Delete a review (admin version)
+const adminDeleteReview = async (req, res) => {
+  const { reviewId } = req.params;
+
+  try {
+    if (!mongoose.Types.ObjectId.isValid(reviewId)) {
+      return res.status(404).json({ error: 'Invalid review ID' });
+    }
+
+    // Find the review
+    const review = await Review.findById(reviewId);
+    if (!review) {
+      return res.status(404).json({ error: 'Review not found' });
+    }
+
+    // Save hospital ID before deletion for updating ratings
+    const hospitalId = review.hospitalId;
+
+    // Delete the review
+    await Review.findByIdAndDelete(reviewId);
 
     // Update hospital rating
     await updateHospitalRating(hospitalId);
@@ -225,5 +291,7 @@ module.exports = {
   createReview,
   updateReview,
   deleteReview,
+  adminDeleteReview,
+  adminUpdateReview,
   getAllHospitalNames
 };
