@@ -1,11 +1,8 @@
 {
-  "projects": [],
   "rewrites": [
     {
       "source": "/api/:path*",
       "destination": "https://emcon-cchs.onrender.com/api/:path*"
     }
-  ],
-  "ignoreCommand": "cd frontend && npm run build",
-  "outputDirectory": "frontend/build"
+  ]
 }
