@@ -66,6 +66,7 @@ const signupUser = async (req, res) => {
       await user.save();
 
       // send email
+      const frontendUrl = getFrontendUrl();
       const verifyURL = `${frontendUrl}/verify-email/${vToken}`;
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -82,11 +83,9 @@ const signupUser = async (req, res) => {
         html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON account.</p>`,
       });
 
-      return res
-        .status(200)
-        .json({
-          message: "Verification link resent. Please check your email.",
-        });
+      return res.status(200).json({
+        message: "Verification link resent. Please check your email.",
+      });
     }
 
     // 1b) Otherwise, they’re fully signed up
@@ -106,6 +105,7 @@ const signupUser = async (req, res) => {
     await user.save();
 
     // 4) Send the verification email
+    const frontendUrl = getFrontendUrl();
     const verifyURL = `${frontendUrl}/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -129,11 +129,9 @@ const signupUser = async (req, res) => {
     });
 
     // 5) Tell the client to check their inbox
-    res
-      .status(201)
-      .json({
-        message: "Signup successful! Check your email to verify your account.",
-      });
+    res.status(201).json({
+      message: "Signup successful! Check your email to verify your account.",
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -178,6 +176,7 @@ const signupAdmin = async (req, res) => {
       existing.isAdmin = true; // make sure it’s flagged admin
       await existing.save();
 
+      const frontendUrl = getFrontendUrl();
       const verifyURL = `${frontendUrl}/admin/verify-email/${vToken}`;
       const transporter = nodemailer.createTransport({
         host: "smtp.gmail.com",
@@ -194,11 +193,9 @@ const signupAdmin = async (req, res) => {
         html: `<p>Click <a href="${verifyURL}">here</a> to verify your EMCON Admin account.</p>`,
       });
 
-      return res
-        .status(200)
-        .json({
-          message: "Verification link resent. Please check your email.",
-        });
+      return res.status(200).json({
+        message: "Verification link resent. Please check your email.",
+      });
     }
 
     // fully signed up & verified already
@@ -222,6 +219,7 @@ const signupAdmin = async (req, res) => {
     await user.save();
 
     // 5) send the email
+    const frontendUrl = getFrontendUrl();
     const verifyURL = `${frontendUrl}/admin/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
       host: "smtp.gmail.com",
@@ -244,12 +242,10 @@ const signupAdmin = async (req, res) => {
     });
 
     // 6) respond to client
-    return res
-      .status(201)
-      .json({
-        message:
-          "Admin signup successful! Check your email to verify your account.",
-      });
+    return res.status(201).json({
+      message:
+        "Admin signup successful! Check your email to verify your account.",
+    });
   } catch (error) {
     res.status(400).json({ error: error.message });
   }
@@ -323,6 +319,7 @@ const forgotPassword = async (req, res) => {
   // }// else {
   //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
   // }
+  const frontendUrl = getFrontendUrl();
   const resetURL = `${frontendUrl}/reset-password/${resetToken}`;
   const transporter = nodemailer.createTransport({
     // host: process.env.SMTP_HOST,
@@ -416,6 +413,7 @@ const adminForgotPassword = async (req, res) => {
   user.passwordResetExpires = Date.now() + 3600 * 1000;
   await user.save();
 
+  const frontendUrl = getFrontendUrl();
   const resetURL = `${frontendUrl}/admin/reset-password/${resetToken}`;
   // if (user.isAdmin) {
   //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
