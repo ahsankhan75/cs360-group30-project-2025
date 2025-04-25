@@ -107,18 +107,20 @@ const HospitalAdminDashboard = () => {
       }
 
       try {
-        // First check if backend is available
-        const isBackendAvailable = await checkBackendConnection();
-        if (!isBackendAvailable) {
-          setError('Unable to connect to server. Please try again later.');
-          setLoading(false);
-          return;
-        }
+        // Use improved connection checking with multiple retries
+        // We'll be optimistic and continue even if the check fails
+        await checkBackendConnection(true, 3);
 
-        const response = await fetch(`/api/hospital-admin/dashboard`, {
+        // Add cache-busting parameter and improved headers
+        const cacheBuster = `?_=${Date.now()}`;
+        const response = await fetch(`/api/hospital-admin/dashboard${cacheBuster}`, {
           headers: {
-            'Authorization': `Bearer ${hospitalAdmin.token}`
-          }
+            'Authorization': `Bearer ${hospitalAdmin.token}`,
+            'Cache-Control': 'no-cache, no-store, must-revalidate',
+            'Pragma': 'no-cache'
+          },
+          // Add a longer timeout for the fetch request
+          signal: AbortSignal.timeout(10000) // 10 second timeout
         });
 
         if (!response.ok) {
@@ -149,8 +151,56 @@ const HospitalAdminDashboard = () => {
         setError(null);
       } catch (err) {
         console.error('Error fetching dashboard data:', err);
-        setError('Failed to load dashboard data');
-        toast.error('Error loading dashboard data');
+
+        // Handle different types of errors differently
+        if (err.name === 'AbortError') {
+          // This is a timeout error - retry automatically
+          console.log('Request timed out, retrying...');
+
+          // Wait a moment before retrying
+          await new Promise(resolve => setTimeout(resolve, 1000));
+
+          // Try one more time with a direct approach
+          try {
+            const response = await fetch(`/api/hospital-admin/dashboard`, {
+              headers: {
+                'Authorization': `Bearer ${hospitalAdmin.token}`
+              },
+              // Longer timeout for retry
+              signal: AbortSignal.timeout(15000)
+            });
+
+            if (response.ok) {
+              const data = await response.json();
+              setDashboardData(data);
+              setFormData({
+                resources: {
+                  icu_beds: data.hospital?.resources?.icu_beds || 0,
+                  ventilators: data.hospital?.resources?.ventilators || 0,
+                  blood_bank: data.hospital?.resources?.blood_bank || false,
+                  emergency_capacity: data.hospital?.resources?.emergency_capacity || 0
+                },
+                contact: {
+                  email: data.hospital?.contact?.email || '',
+                  phone: data.hospital?.contact?.phone || ''
+                },
+                services: data.hospital?.services || [],
+                insurance_accepted: data.hospital?.insurance_accepted || [],
+                city: data.hospital?.location?.address || '',
+                cityu: data.hospital?.cityu || ''
+              });
+              setError(null);
+              setLoading(false);
+              return;
+            }
+          } catch (retryErr) {
+            console.error('Retry also failed:', retryErr);
+            // Continue to the error handling below
+          }
+        }
+
+        // Only set error if we couldn't recover
+        setError('Unable to connect to server. Please try again later.');
       } finally {
         setLoading(false);
       }
@@ -178,12 +228,69 @@ const HospitalAdminDashboard = () => {
           <div className="bg-white p-8 rounded-lg shadow-md max-w-md">
             <h1 className="text-2xl font-bold text-red-600 mb-4">Error</h1>
             <p className="text-gray-700">{error}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
-            >
-              Try Again
-            </button>
+            <div className="mt-6 flex flex-col sm:flex-row sm:space-x-4 space-y-3 sm:space-y-0">
+              <button
+                onClick={async () => {
+                  setLoading(true);
+                  setError(null);
+
+                  // Force a connection check with multiple retries
+                  const isAvailable = await checkBackendConnection(true, 3);
+
+                  if (isAvailable) {
+                    // If connection is available, fetch dashboard data
+                    try {
+                      const response = await fetch(`/api/hospital-admin/dashboard?_=${Date.now()}`, {
+                        headers: {
+                          'Authorization': `Bearer ${hospitalAdmin.token}`,
+                          'Cache-Control': 'no-cache'
+                        }
+                      });
+
+                      if (response.ok) {
+                        const data = await response.json();
+                        setDashboardData(data);
+                        setFormData({
+                          resources: {
+                            icu_beds: data.hospital?.resources?.icu_beds || 0,
+                            ventilators: data.hospital?.resources?.ventilators || 0,
+                            blood_bank: data.hospital?.resources?.blood_bank || false,
+                            emergency_capacity: data.hospital?.resources?.emergency_capacity || 0
+                          },
+                          contact: {
+                            email: data.hospital?.contact?.email || '',
+                            phone: data.hospital?.contact?.phone || ''
+                          },
+                          services: data.hospital?.services || [],
+                          insurance_accepted: data.hospital?.insurance_accepted || [],
+                          city: data.hospital?.location?.address || '',
+                          cityu: data.hospital?.cityu || ''
+                        });
+                        setError(null);
+                      } else {
+                        throw new Error('Failed to fetch dashboard data');
+                      }
+                    } catch (err) {
+                      console.error('Error in retry:', err);
+                      setError('Still having trouble connecting. Please try again later.');
+                    }
+                  } else {
+                    setError('Still unable to connect to server. Please check your internet connection and try again.');
+                  }
+
+                  setLoading(false);
+                }}
+                className="w-full sm:w-auto px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-teal-500 focus:ring-offset-2"
+              >
+                Try Again
+              </button>
+              <button
+                onClick={() => window.location.reload()}
+                className="w-full sm:w-auto px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
+              >
+                Reload Page
+              </button>
+            </div>
           </div>
         </div>
       </div>
