@@ -7,9 +7,9 @@ EMCON is a healthcare navigation platform that helps users find hospitals, track
 - `backend/` - Express API server
 
 ## Deployment Structure
-- 'Frontend' - Deployed on Vercel
-- 'Backend' - Deployed on Render
-- 'Python Script for AI Wait Time Predictions' - Deployed on Railway
+- `Frontend`: Deployed on **Vercel**
+- `Backend`: Deployed on **Render**
+- `Python Script for AI Wait Time Predictions`: Deployed on **Railway**
 
 ## Setup Instructions
 
