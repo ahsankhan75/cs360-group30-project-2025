@@ -7,8 +7,8 @@ const AdminHeader = ({ title }) => {
   const { logout } = useAdminLogout();
   
   return (
-    <header className="bg-white shadow-sm z-10">
-      <div className="flex justify-between items-center px-6 py-4">
+    <header className="bg-white shadow-sm z-10 w-full">
+      <div className="flex justify-between items-center px-6 py-4 w-full">
         <h1 className="text-2xl font-semibold text-gray-800">{title || 'Admin Dashboard'}</h1>
         
         <div className="flex items-center">

@@ -145,8 +145,8 @@ const AdminHospitalsPage = () => {
             <div className="flex-1 flex flex-col">
                 <AdminHeader title="Hospitals Management" />
 
-                <main className="flex-1 bg-gray-100 p-6">
-                    <div className="max-w-7xl mx-auto">
+                <main className="flex-1 overflow-auto p-6">
+                    <div className="w-full">
                         <div className="flex justify-between items-center mb-8">
                             <h1 className="text-3xl font-bold text-gray-800">Manage Hospitals</h1>
                             <button

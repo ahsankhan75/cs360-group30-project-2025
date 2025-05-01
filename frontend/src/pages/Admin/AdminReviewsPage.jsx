@@ -215,7 +215,7 @@ const AdminReviewsPage = () => {
         <AdminHeader title="Reviews Management" />
 
         <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-7xl mx-auto">
+          <div className="w-full">
             <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
               <h1 className="text-2xl font-bold text-gray-800">Manage Reviews</h1>
             </div>

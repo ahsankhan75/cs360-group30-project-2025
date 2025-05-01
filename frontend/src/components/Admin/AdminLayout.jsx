@@ -26,7 +26,7 @@ const AdminLayout = ({ children }) => {
   }
 
   return (
-    <div className="min-h-screen bg-gray-100 flex">
+    <div className="min-h-screen bg-gray-100 flex flex-col w-full">
       {children}
     </div>
   );
