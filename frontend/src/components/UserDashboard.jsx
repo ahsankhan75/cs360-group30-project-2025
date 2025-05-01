@@ -32,7 +32,7 @@ const UserDashboard = () => {
                 'Authorization': `Bearer ${user.token}`
               }
             });
-            
+
             if (fallbackResponse.ok) {
               const data = await fallbackResponse.json();
               // Filter only accepted requests on the client side as fallback
@@ -84,43 +84,47 @@ const UserDashboard = () => {
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
       <h2 className="text-xl font-semibold mb-4">My Accepted Donations</h2>
-      <div className="overflow-x-auto">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead>
-            <tr className="bg-gray-50">
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Hospital</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Blood Type</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Urgency</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date Accepted</th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            </tr>
-          </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
-            {acceptedRequests.map((request) => (
-              <tr key={request.requestId} className="hover:bg-gray-50">
-                <td className="px-6 py-4 whitespace-nowrap">{request.hospitalName}</td>
-                <td className="px-6 py-4 whitespace-nowrap font-medium">{request.bloodType}</td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                    request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+      <div className="space-y-4">
+        {acceptedRequests.map((request) => (
+          <div key={request.requestId} className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
+            <div className="flex flex-col space-y-3">
+              <div className="flex items-center justify-between">
+                <h3 className="font-medium text-gray-900">{request.hospitalName}</h3>
+                <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
                     request.urgencyLevel === 'High' ? 'bg-orange-100 text-orange-800' :
-                    'bg-green-100 text-green-800'
+                      'bg-green-100 text-green-800'
                   }`}>
-                    {request.urgencyLevel}
+                  {request.urgencyLevel}
+                </span>
+              </div>
+
+              <div className="grid grid-cols-2 gap-4 text-sm">
+                <div>
+                  <span className="text-gray-500">Blood Type:</span>
+                  <span className="ml-2 font-medium">{request.bloodType}</span>
+                </div>
+                <div>
+                  <span className="text-gray-500">Date Accepted:</span>
+                  <span className="ml-2 font-medium">
+                    {new Date(request.acceptedAt || request.datePosted).toLocaleDateString()}
                   </span>
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                  {new Date(request.acceptedAt || request.datePosted).toLocaleDateString()}
-                </td>
-                <td className="px-6 py-4 whitespace-nowrap">
-                  <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                    Accepted
-                  </span>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-between">
+                <span className="inline-flex px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                  Accepted
+                </span>
+                <Link
+                  to={`/blood-requests/${request.requestId}`}
+                  className="text-sm text-teal-600 hover:text-teal-700 hover:underline"
+                >
+                  View Details
+                </Link>
+              </div>
+            </div>
+          </div>
+        ))}
       </div>
     </div>
   );

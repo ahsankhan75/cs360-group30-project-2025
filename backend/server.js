@@ -8,7 +8,7 @@ const bloodRequestRoutes = require("./routes/bloodRequestRoutes");
 const medicalCardRoutes = require("./routes/digitalMedicalCardRoutes");
 const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require('./routes/admin');
-const hospitalAdminRoutes = require('./routes/hospitalAdmin'); // Add hospital admin routes
+const hospitalAdminRoutes = require('./routes/hospitalAdmin');
 const path = require('path');
 
 // Check for required environment variables
@@ -105,7 +105,7 @@ app.use("/api/blood-requests", bloodRequestRoutes);
 app.use("/api/medical-card", medicalCardRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use('/api/admin', adminRoutes);
-app.use('/api/hospital-admin', hospitalAdminRoutes); // Add this line
+app.use('/api/hospital-admin', hospitalAdminRoutes);
 
 // Add this below the routes section
 app.post('/api/token/refresh', (req, res) => {

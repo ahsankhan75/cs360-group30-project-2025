@@ -9,6 +9,7 @@ import AdminLogin from './pages/AdminLogin';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminRequireAuth from './components/Admin/AdminRequireAuth';
 import AdminUsersPage from "./pages/Admin/AdminUsersPage";
+import AdminHospitalsPage from "./pages/Admin/AdminHospitalsPage";
 import AdminSignup from "./pages/Admin/AdminSignup";
 import AdminForgotPassword from "./pages/Admin/AdminForgotPassword";
 import AdminResetPassword from "./pages/Admin/AdminResetPassword";
@@ -114,18 +115,17 @@ function App() {
                   <Route path="/admin/login" element={<AdminLogin />} />
                   <Route path="/admin/signup" element={<AdminSignup />} />
                   <Route path="/signupasadmin" element={<Navigate to="/hospital-admin/signup" replace />} />
-                  <Route path="/admin/forgot-password"      element={<AdminForgotPassword />} />
+                  <Route path="/admin/forgot-password" element={<AdminForgotPassword />} />
                   <Route path="/admin/reset-password/:token" element={<AdminResetPassword />} />
-                  <Route path="/admin/verify-email/:token"  element={<VerifyAdminEmail />} />
+                  <Route path="/admin/verify-email/:token" element={<VerifyAdminEmail />} />
 
                   {/* Protected Admin Routes */}
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/dashboard" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
                   <Route path="/admin/users" element={<AdminRequireAuth><AdminUsersPage /></AdminRequireAuth>} />
-                  <Route path="/admin/hospitals" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
+                  <Route path="/admin/hospitals" element={<AdminRequireAuth><AdminHospitalsPage /></AdminRequireAuth>} />
                   <Route path="/admin/hospital-admins" element={<AdminRequireAuth><AdminHospitalAdminsPage /></AdminRequireAuth>} />
-                  <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminBloodRequestsPage /></AdminRequireAuth>} />
-                  <Route path="/admin/add-blood-request" element={<AdminRequireAuth><AdminAddBloodRequestPage /></AdminRequireAuth>} />
+                  <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminAddBloodRequestPage /></AdminRequireAuth>} />
                   <Route path="/admin/reviews" element={<AdminRequireAuth><AdminReviewsPage /></AdminRequireAuth>} />
 
                   {/* Hospital Admin Authentication Routes - Public */}

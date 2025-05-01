@@ -38,7 +38,7 @@ const userSchema = new Schema({
 }, { timestamps: true })
 
 // Static signup method
-userSchema.statics.signup = async function(email, password, fullName, confirmPassword) {
+userSchema.statics.signup = async function (email, password, fullName, confirmPassword) {
   // validation
   if (!fullName || !email || !password || !confirmPassword) {
     throw Error('All fields must be filled');
@@ -72,7 +72,7 @@ userSchema.statics.signup = async function(email, password, fullName, confirmPas
 }
 
 // Static login method
-userSchema.statics.login = async function(email, password) {
+userSchema.statics.login = async function (email, password) {
   if (!email || !password) {
     throw Error('All fields must be filled')
   }
@@ -100,7 +100,7 @@ userSchema.statics.login = async function(email, password) {
  *  - Hashes the password and creates a new admin document in the "admins" collection.
  */
 
-userSchema.statics.signupAsAdmin = async function(
+userSchema.statics.signupAsAdmin = async function (
   fullName,
   email,
   password,
@@ -174,7 +174,7 @@ userSchema.statics.signupAsAdmin = async function(
 }
 
 // Add this below your existing static methods
-userSchema.statics.adminLogin = async function(email, password) {
+userSchema.statics.adminLogin = async function (email, password) {
   if (!email || !password) {
     throw Error('All fields must be filled');
   }

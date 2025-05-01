@@ -1,17 +1,22 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import BloodRequestRow from './ BloodRequestRow';
 import StarRating from '../components/Reviews/StarRating';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import { toast } from 'react-toastify';
 
-const BloodRequestTable = ({ data, onRowClick }) => {
+const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
   const [page, setPage] = useState(1);
   const perPage = 10;
   const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
   const navigate = useNavigate();
   const { user, refreshUserToken } = useAuthContext();
   const [acceptingRequestId, setAcceptingRequestId] = useState(null);
+
+  // Reset page to 1 when data changes (e.g., when filters are applied)
+  useEffect(() => {
+    setPage(1);
+  }, [data]);
 
   // Column definitions for consistent usage
   const columns = [
@@ -92,10 +97,10 @@ const BloodRequestTable = ({ data, onRowClick }) => {
         }
       });
 
-      let data = await res.json();
+      let responseData = await res.json();
 
       // If token is expired, try to refresh and retry request
-      if (res.status === 401 && data.code === 'TOKEN_EXPIRED') {
+      if (res.status === 401 && responseData.code === 'TOKEN_EXPIRED') {
         const newToken = await refreshUserToken();
 
         if (newToken) {
@@ -108,7 +113,7 @@ const BloodRequestTable = ({ data, onRowClick }) => {
             }
           });
 
-          data = await res.json();
+          responseData = await res.json();
         } else {
           // Refresh failed, redirect to login
           navigate('/login');
@@ -117,16 +122,16 @@ const BloodRequestTable = ({ data, onRowClick }) => {
       }
 
       if (res.ok) {
-        // Update the request in the data array
-        const updatedData = data.map(req => {
-          if (req.requestId === requestId) {
-            return { ...req, userAccepted: true, hospitalApproved: 'pending' };
-          }
-          return req;
-        });
+        // Call the onAccept callback with the updated request
+        if (onAccept) {
+          onAccept(requestId, {
+            userAccepted: true,
+            hospitalApproved: 'pending'
+          });
+        }
         toast.success('Blood donation request accepted! Waiting for hospital approval.');
       } else {
-        toast.error(data.error || 'Failed to accept request');
+        toast.error(responseData.error || 'Failed to accept request');
       }
     } catch (err) {
       console.error(err);
@@ -137,10 +142,10 @@ const BloodRequestTable = ({ data, onRowClick }) => {
   };
 
   return (
-    <div className="w-full">
+    <div className="w-full max-w-[95vw] mx-auto">
       {/* Table layout for large screens */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full table-auto text-md text-left">
+        <table className="w-full min-w-[1200px] table-auto text-md text-left">
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               {columns.map(({ key, label }) => (
@@ -172,7 +177,11 @@ const BloodRequestTable = ({ data, onRowClick }) => {
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
             {paginatedData.map((req) => (
-              <BloodRequestRow key={req.requestId} request={req} />
+              <BloodRequestRow
+                key={req.requestId}
+                request={req}
+                onAccept={(e) => handleAcceptRequest(e, req.requestId)}
+              />
             ))}
           </tbody>
         </table>
@@ -201,60 +210,44 @@ const BloodRequestTable = ({ data, onRowClick }) => {
                     )}
                   </div>
                 </div>
-                <div className="flex-shrink-0">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                    req.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                <div className="flex flex-col items-end">
+                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${req.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
                     req.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
-                    'bg-green-100 text-green-800'
-                  }`}>
+                      'bg-green-100 text-green-800'
+                    }`}>
                     {req.urgencyLevel}
                   </span>
+                  <span className="mt-1 text-sm font-medium text-gray-900">{req.bloodType}</span>
                 </div>
               </div>
-
-              <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-sm">
-                <div>
-                  <span className="text-gray-500">Blood Type:</span>
-                  <span className="ml-1 font-medium text-gray-900">{req.bloodType}</span>
+              <div className="mt-2 text-sm text-gray-600">
+                <div className="flex items-center">
+                  <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+                  </svg>
+                  {req.location}
                 </div>
-                <div>
-                  <span className="text-gray-500">Units Needed:</span>
-                  <span className="ml-1 font-medium text-gray-900">{req.unitsNeeded}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Location:</span>
-                  <span className="ml-1 font-medium text-gray-900">{req.location}</span>
-                </div>
-                <div>
-                  <span className="text-gray-500">Request ID:</span>
-                  <span className="ml-1 font-medium text-gray-900">{req.requestId}</span>
-                </div>
-                <div className="col-span-2">
-                  <span className="text-gray-500">Posted:</span>
-                  <span className="ml-1 font-medium text-gray-900">
-                    {new Date(req.datePosted).toLocaleDateString()} {new Date(req.datePosted).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
-                  </span>
+                <div className="flex items-center mt-1">
+                  <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                  </svg>
+                  {new Date(req.datePosted).toLocaleDateString()}
                 </div>
               </div>
             </div>
-
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200 flex justify-end">
+            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
               <button
-                className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
-                  req.userAccepted && req.hospitalApproved === 'approved' ? 'bg-green-100 text-green-700 border border-green-200' :
-                  req.userAccepted && req.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-700 border border-red-200' :
-                  req.userAccepted ? 'bg-yellow-100 text-yellow-700 border border-yellow-200' :
-                  acceptingRequestId === req.requestId ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
-                  'bg-teal-600 text-white hover:bg-teal-700 shadow-sm'
-                }`}
-                disabled={req.userAccepted || acceptingRequestId === req.requestId}
                 onClick={(e) => handleAcceptRequest(e, req.requestId)}
+                disabled={req.userAccepted || acceptingRequestId === req.requestId}
+                className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors ${req.userAccepted ? 'bg-gray-100 text-gray-500 cursor-not-allowed' :
+                  acceptingRequestId === req.requestId ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
+                    'bg-teal-600 text-white hover:bg-teal-700'
+                  }`}
               >
-                {req.userAccepted && req.hospitalApproved === 'approved' ? 'Accepted' :
-                 req.userAccepted && req.hospitalApproved === 'rejected' ? 'Rejected' :
-                 req.userAccepted ? 'Pending Approval' :
-                 acceptingRequestId === req.requestId ? 'Processing...' : 'Accept Request'
-                }
+                {req.userAccepted ? 'Accepted' :
+                  acceptingRequestId === req.requestId ? 'Processing...' :
+                    'Accept Request'}
               </button>
             </div>
           </div>
@@ -262,94 +255,42 @@ const BloodRequestTable = ({ data, onRowClick }) => {
       </div>
 
       {/* Pagination */}
-      {data.length > 0 && (
-        <div className="flex flex-col sm:flex-row justify-between items-center bg-white px-6 py-4 border-t border-gray-200">
-          <div className="text-sm text-gray-700 mb-4 sm:mb-0">
-            Showing <span className="font-medium">{start + 1}</span> to <span className="font-medium">{Math.min(start + perPage, data.length)}</span> of <span className="font-medium">{data.length}</span> results
-          </div>
-          <div className="flex items-center space-x-2">
+      {totalPages > 1 && (
+        <div className="mt-4 flex justify-center">
+          <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button
-              onClick={() => setPage((p) => Math.max(p - 1, 1))}
+              onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Previous
+              <span className="sr-only">Previous</span>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
+              </svg>
             </button>
-
-            {totalPages <= 5 ? (
-              <div className="flex space-x-2">
-                {[...Array(totalPages)].map((_, i) => (
-                  <button
-                    key={i}
-                    onClick={() => setPage(i + 1)}
-                    className={`px-3 py-1 rounded-md ${
-                      page === i + 1
-                        ? 'bg-teal-600 text-white'
-                        : 'border border-gray-300 text-gray-700 hover:bg-gray-50'
-                    }`}
-                  >
-                    {i + 1}
-                  </button>
-                ))}
-              </div>
-            ) : (
-              <div className="flex space-x-2">
-                {page > 1 && (
-                  <button
-                    onClick={() => setPage(1)}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    1
-                  </button>
-                )}
-
-                {page > 3 && <span className="px-2 py-1 text-gray-500">...</span>}
-
-                {page > 2 && (
-                  <button
-                    onClick={() => setPage(page - 1)}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    {page - 1}
-                  </button>
-                )}
-
-                <button
-                  className="px-3 py-1 bg-teal-600 text-white rounded-md"
-                >
-                  {page}
-                </button>
-
-                {page < totalPages - 1 && (
-                  <button
-                    onClick={() => setPage(page + 1)}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    {page + 1}
-                  </button>
-                )}
-
-                {page < totalPages - 2 && <span className="px-2 py-1 text-gray-500">...</span>}
-
-                {page < totalPages && (
-                  <button
-                    onClick={() => setPage(totalPages)}
-                    className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50"
-                  >
-                    {totalPages}
-                  </button>
-                )}
-              </div>
-            )}
-
+            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
+              <button
+                key={pageNum}
+                onClick={() => setPage(pageNum)}
+                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === pageNum
+                  ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
+                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                  }`}
+              >
+                {pageNum}
+              </button>
+            ))}
             <button
-              onClick={() => setPage((p) => Math.min(p + 1, totalPages))}
+              onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="px-3 py-1 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              Next
+              <span className="sr-only">Next</span>
+              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+              </svg>
             </button>
-          </div>
+          </nav>
         </div>
       )}
     </div>

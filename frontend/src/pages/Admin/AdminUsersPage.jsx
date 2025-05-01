@@ -43,6 +43,32 @@ const AdminUsersPage = () => {
     fetchUsers();
   }, [admin]);
 
+  const handleDeleteUser = async (userId) => {
+    if (!window.confirm('Are you sure you want to delete this user? This action cannot be undone.')) {
+      return;
+    }
+
+    try {
+      const response = await fetch(`/api/admin/users/${userId}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${admin.token}`
+        }
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to delete user');
+      }
+
+      // Remove the deleted user from the state
+      setUsers(users.filter(user => user._id !== userId));
+      toast.success('User deleted successfully');
+    } catch (err) {
+      console.error('Error deleting user:', err);
+      toast.error('Failed to delete user');
+    }
+  };
+
   return (
     <div className="flex h-screen bg-gray-100">
       <AdminSidebar />
@@ -94,8 +120,12 @@ const AdminUsersPage = () => {
                           </span>
                         </td>
                         <td className="px-6 py-4 text-center text-sm font-medium">
-                          <button className="text-teal-600 hover:text-teal-900 mr-3">Edit</button>
-                          <button className="text-red-600 hover:text-red-900">Delete</button>
+                          <button
+                            onClick={() => handleDeleteUser(user._id)}
+                            className="text-red-600 hover:text-red-900"
+                          >
+                            Delete
+                          </button>
                         </td>
                       </tr>
                     ))

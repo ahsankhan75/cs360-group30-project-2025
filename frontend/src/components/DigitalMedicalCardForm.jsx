@@ -1,10 +1,9 @@
-
 import { useAuthContext } from "../hooks/useAuthContext";
 import ProfileIcon1 from "../components/profile-icon";
 import { useEffect, useState, useRef } from "react";
 import Notification from "./Notification";
 import { motion, AnimatePresence } from "framer-motion";
-import {useMotionValue } from "framer-motion";
+import { useMotionValue } from "framer-motion";
 
 
 // Simple icon components to replace react-icons
@@ -133,132 +132,408 @@ const ProfileIcon = ({ profilePicture, onEditPicture = null, onRemovePicture = n
 export const DigitalMedicalCardDisplay = ({ data, onEdit }) => {
   const rotateX = useMotionValue(0);
   const rotateY = useMotionValue(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const [shinePosition, setShinePosition] = useState({ x: 0, y: 0 });
 
   const handleMouse = (e) => {
+    // Only apply rotation effect on non-mobile devices
+    if (window.innerWidth > 768) {
     const rect = e.currentTarget.getBoundingClientRect();
     const x = e.clientX - rect.left;
     const y = e.clientY - rect.top;
     rotateY.set(((x - rect.width / 2) / rect.width) * 20);
     rotateX.set(((rect.height / 2 - y) / rect.height) * 20);
+      setShinePosition({ x, y });
+    }
   };
 
   return (
     <div
-      style={{ perspective: 1200 }}
-      className="min-h-screen bg-gradient-to-br from-teal-100 to-orange-50 flex items-center justify-center p-6 relative overflow-hidden"
+      style={{ perspective: window.innerWidth > 768 ? 1200 : 'none' }}
+      className="min-h-screen bg-gradient-to-br from-teal-100 to-orange-50 flex items-center justify-center p-4 md:p-6 relative overflow-hidden"
     >
-      {/* 🎨 Triangle Background */}
-      {[...Array(20)].map((_, i) => (
+      {/* Enhanced Animated Background Elements - Mobile Optimized */}
+      {[...Array(window.innerWidth > 768 ? 12 : 6)].map((_, i) => (
         <motion.div
           key={i}
-          className="absolute rounded-xl opacity-30 blur-xl"
+          className="absolute opacity-10 md:opacity-20"
           style={{
-            width: `${60 + Math.random() * 40}px`,
-            height: `${60 + Math.random() * 40}px`,
+            width: `${window.innerWidth > 768 ? 40 + Math.random() * 40 : 20 + Math.random() * 20}px`,
+            height: `${window.innerWidth > 768 ? 40 + Math.random() * 40 : 20 + Math.random() * 20}px`,
             top: `${Math.random() * 100}%`,
             left: `${Math.random() * 100}%`,
-            background: i % 2 === 0 ? "rgba(0, 79, 72, 0.4)" : "rgba(201, 101, 19, 0.4)",
-            clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
+            background: i % 2 === 0 ? "rgba(0, 79, 72, 0.2)" : "rgba(201, 101, 19, 0.2)",
+            clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
             zIndex: 0,
           }}
           animate={{
             rotate: [0, 360],
-            y: ["0%", "5%", "0%"],
+            scale: [1, 1.2, 1],
+            opacity: [0.1, 0.2, 0.1],
           }}
           transition={{
-            duration: 10 + i,
+            duration: 8 + i * 2,
             repeat: Infinity,
             ease: "linear",
           }}
         />
       ))}
 
-      {/* Card */}
+      {/* Medical Cross Elements */}
+      {[...Array(8)].map((_, i) => (
+        <motion.div
+          key={`cross-${i}`}
+          className="absolute opacity-10"
+          style={{
+            width: `${20 + Math.random() * 20}px`,
+            height: `${20 + Math.random() * 20}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            background: "rgba(0, 79, 72, 0.1)",
+            zIndex: 0,
+          }}
+          animate={{
+            rotate: [0, 180],
+            scale: [1, 1.5, 1],
+            opacity: [0.1, 0.2, 0.1],
+          }}
+          transition={{
+            duration: 6 + i,
+            repeat: Infinity,
+            ease: "linear",
+          }}
+        >
+          <div className="w-full h-full relative">
+            <div className="absolute w-full h-1 bg-teal-600 top-1/2 transform -translate-y-1/2"></div>
+            <div className="absolute h-full w-1 bg-teal-600 left-1/2 transform -translate-x-1/2"></div>
+          </div>
+        </motion.div>
+      ))}
+
+      {/* Pulse Circles */}
+      {[...Array(6)].map((_, i) => (
+        <motion.div
+          key={`pulse-${i}`}
+          className="absolute rounded-full"
+          style={{
+            width: `${100 + Math.random() * 100}px`,
+            height: `${100 + Math.random() * 100}px`,
+            top: `${Math.random() * 100}%`,
+            left: `${Math.random() * 100}%`,
+            border: "2px solid rgba(0, 79, 72, 0.1)",
+            zIndex: 0,
+          }}
+          animate={{
+            scale: [1, 1.5, 1],
+            opacity: [0, 0.2, 0],
+          }}
+          transition={{
+            duration: 4 + i,
+            repeat: Infinity,
+            ease: "easeInOut",
+          }}
+        />
+      ))}
+
+      {/* Main Card */}
       <motion.div
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d", zIndex: 10 }}
+        className="w-full max-w-4xl bg-white rounded-2xl shadow-2xl overflow-hidden"
+        style={{
+          transform: window.innerWidth > 768 ? `rotateX(${rotateX}deg) rotateY(${rotateY}deg)` : 'none',
+          transition: 'transform 0.1s ease-out'
+        }}
         onMouseMove={handleMouse}
+        onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => {
+          setIsHovered(false);
+          if (window.innerWidth > 768) {
           rotateX.set(0);
           rotateY.set(0);
+          }
         }}
-        transition={{ type: "spring", stiffness: 200, damping: 20 }}
-        className="bg-white rounded-2xl shadow-2xl max-w-4xl w-full overflow-hidden"
       >
-        {/* Header gradient */}
-        <div className="relative p-6 bg-gradient-to-r from-teal-300 to-orange-200">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {/* Profile column */}
-            <div className="bg-white p-4 rounded-xl flex flex-col items-center">
-              <ProfileIcon1 profilePicture={data.profilePicture} name={data.name} />
-              <h2 className="mt-2 text-2xl font-bold text-teal-600">{data.name}</h2>
-              <p className="text-gray-600 text-sm">{new Date(data.dateOfBirth).toLocaleDateString()}</p>
-              <p className="text-gray-600 text-sm">Age: {data.age}</p>
-              <p className="text-gray-600 text-sm">Gender: {data.gender}</p>
-            </div>
+        {/* Shine Effect */}
+        <motion.div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at ${shinePosition.x}px ${shinePosition.y}px, rgba(255, 255, 255, 0.8) 0%, rgba(255, 255, 255, 0) 70%)`,
+            opacity: isHovered ? 0.5 : 0,
+            transition: 'opacity 0.3s ease',
+            zIndex: 1
+          }}
+        />
 
-            {/* Medical info */}
-            <div className="bg-white p-4 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">Medical Information</h3>
-              <div className="space-y-2">
-                <div><span className="font-medium">Blood Type:</span> {data.bloodType}</div>
-                <div><span className="font-medium">Organ Donor:</span> {data.organDonor ? "Yes" : "No"}</div>
-                <div><span className="font-medium">Allergies:</span> {data.allergies || "None"}</div>
-                <div><span className="font-medium">Devices/Implants:</span> {data.medicalDevicesImplants || "None"}</div>
-                <div><span className="font-medium">Recent Surgery:</span> {data.recentSurgeryHospitalization || "None"}</div>
-                <div><span className="font-medium">Dietary Restrictions:</span> {data.dietaryRestrictions || "None"}</div>
-              </div>
-            </div>
-
-            {/* Meds and contacts */}
-            <div className="space-y-6">
-              <div className="bg-white p-4 rounded-xl">
-                <h3 className="text-xl font-semibold mb-3">Current Medications</h3>
-                {data.currentMedications
-                  ? data.currentMedications.split(",").map((m, i) => <div key={i}>{m.trim()}</div>)
-                  : "None"}
-              </div>
-              <div className="bg-white p-4 rounded-xl">
-                <h3 className="text-xl font-semibold mb-3">Emergency Contacts</h3>
-                <div>
-                  <span className="font-medium">Primary:</span><br />
-                  {data.primaryEmergencyContact.name} ({data.primaryEmergencyContact.relationship}) –{" "}
-                  {data.primaryEmergencyContact.number}
+        {/* Card Header with Medical ID - Mobile Optimized */}
+        <motion.div
+          className="relative p-4 md:p-6 bg-gradient-to-r from-teal-300 to-orange-200"
+          animate={{
+            background: isHovered && window.innerWidth > 768
+              ? "linear-gradient(45deg, #4FD1C5, #F6AD55)"
+              : "linear-gradient(45deg, #38B2AC, #ED8936)"
+          }}
+          transition={{ duration: 0.5 }}
+        >
+          <div className="flex flex-col md:flex-row md:justify-between md:items-start space-y-4 md:space-y-0">
+            <div className="flex items-center space-x-4">
+              <motion.div
+                whileHover={{ rotate: window.innerWidth > 768 ? 360 : 0 }}
+                transition={{ duration: 1 }}
+                className="w-16 h-16 md:w-20 md:h-20 bg-white rounded-xl shadow-lg overflow-hidden"
+              >
+                <div className="w-full h-full">
+                  {data.profilePicture ? (
+                    <img
+                      src={data.profilePicture.startsWith("http") ? data.profilePicture : `${window.location.origin.includes("localhost") ? "http://localhost:4000" : ""}${data.profilePicture}`}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-teal-600 text-white flex items-center justify-center">
+                      <span className="text-2xl md:text-3xl font-bold">{data.name ? data.name.charAt(0).toUpperCase() : '?'}</span>
+                    </div>
+                  )}
                 </div>
-                {data.secondaryEmergencyContact.name && (
-                  <div className="mt-2">
-                    <span className="font-medium">Secondary:</span><br />
-                    {data.secondaryEmergencyContact.name} ({data.secondaryEmergencyContact.relationship}) –{" "}
-                    {data.secondaryEmergencyContact.number}
-                  </div>
-                )}
+              </motion.div>
+              <div>
+                <motion.h2
+                  className="text-xl md:text-2xl font-bold text-teal-600"
+                  whileHover={{ scale: window.innerWidth > 768 ? 1.05 : 1 }}
+                >
+                  {data.name}
+                </motion.h2>
+                <div className="flex flex-col md:flex-row md:space-x-4 text-sm text-gray-600">
+                  <span>ID: {data._id?.slice(-8) || 'N/A'}</span>
+                  <span>DOB: {new Date(data.dateOfBirth).toLocaleDateString()}</span>
+                </div>
+              </div>
+            </div>
+            <div className="text-right">
+              <div className="bg-white px-3 py-2 rounded-lg shadow-md inline-block">
+                <span className="text-xs md:text-sm font-medium text-gray-600">Blood Type</span>
+                <div className="text-lg md:text-xl font-bold text-red-600">{data.bloodType || 'N/A'}</div>
               </div>
             </div>
           </div>
+        </motion.div>
 
-          {/* Insurance & physician */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-            <div className="bg-white p-4 rounded-xl">
-              <h3 className="text-xl font-semibold mb-3">Insurance Information</h3>
-              <div><span className="font-medium">Provider:</span> {data.insurance.provider}</div>
-              <div><span className="font-medium">Policy #:</span> {data.insurance.policyNumber}</div>
-              <div><span className="font-medium">Group #:</span> {data.insurance.groupNumber}</div>
+        {/* Main Content Grid - Mobile Optimized */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 p-4 md:p-6">
+          {/* Left Column */}
+          <div className="space-y-4 md:space-y-6">
+            {/* Vital Information */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                Vital Information
+              </h3>
+              <div className="grid grid-cols-2 gap-2 md:gap-4">
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Age</span>
+                  <div className="text-sm md:text-base font-medium">{data.age || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Gender</span>
+                  <div className="text-sm md:text-base font-medium">{data.gender || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Contact</span>
+                  <div className="text-sm md:text-base font-medium">{data.userContactNumber || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Organ Donor</span>
+                  <div className={`text-sm md:text-base font-medium ${data.organDonor ? 'text-green-600' : 'text-red-600'}`}>
+                    {data.organDonor ? 'Yes' : 'No'}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Medical History */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Medical History
+              </h3>
+              <div className="space-y-2">
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Allergies</span>
+                  <div className="text-sm md:text-base font-medium">{data.allergies || 'None reported'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Medical Devices/Implants</span>
+                  <div className="text-sm md:text-base font-medium">{data.medicalDevicesImplants || 'None reported'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Recent Surgery</span>
+                  <div className="text-sm md:text-base font-medium">{data.recentSurgeryHospitalization || 'None reported'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Dietary Restrictions</span>
+                  <div className="text-sm md:text-base font-medium">{data.dietaryRestrictions || 'None reported'}</div>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Current Medications */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Current Medications
+              </h3>
+              <div className="space-y-2">
+                {data.currentMedications
+                  ? data.currentMedications.split(",").map((m, i) => (
+                    <motion.div
+                      key={i}
+                      className="bg-white p-2 md:p-3 rounded-lg"
+                      whileHover={{ x: 5 }}
+                    >
+                      <div className="text-sm md:text-base font-medium">{m.trim()}</div>
+                    </motion.div>
+                  ))
+                  : <div className="bg-white p-2 md:p-3 rounded-lg text-gray-500">No current medications</div>}
+              </div>
+            </motion.div>
+                </div>
+
+          {/* Right Column */}
+          <div className="space-y-4 md:space-y-6">
+            {/* Emergency Contacts */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+                </svg>
+                Emergency Contacts
+              </h3>
+              <div className="space-y-2">
+                <motion.div
+                  className="bg-white p-2 md:p-3 rounded-lg"
+                  whileHover={{ x: 5 }}
+                >
+                  <div className="text-xs md:text-sm text-gray-500">Primary Contact</div>
+                  <div className="text-sm md:text-base font-medium">{data.primaryEmergencyContact.name}</div>
+                  <div className="text-xs md:text-sm text-gray-600">{data.primaryEmergencyContact.relationship}</div>
+                  <div className="text-xs md:text-sm text-teal-600">{data.primaryEmergencyContact.number}</div>
+                </motion.div>
+                {data.secondaryEmergencyContact.name && (
+                  <motion.div
+                    className="bg-white p-2 md:p-3 rounded-lg"
+                    whileHover={{ x: 5 }}
+                  >
+                    <div className="text-xs md:text-sm text-gray-500">Secondary Contact</div>
+                    <div className="text-sm md:text-base font-medium">{data.secondaryEmergencyContact.name}</div>
+                    <div className="text-xs md:text-sm text-gray-600">{data.secondaryEmergencyContact.relationship}</div>
+                    <div className="text-xs md:text-sm text-teal-600">{data.secondaryEmergencyContact.number}</div>
+                  </motion.div>
+                )}
+              </div>
+            </motion.div>
+
+            {/* Insurance Information */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+                Insurance Information
+              </h3>
+              <div className="space-y-2">
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Provider</span>
+                  <div className="text-sm md:text-base font-medium">{data.insurance.provider || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Policy Number</span>
+                  <div className="text-sm md:text-base font-medium">{data.insurance.policyNumber || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Group Number</span>
+                  <div className="text-sm md:text-base font-medium">{data.insurance.groupNumber || 'N/A'}</div>
             </div>
-            <div className="bg-white p-4 rounded-xl">
-              <h3 className="text-xl font-semibold mb-3">Primary Physician</h3>
-              <div><span className="font-medium">Name:</span> {data.primaryPhysician.name}</div>
-              <div><span className="font-medium">Specialty:</span> {data.primaryPhysician.specialization}</div>
-              <div><span className="font-medium">Contact:</span> {data.primaryPhysician.contact}</div>
+          </div>
+            </motion.div>
+
+            {/* Primary Physician */}
+            <motion.div
+              className="bg-gray-50 p-3 md:p-4 rounded-xl shadow-sm"
+              whileHover={{ scale: window.innerWidth > 768 ? 1.02 : 1 }}
+              transition={{ type: "spring", stiffness: 300 }}
+            >
+              <h3 className="text-base md:text-lg font-semibold text-teal-600 mb-2 md:mb-3 flex items-center">
+                <svg className="w-4 h-4 md:w-5 md:h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                </svg>
+                Primary Physician
+              </h3>
+              <div className="space-y-2">
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Name</span>
+                  <div className="text-sm md:text-base font-medium">{data.primaryPhysician.name || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Specialization</span>
+                  <div className="text-sm md:text-base font-medium">{data.primaryPhysician.specialization || 'N/A'}</div>
+                </div>
+                <div className="bg-white p-2 md:p-3 rounded-lg">
+                  <span className="text-xs md:text-sm text-gray-500">Contact</span>
+                  <div className="text-sm md:text-base font-medium">{data.primaryPhysician.contact || 'N/A'}</div>
             </div>
+            </div>
+            </motion.div>
           </div>
         </div>
       </motion.div>
 
-      {/* Floating action button (FAB) */}
+      {/* Mobile Edit Button - Enhanced */}
+      <motion.button
+        whileHover={{ scale: 1.1 }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onEdit}
+        className="fixed bottom-6 right-6 z-50 bg-teal-600 text-white p-4 rounded-full shadow-xl hover:bg-teal-700 focus:outline-none md:hidden"
+        style={{
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+        }}
+        title="Edit Medical Card"
+      >
+        <EditIcon />
+      </motion.button>
+
+      {/* Desktop Edit Button - Unchanged */}
       <motion.button
         whileHover={{ scale: 1.1, rotate: 90 }}
         whileTap={{ scale: 0.95 }}
         onClick={onEdit}
-        className="fixed top-6 right-6 z-50 bg-teal-600 text-white p-4 rounded-full shadow-xl hover:bg-teal-700 focus:outline-none"
+        className="fixed top-6 right-6 z-50 bg-teal-600 text-white p-4 rounded-full shadow-xl hover:bg-teal-700 focus:outline-none hidden md:block"
+        style={{
+          boxShadow: "0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)"
+        }}
         title="Edit Medical Card"
       >
         <EditIcon />
@@ -318,7 +593,7 @@ const DigitalMedicalCardForm = () => {
     const fetchCard = async () => {
       if (!user) return;
       try {
-        const res = await fetch(`/api/medical-card`, { headers: { Authorization: `Bearer ${user.token}` }});
+        const res = await fetch(`/api/medical-card`, { headers: { Authorization: `Bearer ${user.token}` } });
         if (res.ok) {
           const data = await res.json();
           if (data) setExistingCard(data);
@@ -352,7 +627,8 @@ const DigitalMedicalCardForm = () => {
     if (!user) { setNotification({ message: "Log in to upload.", type: "error" }); return; }
     const file = e.target.files[0]; if (!file || !file.type.startsWith("image/")) { setNotification({ message: "Invalid image.", type: "error" }); return; }
     if (file.size > 5 * 1024 * 1024) { setNotification({ message: "Max 5MB.", type: "error" }); return; }
-    try { setIsUploading(true);
+    try {
+      setIsUploading(true);
       const fd = new FormData(); fd.append("profilePicture", file);
       const res = await fetch("/api/medical-card/profile-picture", { method: "POST", headers: { Authorization: `Bearer ${user.token}` }, body: fd });
       const json = await res.json(); if (!res.ok) throw new Error(json.error || "Upload failed");
@@ -365,7 +641,8 @@ const DigitalMedicalCardForm = () => {
 
   const handleRemoveProfile = async () => {
     if (!user) { setNotification({ message: "Log in to remove.", type: "error" }); return; }
-    try { setIsUploading(true);
+    try {
+      setIsUploading(true);
       const res = await fetch("/api/medical-card/profile-picture", { method: "DELETE", headers: { Authorization: `Bearer ${user.token}` } });
       const json = await res.json(); if (!res.ok) throw new Error(json.error || "Remove failed");
       setExistingCard(json.card);
@@ -445,12 +722,12 @@ const DigitalMedicalCardForm = () => {
           <InputField label="Name" name="name" value={formData.name} onChange={handleChange} />
           <InputField label="Date of Birth" name="dob" type="date" value={formData.dateOfBirth} onChange={handleChange} />
           <InputField label="Age" name="age" value={formData.age} onChange={handleChange} disabled />
-          <SelectField label="Gender" name="gender" value={formData.gender} onChange={handleChange} options={["Male","Female","Other"]} />
+          <SelectField label="Gender" name="gender" value={formData.gender} onChange={handleChange} options={["Male", "Female", "Other"]} />
           <InputField label="Contact Number" name="userContactNumber" value={formData.userContactNumber} onChange={handleChange} />
         </div>
         {/* Medical Info */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6"> 
-          <SelectField label="Blood Type" name="bloodType" value={formData.bloodType} onChange={handleChange} options={["A+","A-","B+","B-","AB+","AB-","O+","O-"]} />
+          <SelectField label="Blood Type" name="bloodType" value={formData.bloodType} onChange={handleChange} options={["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]} />
           <CheckboxField label="Organ Donor" name="organDonor" checked={formData.organDonor} onChange={handleChange} />
           <InputField label="Allergies" name="allergies" value={formData.allergies} onChange={handleChange} />
           <InputField label="Current Medications" name="currentMedications" value={formData.currentMedications} onChange={handleChange} />
