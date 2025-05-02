@@ -4,6 +4,7 @@ import { useEffect, useState, useRef } from "react";
 import Notification from "./Notification";
 import { motion, AnimatePresence } from "framer-motion";
 import { useMotionValue } from "framer-motion";
+import Footer from "../components/Footer";
 
 
 // Simple icon components to replace react-icons
@@ -624,32 +625,108 @@ const DigitalMedicalCardForm = () => {
   };
 
   const handleProfileUpload = async (e) => {
-    if (!user) { setNotification({ message: "Log in to upload.", type: "error" }); return; }
-    const file = e.target.files[0]; if (!file || !file.type.startsWith("image/")) { setNotification({ message: "Invalid image.", type: "error" }); return; }
-    if (file.size > 5 * 1024 * 1024) { setNotification({ message: "Max 5MB.", type: "error" }); return; }
+    if (!user) {
+      setNotification({ message: "Log in to upload.", type: "error" });
+      return;
+    }
+
+    const file = e.target.files[0];
+    if (!file || !file.type.startsWith("image/")) {
+      setNotification({ message: "Invalid image.", type: "error" });
+      return;
+    }
+
+    if (file.size > 5 * 1024 * 1024) {
+      setNotification({ message: "Max 5MB.", type: "error" });
+      return;
+    }
+
     try {
       setIsUploading(true);
-      const fd = new FormData(); fd.append("profilePicture", file);
-      const res = await fetch("/api/medical-card/profile-picture", { method: "POST", headers: { Authorization: `Bearer ${user.token}` }, body: fd });
-      const json = await res.json(); if (!res.ok) throw new Error(json.error || "Upload failed");
-      setExistingCard(json.card);
-      setNotification({ message: "Uploaded!", type: "success" });
-      window.dispatchEvent(new CustomEvent("profilePictureChanged", { detail: { profilePicture: json.card.profilePicture } }));
-    } catch (err) { console.error(err); setNotification({ message: err.message, type: "error" }); }
-    finally { setIsUploading(false); }
+      const fd = new FormData();
+      fd.append("profilePicture", file);
+
+      // First, upload the photo to the profile-photos collection
+      const uploadRes = await fetch("/api/profile-photos", {
+        method: "POST",
+        headers: { Authorization: `Bearer ${user.token}` },
+        body: fd
+      });
+
+      if (!uploadRes.ok) {
+        const errorData = await uploadRes.json();
+        throw new Error(errorData.message || "Upload failed");
+      }
+
+      const uploadData = await uploadRes.json();
+
+      // Then, update the medical card with the new photo path
+      const updateRes = await fetch("/api/medical-card", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify({
+          profilePicture: uploadData.profilePhoto.path
+        })
+      });
+
+      if (!updateRes.ok) {
+        const errorData = await updateRes.json();
+        throw new Error(errorData.message || "Failed to update medical card");
+      }
+
+      const updateData = await updateRes.json();
+      setExistingCard(updateData);
+      setNotification({ message: "Profile picture uploaded successfully!", type: "success" });
+      window.dispatchEvent(new CustomEvent("profilePictureChanged", {
+        detail: { profilePicture: updateData.profilePicture }
+      }));
+    } catch (err) {
+      console.error(err);
+      setNotification({ message: err.message, type: "error" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const handleRemoveProfile = async () => {
-    if (!user) { setNotification({ message: "Log in to remove.", type: "error" }); return; }
+    if (!user) {
+      setNotification({ message: "Log in to remove.", type: "error" });
+      return;
+    }
+
     try {
       setIsUploading(true);
-      const res = await fetch("/api/medical-card/profile-picture", { method: "DELETE", headers: { Authorization: `Bearer ${user.token}` } });
-      const json = await res.json(); if (!res.ok) throw new Error(json.error || "Remove failed");
-      setExistingCard(json.card);
-      setNotification({ message: "Removed!", type: "success" });
-      window.dispatchEvent(new CustomEvent("profilePictureChanged", { detail: { profilePicture: "" } }));
-    } catch (err) { console.error(err); setNotification({ message: err.message, type: "error" }); }
-    finally { setIsUploading(false); }
+
+      // First, update the medical card to remove the profile picture
+      const updateRes = await fetch("/api/medical-card", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${user.token}`
+        },
+        body: JSON.stringify({ profilePicture: "" })
+      });
+
+      if (!updateRes.ok) {
+        const errorData = await updateRes.json();
+        throw new Error(errorData.message || "Failed to update medical card");
+      }
+
+      const updateData = await updateRes.json();
+      setExistingCard(updateData);
+      setNotification({ message: "Profile picture removed successfully!", type: "success" });
+      window.dispatchEvent(new CustomEvent("profilePictureChanged", {
+        detail: { profilePicture: "" }
+      }));
+    } catch (err) {
+      console.error(err);
+      setNotification({ message: err.message, type: "error" });
+    } finally {
+      setIsUploading(false);
+    }
   };
 
   const triggerFile = () => fileInputRef.current.click();
@@ -766,6 +843,7 @@ const DigitalMedicalCardForm = () => {
           {isEditing ? "Update Card" : "Submit Card"}
         </button>
       </form>
+      <Footer />
     </motion.div>
   );
 };

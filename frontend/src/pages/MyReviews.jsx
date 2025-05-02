@@ -4,6 +4,7 @@ import { useAuthContext } from '../hooks/useAuthContext';
 import StarRating from '../components/Reviews/StarRating';
 import EditReviewModal from '../components/Reviews/EditReviewModal';
 import { fetchWithErrorHandling } from '../utils/api';
+import Footer from '../components/Footer';
 
 const MyReviews = () => {
   const [reviews, setReviews] = useState([]);
@@ -19,14 +20,14 @@ const MyReviews = () => {
     try {
       const date = new Date(dateString);
       const now = new Date();
-      
+
       const seconds = Math.floor((now - date) / 1000);
       const minutes = Math.floor(seconds / 60);
       const hours = Math.floor(minutes / 60);
       const days = Math.floor(hours / 24);
       const months = Math.floor(days / 30);
       const years = Math.floor(days / 365);
-      
+
       if (seconds < 60) return 'just now';
       if (minutes < 60) return `${minutes} ${minutes === 1 ? 'minute' : 'minutes'} ago`;
 
@@ -54,17 +55,17 @@ const MyReviews = () => {
             'Authorization': `Bearer ${user.token}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch your reviews');
         }
-        
+
         const data = await response.json();
-        
+
         // Ensure data has the expected structure
         if (data && Array.isArray(data.reviews)) {
           setReviews(data.reviews);
-          
+
           // Handle stats if they exist
           if (data.stats) {
             setTotalReviewCount(data.stats.totalReviewCount || 0);
@@ -72,14 +73,14 @@ const MyReviews = () => {
           } else {
             // Calculate stats from reviews if not provided
             setTotalReviewCount(data.reviews.length);
-            
+
             const totalRating = data.reviews.reduce(
-              (sum, review) => sum + review.rating, 
+              (sum, review) => sum + review.rating,
               0
             );
             setAverageRating(
-              data.reviews.length > 0 
-                ? totalRating / data.reviews.length 
+              data.reviews.length > 0
+                ? totalRating / data.reviews.length
                 : 0
             );
           }
@@ -87,14 +88,14 @@ const MyReviews = () => {
           // Handle case where API returns just an array of reviews
           setReviews(data);
           setTotalReviewCount(data.length);
-          
+
           const totalRating = data.reduce(
-            (sum, review) => sum + review.rating, 
+            (sum, review) => sum + review.rating,
             0
           );
           setAverageRating(
-            data.length > 0 
-              ? totalRating / data.length 
+            data.length > 0
+              ? totalRating / data.length
               : 0
           );
         } else {
@@ -120,7 +121,7 @@ const MyReviews = () => {
     if (!window.confirm('Are you sure you want to delete this review?')) {
       return;
     }
-    
+
     try {
       const response = await fetch(`/api/reviews/${reviewId}`, {
         method: 'DELETE',
@@ -128,17 +129,17 @@ const MyReviews = () => {
           'Authorization': `Bearer ${user.token}`
         }
       });
-      
+
       if (!response.ok) {
         throw new Error('Failed to delete review');
       }
-      
+
       // Update reviews list
       setReviews(prevReviews => prevReviews.filter(review => review._id !== reviewId));
-      
+
       // Update stats
       setTotalReviewCount(prev => prev - 1);
-      
+
       if (totalReviewCount > 1) {
         const deletedReview = reviews.find(review => review._id === reviewId);
         const newTotalRating = averageRating * totalReviewCount - (deletedReview?.rating || 0);
@@ -154,20 +155,20 @@ const MyReviews = () => {
   };
 
   const handleReviewUpdate = (updatedReview) => {
-    setReviews(prevReviews => 
-      prevReviews.map(review => 
+    setReviews(prevReviews =>
+      prevReviews.map(review =>
         review._id === updatedReview._id ? updatedReview : review
       )
     );
-    
+
     // Update average rating
     const totalRating = reviews.reduce(
-      (sum, review) => sum + (review._id === updatedReview._id ? updatedReview.rating : review.rating), 
+      (sum, review) => sum + (review._id === updatedReview._id ? updatedReview.rating : review.rating),
       0
     );
-    
+
     setAverageRating(totalRating / totalReviewCount);
-    
+
     setEditingReview(null);
   };
 
@@ -193,7 +194,7 @@ const MyReviews = () => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
           <h1 className="text-2xl md:text-3xl font-bold text-teal-600 mb-4 md:mb-0">My Reviews</h1>
         </div>
-        
+
         {/* Statistics Section */}
         {!loading && reviews.length > 0 && (
           <div className="bg-gradient-to-r from-teal-500 to-cyan-500 text-white rounded-lg shadow-md p-6 mb-6">
@@ -218,7 +219,7 @@ const MyReviews = () => {
             </div>
           </div>
         )}
-        
+
         {loading ? (
           <div className="flex justify-center items-center py-12">
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
@@ -227,8 +228,8 @@ const MyReviews = () => {
           <div className="bg-red-50 border border-red-200 text-red-700 p-6 rounded-lg shadow-md">
             <h2 className="text-xl font-semibold mb-2">Error Loading Reviews</h2>
             <p>{error}</p>
-            <button 
-              onClick={() => window.location.reload()} 
+            <button
+              onClick={() => window.location.reload()}
               className="mt-4 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-md"
             >
               Try Again
@@ -252,12 +253,12 @@ const MyReviews = () => {
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             {reviews.map((review) => (
-              <div 
-                key={review._id} 
+              <div
+                key={review._id}
                 className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow"
               >
                 <div className="bg-gray-50 p-4 border-b">
-                  <Link 
+                  <Link
                     to={`/reviews?hospital=${review.hospitalId._id}`}
                     className="text-lg font-semibold text-teal-700 hover:text-teal-900 transition-colors"
                   >
@@ -265,7 +266,7 @@ const MyReviews = () => {
                   </Link>
                   <p className="text-sm text-gray-600">{review.hospitalId.location?.address}</p>
                 </div>
-                
+
                 <div className="p-4">
                   <div className="flex justify-between items-center mb-3">
                     <div className="flex items-center">
@@ -276,7 +277,7 @@ const MyReviews = () => {
                       {formatTimeAgo(review.createdAt)}
                     </span>
                   </div>
-                  
+
                   <div className="mb-4">
                     {review.comment ? (
                       <p className="text-gray-700">{review.comment}</p>
@@ -284,9 +285,9 @@ const MyReviews = () => {
                       <p className="text-gray-500 italic">No comment provided.</p>
                     )}
                   </div>
-                  
+
                   <div className="mt-4 flex justify-end space-x-2">
-                    <button 
+                    <button
                       onClick={() => handleReviewDelete(review._id)}
                       className="px-3 py-1 text-sm text-red-600 hover:text-red-800 transition-colors flex items-center"
                     >
@@ -295,7 +296,7 @@ const MyReviews = () => {
                       </svg>
                       Delete
                     </button>
-                    <button 
+                    <button
                       onClick={() => setEditingReview(review)}
                       className="px-3 py-1 text-sm text-teal-600 hover:text-teal-800 transition-colors flex items-center"
                     >
@@ -310,10 +311,10 @@ const MyReviews = () => {
             ))}
           </div>
         )}
-        
+
         <div className="mt-8 text-center">
-          <Link 
-            to="/reviews" 
+          <Link
+            to="/reviews"
             className="text-teal-600 hover:text-teal-800 transition-colors flex items-center justify-center"
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -323,14 +324,27 @@ const MyReviews = () => {
           </Link>
         </div>
       </div>
-      
+
       {editingReview && (
-        <EditReviewModal 
+        <EditReviewModal
           review={editingReview}
           onClose={() => setEditingReview(null)}
           onReviewUpdated={handleReviewUpdate}
         />
       )}
+      {/* Desktop Footer */}
+      <div className="hidden md:block"><Footer /></div>
+      {/* Mobile Footer */}
+      <footer className="bg-[#2a9fa7] text-white py-8 px-6 mt-20 flex flex-col items-center space-y-4 md:hidden z-10">
+        <h1 className="text-xl font-bold">EMCON</h1>
+        <nav className="flex flex-col items-center space-y-2 mt-2">
+          <a href="/hospitals" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Find Hospitals</a>
+          <a href="/blood-requests" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Blood Requests</a>
+          <a href="/medical-card" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Medical Card</a>
+          <a href="/reviews" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Reviews</a>
+        </nav>
+        <p className="text-sm text-center mt-4 opacity-80">Smart healthcare navigation for everyone!</p>
+      </footer>
     </div>
   );
 };

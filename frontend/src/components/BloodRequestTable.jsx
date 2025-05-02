@@ -127,7 +127,7 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
           onAccept(requestId, {
             userAccepted: true,
             hospitalApproved: 'pending'
-          });
+        });
         }
         toast.success('Blood donation request accepted! Waiting for hospital approval.');
       } else {
@@ -142,16 +142,16 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
   };
 
   return (
-    <div className="w-full max-w-[95vw] mx-auto">
+    <div className="w-full max-w-[98vw] mx-auto">
       {/* Table layout for large screens */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full min-w-[1200px] table-auto text-md text-left">
+        <table className="w-full min-w-[1400px] table-auto text-md text-left">
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               {columns.map(({ key, label }) => (
                 <th
                   key={key}
-                  className="px-6 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-8 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort(key)}
                 >
                   <div className="flex items-center">
@@ -172,7 +172,7 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                   </div>
                 </th>
               ))}
-              <th className="px-6 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider text-center">Action</th>
+              <th className="px-8 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider text-center">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -213,8 +213,8 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                 <div className="flex flex-col items-end">
                   <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${req.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
                     req.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
-                      'bg-green-100 text-green-800'
-                    }`}>
+                    'bg-green-100 text-green-800'
+                  }`}>
                     {req.urgencyLevel}
                   </span>
                   <span className="mt-1 text-sm font-medium text-gray-900">{req.bloodType}</span>
@@ -243,7 +243,7 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                 className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors ${req.userAccepted ? 'bg-gray-100 text-gray-500 cursor-not-allowed' :
                   acceptingRequestId === req.requestId ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
                     'bg-teal-600 text-white hover:bg-teal-700'
-                  }`}
+                }`}
               >
                 {req.userAccepted ? 'Accepted' :
                   acceptingRequestId === req.requestId ? 'Processing...' :
@@ -269,17 +269,17 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
               </svg>
             </button>
             {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-              <button
+                  <button
                 key={pageNum}
                 onClick={() => setPage(pageNum)}
                 className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === pageNum
                   ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
                   : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                  }`}
-              >
+                    }`}
+                  >
                 {pageNum}
-              </button>
-            ))}
+                  </button>
+                ))}
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}

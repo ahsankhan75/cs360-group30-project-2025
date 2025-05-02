@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { filterRequests } from "../utils/bloodRequestFilters"; // Assuming this utility handles the 'cityu' filter key
 import { useAuthContext } from "../hooks/useAuthContext";
 import FallbackErrorComponent from "../components/FallbackErrorComponent";
+import Footer from "../components/Footer";
 
 const BloodRequestsPage = () => {
   // --- State Variables ---
@@ -698,6 +699,19 @@ const BloodRequestsPage = () => {
           </div>
         </div>
       </div>
+      {/* Desktop Footer */}
+      <div className="hidden md:block"><Footer /></div>
+      {/* Mobile Footer */}
+      <footer className="bg-[#2a9fa7] text-white py-8 px-6 mt-20 flex flex-col items-center space-y-4 md:hidden z-10">
+        <h1 className="text-xl font-bold">EMCON</h1>
+        <nav className="flex flex-col items-center space-y-2 mt-2">
+          <a href="/hospitals" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Find Hospitals</a>
+          <a href="/blood-requests" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Blood Requests</a>
+          <a href="/medical-card" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Medical Card</a>
+          <a href="/reviews" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Reviews</a>
+        </nav>
+        <p className="text-sm text-center mt-4 opacity-80">Smart healthcare navigation for everyone!</p>
+      </footer>
     </div>
   );
 };

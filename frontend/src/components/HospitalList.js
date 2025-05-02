@@ -11,144 +11,146 @@ const HospitalList = ({ hospitals }) => {
           {hospitals.map((hospital) => (
             <div
               key={hospital._id}
-              className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow"
+              className="p-4 border rounded-lg shadow-md bg-white hover:shadow-lg transition-shadow h-[400px] flex flex-col"
             >
-              <h3 className="text-lg font-bold text-teal-700">
-                {hospital.name}
-              </h3>
-              <p className="text-sm text-gray-600 mb-2">
-                {hospital.location.address}
-              </p>
-
-              {/* Rating display with review count */}
-              <div className="flex items-center mb-3">
-                {hospital.ratings ? (
-                  <>
-                    <StarRating rating={hospital.ratings || 0} />
-                    <span className="ml-2 text-sm text-gray-600">
-                      {hospital.ratings.toFixed(1)}
-                    </span>
-                    <span className="ml-1 text-sm text-gray-500">
-                      ({hospital.reviewCount || 0}{" "}
-                      {hospital.reviewCount === 1 ? "review" : "reviews"})
-                    </span>
-                  </>
-                ) : (
-                  <span className="text-sm text-gray-500">No ratings yet</span>
-                )}
-              </div>
-
-              {hospital.wait_times?.general &&
-                (() => {
-                  const wait = parseInt(hospital.wait_times.general);
-                  let textColor = "text-green-700";
-                  let bgColor = "bg-green-100";
-
-                  if (wait > 40) {
-                    textColor = "text-red-700";
-                    bgColor = "bg-red-100";
-                  } else if (wait > 25) {
-                    textColor = "text-yellow-700";
-                    bgColor = "bg-yellow-100";
-                  }
-
-                  return (
-                    <div
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${textColor} ${bgColor}`}
-                    >
-                      Estimated Wait Time (General):{" "}
-                      {hospital.wait_times.general}
-                    </div>
-                  );
-                })()}
-
-              {hospital.wait_times?.emergency &&
-                (() => {
-                  const wait = parseInt(hospital.wait_times.emergency);
-                  let textColor = "text-green-700";
-                  let bgColor = "bg-green-100";
-
-                  if (wait > 30) {
-                    textColor = "text-red-700";
-                    bgColor = "bg-red-100";
-                  } else if (wait > 15) {
-                    textColor = "text-yellow-700";
-                    bgColor = "bg-yellow-100";
-                  }
-
-                  return (
-                    <div
-                      className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${textColor} ${bgColor} mt-2`}
-                    >
-                      Estimated Wait Time (Emergency):{" "}
-                      {hospital.wait_times.emergency}
-                    </div>
-                  );
-                })()}
-
-              <div className="border-t border-gray-200 my-2 pt-2">
-                <p>
-                  <strong>ICU Beds:</strong> {hospital.resources.icu_beds}
+              <div className="flex-grow">
+                <h3 className="text-lg font-bold text-teal-700 line-clamp-1">
+                  {hospital.name}
+                </h3>
+                <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                  {hospital.location.address}
                 </p>
-                <p>
-                  <strong>Ventilators:</strong> {hospital.resources.ventilators}
-                </p>
-                <p>
-                  <strong>Blood Bank:</strong>{" "}
-                  <span
-                    className={
-                      hospital.resources.blood_bank
-                        ? "text-green-600"
-                        : "text-gray-500"
-                    }
-                  >
-                    {hospital.resources.blood_bank
-                      ? "Available"
-                      : "Not Available"}
-                  </span>
-                </p>
-                <p>
-                  <strong>Medical Imaging:</strong>{" "}
-                  {hospital.resources.medical_imaging?.length
-                    ? hospital.resources.medical_imaging.join(", ")
-                    : "None available"}
-                </p>
-              </div>
 
-              {hospital.services && hospital.services.length > 0 && (
-                <div className="border-t border-gray-200 my-2 pt-2">
-                  <p>
-                    <strong>Specializations:</strong>
-                  </p>
-                  <div className="flex flex-wrap gap-1 mt-1">
-                    {hospital.services.slice(0, 3).map((service, index) => (
-                      <span
-                        key={index}
-                        className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800"
-                      >
-                        {service}
+                {/* Rating display with review count */}
+                <div className="flex items-center mb-3">
+                  {hospital.ratings ? (
+                    <>
+                      <StarRating rating={hospital.ratings || 0} />
+                      <span className="ml-2 text-sm text-gray-600">
+                        {hospital.ratings.toFixed(1)}
                       </span>
-                    ))}
-                    {hospital.services.length > 3 && (
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
-                        +{hospital.services.length - 3} more
+                      <span className="ml-1 text-sm text-gray-500">
+                        ({hospital.reviewCount || 0}{" "}
+                        {hospital.reviewCount === 1 ? "review" : "reviews"})
                       </span>
-                    )}
-                  </div>
+                    </>
+                  ) : (
+                    <span className="text-sm text-gray-500">No ratings yet</span>
+                  )}
                 </div>
-              )}
 
-              {hospital.insurance_accepted &&
-                hospital.insurance_accepted.length > 0 && (
+                {hospital.wait_times?.general &&
+                  (() => {
+                    const wait = parseInt(hospital.wait_times.general);
+                    let textColor = "text-green-700";
+                    let bgColor = "bg-green-100";
+
+                    if (wait > 40) {
+                      textColor = "text-red-700";
+                      bgColor = "bg-red-100";
+                    } else if (wait > 25) {
+                      textColor = "text-yellow-700";
+                      bgColor = "bg-yellow-100";
+                    }
+
+                    return (
+                      <div
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${textColor} ${bgColor}`}
+                      >
+                        Estimated Wait Time (General):{" "}
+                        {hospital.wait_times.general}
+                      </div>
+                    );
+                  })()}
+
+                {hospital.wait_times?.emergency &&
+                  (() => {
+                    const wait = parseInt(hospital.wait_times.emergency);
+                    let textColor = "text-green-700";
+                    let bgColor = "bg-green-100";
+
+                    if (wait > 30) {
+                      textColor = "text-red-700";
+                      bgColor = "bg-red-100";
+                    } else if (wait > 15) {
+                      textColor = "text-yellow-700";
+                      bgColor = "bg-yellow-100";
+                    }
+
+                    return (
+                      <div
+                        className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${textColor} ${bgColor} mt-2`}
+                      >
+                        Estimated Wait Time (Emergency):{" "}
+                        {hospital.wait_times.emergency}
+                      </div>
+                    );
+                  })()}
+
+                <div className="border-t border-gray-200 my-2 pt-2">
+                  <p className="line-clamp-1">
+                    <strong>ICU Beds:</strong> {hospital.resources.icu_beds}
+                  </p>
+                  <p className="line-clamp-1">
+                    <strong>Ventilators:</strong> {hospital.resources.ventilators}
+                  </p>
+                  <p className="line-clamp-1">
+                    <strong>Blood Bank:</strong>{" "}
+                    <span
+                      className={
+                        hospital.resources.blood_bank
+                          ? "text-green-600"
+                          : "text-gray-500"
+                      }
+                    >
+                      {hospital.resources.blood_bank
+                        ? "Available"
+                        : "Not Available"}
+                    </span>
+                  </p>
+                  <p className="line-clamp-1">
+                    <strong>Medical Imaging:</strong>{" "}
+                    {hospital.resources.medical_imaging?.length
+                      ? hospital.resources.medical_imaging.join(", ")
+                      : "None available"}
+                  </p>
+                </div>
+
+                {hospital.services && hospital.services.length > 0 && (
                   <div className="border-t border-gray-200 my-2 pt-2">
                     <p>
-                      <strong>Insurance:</strong>{" "}
-                      {hospital.insurance_accepted.length} providers accepted
+                      <strong>Specializations:</strong>
                     </p>
+                    <div className="flex flex-wrap gap-1 mt-1">
+                      {hospital.services.slice(0, 3).map((service, index) => (
+                        <span
+                          key={index}
+                          className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-teal-100 text-teal-800"
+                        >
+                          {service}
+                        </span>
+                      ))}
+                      {hospital.services.length > 3 && (
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-gray-100 text-gray-800">
+                          +{hospital.services.length - 3} more
+                        </span>
+                      )}
+                    </div>
                   </div>
                 )}
 
-              <div className="mt-4 flex justify-between items-center">
+                {hospital.insurance_accepted &&
+                  hospital.insurance_accepted.length > 0 && (
+                    <div className="border-t border-gray-200 my-2 pt-2">
+                      <p className="line-clamp-1">
+                        <strong>Insurance:</strong>{" "}
+                        {hospital.insurance_accepted.length} providers accepted
+                      </p>
+                    </div>
+                  )}
+              </div>
+
+              <div className="mt-4 flex justify-between items-center pt-2 border-t border-gray-200">
                 <Link
                   to={`/reviews?hospital=${hospital._id}`}
                   className="text-teal-600 hover:text-teal-800 flex items-center"

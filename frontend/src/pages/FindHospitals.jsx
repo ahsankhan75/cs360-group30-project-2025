@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import ProfileIcon from '../components/profile-icon';
 import StarRating from '../components/Reviews/StarRating';
 import { motion, AnimatePresence } from 'framer-motion';
+import Footer from '../components/Footer';
 
 const FindHospitals = () => {
   const [hospitals, setHospitals] = useState([]);
@@ -45,7 +46,7 @@ const FindHospitals = () => {
 
   const handleSearch = (e) => {
     e.preventDefault();
-    fetchHospitals({
+    fetchHospitals({ 
       name: searchQuery,
       minRating: minRating || undefined,
       services: serviceFilter || undefined
@@ -86,7 +87,7 @@ const FindHospitals = () => {
       <div className="relative z-50">
         <ProfileIcon />
       </div>
-
+      
       <div className="max-w-screen-xl mx-auto px-6 py-8">
         <motion.div
           initial={{ opacity: 0, y: -20 }}
@@ -112,51 +113,51 @@ const FindHospitals = () => {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  placeholder="Search hospitals..."
+              <input
+                type="text"
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                placeholder="Search hospitals..."
                   className="w-full pl-10 pr-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300"
-                />
-              </div>
-
-              <div>
-                <select
-                  value={minRating}
-                  onChange={(e) => setMinRating(e.target.value)}
+              />
+            </div>
+            
+            <div>
+              <select
+                value={minRating}
+                onChange={(e) => setMinRating(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300"
-                >
-                  <option value="">Any Rating</option>
-                  <option value="4.5">4.5+ Stars</option>
-                  <option value="4">4+ Stars</option>
-                  <option value="3">3+ Stars</option>
-                  <option value="2">2+ Stars</option>
-                  <option value="1">1+ Star</option>
-                </select>
-              </div>
-
-              <div>
-                <select
-                  value={serviceFilter}
-                  onChange={(e) => setServiceFilter(e.target.value)}
+              >
+                <option value="">Any Rating</option>
+                <option value="4.5">4.5+ Stars</option>
+                <option value="4">4+ Stars</option>
+                <option value="3">3+ Stars</option>
+                <option value="2">2+ Stars</option>
+                <option value="1">1+ Star</option>
+              </select>
+            </div>
+            
+            <div>
+              <select
+                value={serviceFilter}
+                onChange={(e) => setServiceFilter(e.target.value)}
                   className="w-full px-4 py-3 border border-gray-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-teal-500 focus:border-transparent transition-all duration-300"
-                >
+              >
                   <option value="">All Services</option>
                   <option value="emergency">Emergency Care</option>
                   <option value="surgery">Surgery</option>
                   <option value="pediatrics">Pediatrics</option>
                   <option value="cardiology">Cardiology</option>
-                </select>
-              </div>
-
+              </select>
+            </div>
+            
               <div className="flex gap-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  type="submit"
+                type="submit"
                   className="flex-1 px-6 py-3 bg-teal-600 text-white font-medium rounded-xl hover:bg-teal-700 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
-                >
+              >
                   {isSearching ? (
                     <div className="flex items-center justify-center">
                       <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -173,11 +174,11 @@ const FindHospitals = () => {
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
-                  type="button"
-                  onClick={handleClearFilters}
+                type="button"
+                onClick={handleClearFilters}
                   className="px-6 py-3 bg-gray-100 text-gray-700 font-medium rounded-xl hover:bg-gray-200 transition-colors focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
-                >
-                  Clear
+              >
+                Clear
                 </motion.button>
               </div>
             </div>
@@ -185,7 +186,7 @@ const FindHospitals = () => {
         </motion.div>
 
         <AnimatePresence>
-          {loading ? (
+        {loading ? (
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
@@ -195,44 +196,44 @@ const FindHospitals = () => {
               <div className="flex flex-col items-center">
                 <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-b-4 border-teal-500"></div>
                 <p className="mt-4 text-gray-600 text-lg">Loading hospitals...</p>
-              </div>
+          </div>
             </motion.div>
-          ) : (
+        ) : (
             <motion.div
               variants={containerVariants}
               initial="hidden"
               animate="visible"
               className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
             >
-              {hospitals.length > 0 ? (
-                hospitals.map((hospital) => (
+            {hospitals.length > 0 ? (
+              hospitals.map((hospital) => (
                   <motion.div
-                    key={hospital._id}
+                  key={hospital._id}
                     variants={itemVariants}
                     whileHover={{ scale: 1.02, y: -5 }}
                     className="bg-white rounded-2xl shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300"
-                  >
-                    <div className="p-6">
-                      <div className="flex justify-between items-start">
+                >
+                  <div className="p-6">
+                    <div className="flex justify-between items-start">
                         <h2 className="text-xl font-semibold text-gray-800">{hospital.name}</h2>
-                        <Link
-                          to={`/reviews?hospital=${hospital._id}`}
+                      <Link 
+                        to={`/reviews?hospital=${hospital._id}`} 
                           className="text-sm text-teal-600 hover:text-teal-700 transition-colors"
-                        >
-                          Write Review
-                        </Link>
-                      </div>
-
+                      >
+                        Write Review
+                      </Link>
+                    </div>
+                    
                       <div className="flex items-center mt-3">
-                        <StarRating rating={hospital.ratings || 0} />
+                      <StarRating rating={hospital.ratings || 0} />
                         <span className="ml-2 text-sm font-medium text-gray-600">
-                          {hospital.ratings ? hospital.ratings.toFixed(1) : 'No ratings'}
-                        </span>
-                        <span className="ml-1 text-xs text-gray-500">
-                          ({hospital.reviewCount || 0} {hospital.reviewCount === 1 ? 'review' : 'reviews'})
-                        </span>
-                      </div>
-
+                        {hospital.ratings ? hospital.ratings.toFixed(1) : 'No ratings'}
+                      </span>
+                      <span className="ml-1 text-xs text-gray-500">
+                        ({hospital.reviewCount || 0} {hospital.reviewCount === 1 ? 'review' : 'reviews'})
+                      </span>
+                    </div>
+                    
                       {/* Enhanced Wait Time Display */}
                       <motion.div
                         initial={{ opacity: 0, y: 10 }}
@@ -293,61 +294,61 @@ const FindHospitals = () => {
                       </motion.div>
 
                       <p className="mt-3 text-gray-600">
-                        {hospital.location?.address || 'Address not available'}
-                      </p>
-
+                      {hospital.location?.address || 'Address not available'}
+                    </p>
+                    
                       <div className="mt-4 flex flex-wrap gap-2">
-                        {hospital.resources?.blood_bank && (
+                      {hospital.resources?.blood_bank && (
                           <span className="px-3 py-1 bg-red-100 text-red-800 text-xs font-medium rounded-full">
-                            Blood Bank
-                          </span>
-                        )}
-                        {hospital.resources?.icu_beds > 0 && (
+                          Blood Bank
+                        </span>
+                      )}
+                      {hospital.resources?.icu_beds > 0 && (
                           <span className="px-3 py-1 bg-blue-100 text-blue-800 text-xs font-medium rounded-full">
-                            ICU: {hospital.resources.icu_beds} beds
-                          </span>
-                        )}
-                      </div>
-
-                      {hospital.services && hospital.services.length > 0 && (
+                          ICU: {hospital.resources.icu_beds} beds
+                        </span>
+                      )}
+                    </div>
+                    
+                    {hospital.services && hospital.services.length > 0 && (
                         <div className="mt-4">
                           <div className="text-sm font-medium text-gray-700 mb-2">Services:</div>
-                          <div className="flex flex-wrap gap-2">
-                            {hospital.services.slice(0, 3).map((service, index) => (
-                              <span
-                                key={index}
+                        <div className="flex flex-wrap gap-2">
+                          {hospital.services.slice(0, 3).map((service, index) => (
+                            <span
+                              key={index}
                                 className="px-3 py-1 bg-teal-100 text-teal-800 text-xs font-medium rounded-full"
-                              >
-                                {service}
-                              </span>
-                            ))}
-                            {hospital.services.length > 3 && (
+                            >
+                              {service}
+                            </span>
+                          ))}
+                          {hospital.services.length > 3 && (
                               <span className="px-3 py-1 bg-gray-100 text-gray-800 text-xs font-medium rounded-full">
-                                +{hospital.services.length - 3} more
-                              </span>
-                            )}
-                          </div>
+                              +{hospital.services.length - 3} more
+                            </span>
+                          )}
                         </div>
-                      )}
-
-                      <div className="mt-6 flex justify-between items-center">
-                        <Link
-                          to={`/hospitals/${hospital._id}`}
-                          className="text-teal-600 font-medium hover:text-teal-700 transition-colors"
-                        >
-                          View Details →
-                        </Link>
-                        <Link
-                          to={`/add-request?hospital=${hospital._id}`}
-                          className="text-red-600 hover:text-red-700 transition-colors"
-                        >
-                          Add Blood Request
-                        </Link>
                       </div>
+                    )}
+                    
+                      <div className="mt-6 flex justify-between items-center">
+                      <Link
+                        to={`/hospitals/${hospital._id}`}
+                          className="text-teal-600 font-medium hover:text-teal-700 transition-colors"
+                      >
+                        View Details →
+                      </Link>
+                      <Link
+                        to={`/add-request?hospital=${hospital._id}`}
+                          className="text-red-600 hover:text-red-700 transition-colors"
+                      >
+                        Add Blood Request
+                      </Link>
                     </div>
+                  </div>
                   </motion.div>
-                ))
-              ) : (
+              ))
+            ) : (
                 <motion.div
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
@@ -361,13 +362,14 @@ const FindHospitals = () => {
                     <p className="text-gray-500 max-w-md mx-auto">
                       Try adjusting your search criteria or filters to find more hospitals.
                     </p>
-                  </div>
+              </div>
                 </motion.div>
-              )}
+            )}
             </motion.div>
-          )}
+        )}
         </AnimatePresence>
       </div>
+      <Footer />
     </div>
   );
 };

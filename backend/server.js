@@ -10,6 +10,7 @@ const reviewRoutes = require("./routes/reviewRoutes");
 const adminRoutes = require('./routes/admin');
 const hospitalAdminRoutes = require('./routes/hospitalAdmin');
 const path = require('path');
+const profilePhotoRoutes = require('./routes/profilePhotoRoutes');
 
 // Check for required environment variables
 const requiredEnvVars = ['PORT', 'MONGO_URI', 'SECRET'];
@@ -106,6 +107,7 @@ app.use("/api/medical-card", medicalCardRoutes);
 app.use("/api/reviews", reviewRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/hospital-admin', hospitalAdminRoutes);
+app.use('/api/profile-photos', profilePhotoRoutes);
 
 // Add this below the routes section
 app.post('/api/token/refresh', (req, res) => {

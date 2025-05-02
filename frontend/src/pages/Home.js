@@ -1,6 +1,6 @@
-
 import React, { useState, useEffect } from "react";
 import { motion } from "framer-motion";
+import Footer from "../components/Footer";
 
 const HoverMenu = ({ label, options }) => {
   const [hovered, setHovered] = useState(false);
@@ -310,31 +310,46 @@ const Home = () => {
   }, []);
 
   return (
-    <div style={{ overflowX: "hidden" }}>
-      {isMobile ? <HeroSectionMobile /> : <HeroSectionDesktop />}
+    <>
+      <div style={{ overflowX: "hidden" }}>
+        {isMobile ? <HeroSectionMobile /> : <HeroSectionDesktop />}
 
-      <Section
-        title="Hospital Lookup & AI-based Time Estimation"
-        description="Find nearby hospitals instantly and get AI-estimated wait times to optimize your visit experience."
-        imageSrc="/hospital-ai.png"
-      />
-      <Section
-        title="Blood Donation Requests"
-        description="Browse and accept real-time blood donation requests around you. Be a lifesaver in moments of urgency."
-        imageSrc="/blood-donation.png"
-        reverse
-      />
-      <Section
-        title="Digital Medical Card"
-        description="Securely store your essential medical history, prescriptions, and allergies in one place. Your EMCON Medical Card makes it quick and easy to share vital information during emergencies or hospital visits."
-        imageSrc="/med-card.png"
-      />
-      <Section
-        title="Hospital Reviews & Feedback"
-        description="Make informed choices by reading reviews from real patients. Rate and review your hospital visits."
-        imageSrc="/hospital-reviews.png"
-      />
-    </div>
+        <Section
+          title="Hospital Lookup & AI-based Time Estimation"
+          description="Find nearby hospitals instantly and get AI-estimated wait times to optimize your visit experience."
+          imageSrc="/hospital-ai.png"
+        />
+        <Section
+          title="Blood Donation Requests"
+          description="Browse and accept real-time blood donation requests around you. Be a lifesaver in moments of urgency."
+          imageSrc="/blood-donation.png"
+          reverse
+        />
+        <Section
+          title="Digital Medical Card"
+          description="Securely store your essential medical history, prescriptions, and allergies in one place. Your EMCON Medical Card makes it quick and easy to share vital information during emergencies or hospital visits."
+          imageSrc="/med-card.png"
+        />
+        <Section
+          title="Hospital Reviews & Feedback"
+          description="Make informed choices by reading reviews from real patients. Rate and review your hospital visits."
+          imageSrc="/hospital-reviews.png"
+        />
+      </div>
+      {/* Desktop Footer */}
+      <div className="hidden md:block"><Footer /></div>
+      {/* Mobile Footer */}
+      <footer className="bg-[#2a9fa7] text-white py-8 px-6 mt-20 flex flex-col items-center space-y-4 md:hidden z-10">
+        <h1 className="text-xl font-bold">EMCON</h1>
+        <nav className="flex flex-col items-center space-y-2 mt-2">
+          <a href="/hospitals" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Find Hospitals</a>
+          <a href="/blood-requests" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Blood Requests</a>
+          <a href="/medical-card" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Medical Card</a>
+          <a href="/reviews" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Reviews</a>
+        </nav>
+        <p className="text-sm text-center mt-4 opacity-80">Smart healthcare navigation for everyone!</p>
+      </footer>
+    </>
   );
 };
 
