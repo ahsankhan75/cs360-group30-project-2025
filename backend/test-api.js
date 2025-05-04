@@ -4,7 +4,7 @@ const fetch = require('node-fetch');
 async function testBloodRequestsAPI() {
   try {
     console.log('Testing blood requests API...');
-    const response = await fetch('http://localhost:4000/api/blood-requests');
+    const response = await fetch(`http://localhost:${process.env.PORT || 4000}/api/blood-requests`);
     
     if (!response.ok) {
       throw new Error(`HTTP error! Status: ${response.status}`);

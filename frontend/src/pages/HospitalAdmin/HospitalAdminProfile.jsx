@@ -278,6 +278,9 @@ const HospitalAdminProfile = () => {
       console.log('Sending update data to server:', updateData);
       console.log('Medical imaging costs being sent:', updateData.resources.medical_imaging_costs);
 
+      // This calls the updateHospitalProfile API endpoint in hospitalAdminController.js
+      // It updates specific fields of the hospital profile like resources, contact info,
+      // services offered, and insurance accepted
       const response = await fetch('/api/hospital-admin/profile', {
         method: 'PATCH',
         headers: {

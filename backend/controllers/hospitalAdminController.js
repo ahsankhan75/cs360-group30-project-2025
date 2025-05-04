@@ -326,29 +326,29 @@ const updateHospitalProfile = async (req, res) => {
             hospital.resources.medical_imaging = resources.medical_imaging;
             console.log('Setting medical_imaging to:', resources.medical_imaging);
         }
-        
+            
         // Update medical_imaging_costs as a regular object
-        if (resources.medical_imaging_costs && typeof resources.medical_imaging_costs === 'object') {
+            if (resources.medical_imaging_costs && typeof resources.medical_imaging_costs === 'object') {
             // Create a clean costs object with numeric values
             const costsObject = {};
-            
+                    
             // Process each imaging type from the selected imaging types
             if (resources.medical_imaging && Array.isArray(resources.medical_imaging)) {
-                resources.medical_imaging.forEach(type => {
-                    // Get cost value from request or default to 0
-                    let costValue = 0;
-                    if (resources.medical_imaging_costs[type] !== undefined) {
-                        costValue = Number(resources.medical_imaging_costs[type]);
-                        // Check for NaN and replace with 0
-                        if (isNaN(costValue)) costValue = 0;
-                    }
-                    
+                    resources.medical_imaging.forEach(type => {
+                        // Get cost value from request or default to 0
+                        let costValue = 0;
+                        if (resources.medical_imaging_costs[type] !== undefined) {
+                            costValue = Number(resources.medical_imaging_costs[type]);
+                            // Check for NaN and replace with 0
+                            if (isNaN(costValue)) costValue = 0;
+                        }
+                        
                     // Set the cost in the object
                     costsObject[type] = costValue;
-                    console.log(`Setting cost for ${type} to ${costValue}`);
-                });
+                        console.log(`Setting cost for ${type} to ${costValue}`);
+                    });
             }
-            
+                    
             console.log('Final costs object:', costsObject);
             // Set the costs object directly
             hospital.resources.medical_imaging_costs = costsObject;
@@ -359,7 +359,7 @@ const updateHospitalProfile = async (req, res) => {
         if (resources.ventilators !== undefined) hospital.resources.ventilators = resources.ventilators;
         if (resources.blood_bank !== undefined) hospital.resources.blood_bank = resources.blood_bank;
         if (resources.emergency_capacity !== undefined) hospital.resources.emergency_capacity = resources.emergency_capacity;
-    }
+            }
     
     // Update contact information
     if (contact && typeof contact === 'object') {
@@ -375,9 +375,9 @@ const updateHospitalProfile = async (req, res) => {
     }
 
     // Update cityu field if provided
-    if (cityu !== undefined) {
+     if (cityu !== undefined) {
         hospital.cityu = cityu;
-    }
+     }
 
     // Update array fields
     if (services && Array.isArray(services)) {
@@ -421,7 +421,7 @@ const updateHospitalProfile = async (req, res) => {
       console.log('Creating missing medical_imaging_costs field in response');
       responseData.resources.medical_imaging_costs = {};
     }
-
+    
     // Log full response data 
     console.log('FINAL RESPONSE DATA:');
     console.log('Keys in resources:', responseData.resources ? Object.keys(responseData.resources) : 'No resources');

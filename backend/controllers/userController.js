@@ -50,7 +50,7 @@ const signupUser = async (req, res) => {
   let user = await User.findOne({ email });
 
   if (user) {
-    // 1a) If they _haven’t_ verified, just resend the link
+    // 1a) If they _haven't_ verified, just resend the link
     if (!user.emailVerified) {                             // WHAT IF PASSWORD IS DIFFERENT IN NEW SIGNUP??
       // generate & store a fresh token
       const vToken  = crypto.randomBytes(32).toString("hex");
@@ -60,11 +60,11 @@ const signupUser = async (req, res) => {
       await user.save();
 
       // send email
-      const verifyURL = `http://localhost:3000/verify-email/${vToken}`;
+      const verifyURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email/${vToken}`;
       const transporter = nodemailer.createTransport({
-        host:   "smtp.gmail.com",
-        port:   587,
-        secure: false,
+        host:   process.env.SMTP_HOST || "smtp.gmail.com",
+        port:   Number(process.env.SMTP_PORT) || 587,
+        secure: (process.env.SMTP_PORT || 587) === 465,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
@@ -81,7 +81,7 @@ const signupUser = async (req, res) => {
         .json({ message: "Verification link resent. Please check your email." });
     }
 
-    // 1b) Otherwise, they’re fully signed up
+    // 1b) Otherwise, they're fully signed up
     return res.status(400).json({ error: "Email already in use" });
   }
 
@@ -101,11 +101,11 @@ const signupUser = async (req, res) => {
     await user.save();
 
     // 4) Send the verification email
-    const verifyURL = `http://localhost:3000/verify-email/${vToken}`;
+    const verifyURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
-      host:   "smtp.gmail.com",
-      port:   587,
-      secure: false,
+      host:   process.env.SMTP_HOST || "smtp.gmail.com",
+      port:   Number(process.env.SMTP_PORT) || 587,
+      secure: (process.env.SMTP_PORT || 587) === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -168,14 +168,14 @@ const signupAdmin = async (req, res) => {
       const vHashed = crypto.createHash("sha256").update(vToken).digest("hex");
       existing.emailVerificationToken   = vHashed;
       existing.emailVerificationExpires = Date.now() + 24*3600*1000;
-      existing.isAdmin = true;           // make sure it’s flagged admin
+      existing.isAdmin = true;           // make sure it's flagged admin
       await existing.save();
 
-      const verifyURL = `http://localhost:3000/admin/verify-email/${vToken}`;
+      const verifyURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/verify-email/${vToken}`;
       const transporter = nodemailer.createTransport({
-        host: "smtp.gmail.com",
-        port: 587,
-        secure: false,
+        host: process.env.SMTP_HOST || "smtp.gmail.com",
+        port: Number(process.env.SMTP_PORT) || 587,
+        secure: (process.env.SMTP_PORT || 587) === 465,
         auth: {
           user: process.env.SMTP_USER,
           pass: process.env.SMTP_PASS
@@ -213,11 +213,11 @@ const signupAdmin = async (req, res) => {
     await user.save();
 
     // 5) send the email
-    const verifyURL = `http://localhost:3000/admin/verify-email/${vToken}`;
+    const verifyURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/verify-email/${vToken}`;
     const transporter = nodemailer.createTransport({
-      host: "smtp.gmail.com",
-      port: 587,
-      secure: false,
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: (process.env.SMTP_PORT || 587) === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
@@ -307,13 +307,13 @@ const forgotPassword = async (req, res) => {
   // }// else {
   //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
   // }
-  const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
+  const resetURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/reset-password/${resetToken}`;
   const transporter = nodemailer.createTransport({
     // host: process.env.SMTP_HOST,
     // port: Number(process.env.SMTP_PORT),
-    host: 'smtp.gmail.com', 
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST || 'smtp.gmail.com',
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: (process.env.SMTP_PORT || 587) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
@@ -402,7 +402,7 @@ const adminForgotPassword = async (req, res) => {
   user.passwordResetExpires = Date.now() + 3600 * 1000;
   await user.save();
 
-  const resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
+  const resetURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/admin/reset-password/${resetToken}`;
   // if (user.isAdmin) {
   //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
   // }// else {
@@ -412,9 +412,9 @@ const adminForgotPassword = async (req, res) => {
   const transporter = nodemailer.createTransport({
     // host: process.env.SMTP_HOST,
     // port: Number(process.env.SMTP_PORT),
-    host: 'smtp.gmail.com', 
-    port: 587,
-    secure: false,
+    host: process.env.SMTP_HOST || "smtp.gmail.com",
+    port: Number(process.env.SMTP_PORT) || 587,
+    secure: (process.env.SMTP_PORT || 587) === 465,
     auth: {
       user: process.env.SMTP_USER,
       pass: process.env.SMTP_PASS
