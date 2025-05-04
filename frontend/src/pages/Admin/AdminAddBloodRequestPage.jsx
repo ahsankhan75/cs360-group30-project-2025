@@ -96,7 +96,7 @@ const AdminAddBloodRequestPage = () => {
         notes
       };
 
-      const response = await fetch('/api/admin/blood-requests', {
+      const response = await fetch('/api/blood-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

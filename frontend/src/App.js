@@ -15,7 +15,6 @@ import AdminForgotPassword from "./pages/Admin/AdminForgotPassword";
 import AdminResetPassword from "./pages/Admin/AdminResetPassword";
 import VerifyAdminEmail from "./pages/VerifyEmailAdmin";
 import AdminHospitalAdminsPage from "./pages/Admin/AdminHospitalAdminsPage";
-import AdminAddBloodRequestPage from "./pages/Admin/AdminAddBloodRequestPage";
 import AdminBloodRequestDetailPage from "./pages/Admin/AdminBloodRequestDetailPage";
 import AdminReviewsPage from "./pages/Admin/AdminReviewsPage";
 
@@ -124,11 +123,11 @@ function App() {
                   <Route path="/admin" element={<Navigate to="/admin/dashboard" replace />} />
                   <Route path="/admin/dashboard" element={<AdminRequireAuth><AdminDashboard /></AdminRequireAuth>} />
                   <Route path="/admin/users" element={<AdminRequireAuth><AdminUsersPage /></AdminRequireAuth>} />
+
                   <Route path="/admin/hospitals" element={<AdminRequireAuth><AdminHospitalsPage /></AdminRequireAuth>} />
                   <Route path="/admin/hospital-admins" element={<AdminRequireAuth><AdminHospitalAdminsPage /></AdminRequireAuth>} />
                   <Route path="/admin/blood-requests" element={<AdminRequireAuth><AdminBloodRequestsPage /></AdminRequireAuth>} />
                   <Route path="/admin/blood-requests/:requestId" element={<AdminRequireAuth><AdminBloodRequestDetailPage /></AdminRequireAuth>} />
-                  <Route path="/admin/add-blood-request" element={<AdminRequireAuth><AdminAddBloodRequestPage /></AdminRequireAuth>} />
                   <Route path="/admin/reviews" element={<AdminRequireAuth><AdminReviewsPage /></AdminRequireAuth>} />
 
                   {/* Hospital Admin Authentication Routes - Public */}
@@ -153,7 +152,19 @@ function App() {
                   } />
                 </Routes>
               </div>
-              <ToastContainer position="bottom-right" />
+              <ToastContainer
+                position="bottom-right"
+                autoClose={3000}
+                hideProgressBar={false}
+                newestOnTop={false}
+                closeOnClick
+                rtl={false}
+                pauseOnFocusLoss={false}
+                draggable
+                pauseOnHover={false}
+                limit={3}
+                delay={500}
+              />
             </BrowserRouter>
           </HospitalAdminAuthContextProvider>
         </AdminAuthContextProvider>

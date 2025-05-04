@@ -1,6 +1,5 @@
 import { useAdminAuthContext } from './useAdminAuthContext';
 import { useNavigate } from 'react-router-dom';
-import { toast } from 'react-toastify';
 
 export const useAdminLogout = () => {
   const { dispatch } = useAdminAuthContext();
@@ -9,13 +8,10 @@ export const useAdminLogout = () => {
   const logout = () => {
     // Remove admin from local storage
     localStorage.removeItem('adminUser');
-    
+
     // Dispatch logout action
     dispatch({ type: 'LOGOUT' });
-    
-    // Show success message
-    toast.success('Logged out successfully');
-    
+
     // Navigate to admin login page
     navigate('/admin/login');
   };

@@ -160,7 +160,17 @@ const BloodRequestRow = ({ request }) => {
         </span>
       </td>
       <td className="px-4 sm:px-6 py-4">
-        <div className="text-sm text-gray-900">{request.location}</div>
+        <div className="text-sm text-gray-900">
+          {typeof request.location === 'object'
+            ? (request.location.type === 'Point' && Array.isArray(request.location.coordinates))
+              ? `${request.location.coordinates[1]?.toFixed(4)}, ${request.location.coordinates[0]?.toFixed(4)}`
+              : (request.location.coordinates && Array.isArray(request.location.coordinates))
+                ? `${request.location.coordinates[1]?.toFixed(4)}, ${request.location.coordinates[0]?.toFixed(4)}`
+                : (request.location.latitude && request.location.longitude)
+                  ? `${request.location.latitude?.toFixed(4)}, ${request.location.longitude?.toFixed(4)}`
+                  : 'Unknown location'
+            : request.location}
+        </div>
       </td>
       <td className="px-4 sm:px-6 py-4">
         <div className="text-sm text-gray-900">

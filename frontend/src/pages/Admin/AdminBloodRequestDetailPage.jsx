@@ -103,7 +103,7 @@ const AdminBloodRequestDetailPage = () => {
                 </div>
                 <div className="ml-3">
                   <p className="text-sm text-red-700">{error}</p>
-                  <button 
+                  <button
                     onClick={() => window.location.reload()}
                     className="mt-2 text-sm font-medium text-red-700 hover:text-red-600"
                   >
@@ -212,7 +212,21 @@ const AdminBloodRequestDetailPage = () => {
 
                   <div className="sm:col-span-1">
                     <dt className="text-sm font-medium text-gray-500">Location</dt>
-                    <dd className="mt-1 text-sm text-gray-900">{request.location}</dd>
+                    <dd className="mt-1 text-sm text-gray-900">
+                      {typeof request.location === 'object'
+                        ? (request.location.type === 'Point' && Array.isArray(request.location.coordinates))
+                          ? `${request.location.coordinates[1]?.toFixed(4)}, ${request.location.coordinates[0]?.toFixed(4)}`
+                          : (request.location.coordinates && Array.isArray(request.location.coordinates))
+                            ? `${request.location.coordinates[1]?.toFixed(4)}, ${request.location.coordinates[0]?.toFixed(4)}`
+                            : (request.location.latitude && request.location.longitude)
+                              ? `${request.location.latitude?.toFixed(4)}, ${request.location.longitude?.toFixed(4)}`
+                              : JSON.stringify(request.location).length > 30
+                                ? 'Coordinates: ' + (Array.isArray(request.location.coordinates)
+                                    ? `${request.location.coordinates[1]?.toFixed(4)}, ${request.location.coordinates[0]?.toFixed(4)}`
+                                    : 'Unknown format')
+                                : 'Unknown location'
+                        : request.location}
+                    </dd>
                   </div>
 
                   <div className="sm:col-span-1">
@@ -266,4 +280,4 @@ const AdminBloodRequestDetailPage = () => {
   );
 };
 
-export default AdminBloodRequestDetailPage; 
+export default AdminBloodRequestDetailPage;

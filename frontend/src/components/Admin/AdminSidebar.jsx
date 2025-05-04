@@ -16,65 +16,67 @@ const AdminSidebar = () => {
   ];
 
   const isActive = (path) => {
-    // Enhanced to handle sub-pages (e.g., /admin/add-blood-request should highlight blood-requests)
+    // Enhanced to handle sub-pages
     if (path === '/admin/blood-requests') {
-      return location.pathname === path || location.pathname === '/admin/add-blood-request' || location.pathname.startsWith('/admin/blood-requests/');
+      return location.pathname === path || location.pathname.startsWith('/admin/blood-requests/');
     }
     return location.pathname === path;
   };
 
   return (
-    <div className="h-screen w-64 bg-[#1e293b] text-white flex flex-col flex-shrink-0">
-      <div className="p-5 border-b border-gray-700">
+    <div className="h-screen w-16 sm:w-20 md:w-64 bg-[#1e293b] text-white flex flex-col flex-shrink-0 transition-all duration-300">
+      <div className="p-3 md:p-5 border-b border-gray-700">
         <Link to="/admin/dashboard" className="flex items-center space-x-2">
-          <img src="/kk.png" alt="EMCON Admin" className="h-8 w-8" />
-          <span className="text-xl font-bold">EMCON Admin</span>
+          <img src="/kk.png" alt="EMCON Admin" className="h-6 w-6 md:h-8 md:w-8" />
+          <span className="hidden md:block text-base md:text-xl font-bold">EMCON Admin</span>
         </Link>
       </div>
 
-      <nav className="flex-1 overflow-y-auto py-4">
-        <ul className="space-y-2 px-4">
+      <nav className="flex-1 overflow-y-auto py-2 md:py-4">
+        <ul className="space-y-1 md:space-y-2 px-2 md:px-4">
           {navLinks.map((link) => (
             <li key={link.path}>
               <Link
                 to={link.path}
-                className={`flex items-center p-3 rounded-lg transition-colors ${
+                className={`flex items-center justify-center md:justify-start p-2 md:p-3 rounded-lg transition-colors ${
                   isActive(link.path)
                     ? "bg-teal-600 text-white"
                     : "text-gray-300 hover:bg-gray-700"
                 }`}
+                title={link.name}
               >
                 <svg
                   xmlns="http://www.w3.org/2000/svg"
-                  className="h-5 w-5 mr-3"
+                  className="h-5 w-5 md:mr-3"
                   fill="none"
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                 >
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d={link.icon} />
                 </svg>
-                {link.name}
+                <span className="hidden md:block text-sm md:text-base">{link.name}</span>
               </Link>
             </li>
           ))}
         </ul>
       </nav>
 
-      <div className="p-4 border-t border-gray-700">
+      <div className="p-2 md:p-4 border-t border-gray-700">
         <button
           onClick={logout}
-          className="flex items-center w-full p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors"
+          className="flex items-center justify-center md:justify-start w-full p-2 md:p-3 rounded-lg text-gray-300 hover:bg-gray-700 transition-colors"
+          title="Logout"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            className="h-5 w-5 mr-3"
+            className="h-5 w-5 md:mr-3"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
           >
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
           </svg>
-          Logout
+          <span className="hidden md:block text-sm md:text-base">Logout</span>
         </button>
       </div>
     </div>

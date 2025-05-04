@@ -202,10 +202,10 @@ const HeroSectionDesktop = () => (
     initial={{ opacity: 0 }}
     animate={{ opacity: 1 }}
     transition={{ duration: 1 }}
-    style={{ position: "relative", minHeight: "100vh", paddingTop: "80px", fontSize: "24px", textAlign: "center" }}
+    className="relative min-h-screen pt-20 text-2xl text-center"
   >
     {/* SVG Backgrounds for Desktop Only */}
-    <div style={{ position: "absolute", top: 0, left: 0, width: "100%", height: "100%", overflow: "hidden", zIndex: -1 }}>
+    <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-10">
       <motion.svg
         initial={{ opacity: 0, x: -100 }}
         animate={{ opacity: 1, x: 0 }}
@@ -213,7 +213,7 @@ const HeroSectionDesktop = () => (
         viewBox="0 0 998 1134"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ position: "absolute", top: "-50px", left: "-100px", width: "700px" }}
+        className="absolute -top-12 -left-24 w-[700px]"
       >
         <path d="M941.847 664.311C1016.12 620.619 1016.12 513.204 941.847 469.513L170.707 15.9077C95.3771 -28.4032 0.414215 25.911 0.414215 113.307V1020.52C0.414215 1107.91 95.3773 1162.23 170.707 1117.92L941.847 664.311Z" fill="#0694A2" fillOpacity="0.37" />
       </motion.svg>
@@ -224,7 +224,7 @@ const HeroSectionDesktop = () => (
         viewBox="0 0 1019 1146"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ position: "absolute", top: "100px", left: "-100px", width: "700px" }}
+        className="absolute top-24 -left-24 w-[700px]"
       >
         <path d="M968.83 640.743C1036.71 598.318 1033.97 498.546 963.857 459.805L156.378 13.5965C85.2747 -25.6945 -1.54765 27.1097 0.683496 108.288L26.3771 1043.12C28.6083 1124.3 118.204 1172.4 187.044 1129.37L968.83 640.743Z" fill="#0694A2" fillOpacity="0.37" />
       </motion.svg>
@@ -235,7 +235,7 @@ const HeroSectionDesktop = () => (
         viewBox="0 0 593 637"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ position: "absolute", top: "-10px", right: "-200px", width: "500px", zIndex: 100 }}
+        className="absolute -top-2 -right-48 w-[500px] z-[100]"
       >
         <path d="M456.724 626.835C515.471 656.989 585.443 614.914 586.356 548.886L592.691 90.7296C593.656 20.968 517.628 -22.7266 457.837 13.2263L43.8634 262.151C-15.9278 298.104 -12.9837 385.744 49.0856 417.603L456.724 626.835Z" fill="#C97602" fillOpacity="0.37" />
       </motion.svg>
@@ -246,57 +246,54 @@ const HeroSectionDesktop = () => (
         viewBox="0 0 597 637"
         fill="none"
         xmlns="http://www.w3.org/2000/svg"
-        style={{ position: "absolute", top: "200px", right: "-200px", width: "500px" }}
+        className="absolute top-48 -right-48 w-[500px]"
       >
         <path d="M471.739 628.952C532.062 655.814 599.603 609.938 596.867 543.961L577.882 86.1536C574.991 16.4453 496.666 -22.9825 438.952 16.2186L39.3625 287.633C-18.3513 326.834 -10.5701 414.178 53.1645 442.559L471.739 628.952Z" fill="#0694A2" fillOpacity="0.37" />
       </motion.svg>
     </div>
 
-    {/* Hero Text */}
-    <motion.div
-      initial={{ opacity: 0, y: 60 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1 }}
-      style={{
-        width: "400px",
-        textAlign: "left",
-        transform: "translate(-50px, 20px)",
-        position: "absolute",
-        right: "400px",
-        top: "290px",
-        zIndex: 10
-      }}
-    >
-      <h1 style={{ fontWeight: "bold", fontSize: "48px", color: "#0694A2", marginBottom: "10px", letterSpacing: "2px" }}>
-        EMCON
-      </h1>
-      <p style={{ color: "#0694A2", fontSize: "20px", marginBottom: "30px" }}>Smart healthcare navigation for everyone</p>
+    {/* Hero Content Container - Using Tailwind Flex */}
+    <div className="flex items-center justify-between px-16 mt-16 h-[70vh]">
+      {/* Hero Text */}
+      <motion.div
+        initial={{ opacity: 0, y: 60 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1 }}
+        className="w-[400px] text-left z-10"
+      >
+        <h1 className="font-bold text-5xl text-[#0694A2] mb-3 tracking-wider">
+          EMCON
+        </h1>
+        <p className="text-[#0694A2] text-xl mb-8">Smart healthcare navigation for everyone</p>
 
-      <HoverMenu
-        label="Sign up"
-        options={[
-          { label: "For Users", href: "/signup" },
-          { label: "For Hospital Admin", href: "/hospital-admin/signup" }
-        ]}
-      />
-      <HoverMenu
-        label="Login"
-        options={[
-          { label: "For Users", href: "/login" },
-          { label: "For Hospital Admin", href: "/hospital-admin/login" }
-        ]}
-      />
-    </motion.div>
+        <div className="flex flex-wrap gap-2">
+          <HoverMenu
+            label="Sign up"
+            options={[
+              { label: "For Users", href: "/signup" },
+              { label: "For Hospital Admin", href: "/hospital-admin/signup" }
+            ]}
+          />
+          <HoverMenu
+            label="Login"
+            options={[
+              { label: "For Users", href: "/login" },
+              { label: "For Hospital Admin", href: "/hospital-admin/login" }
+            ]}
+          />
+        </div>
+      </motion.div>
 
-    {/* Hero Image */}
-    <motion.div
-      initial={{ opacity: 0, y: 30 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 1.2 }}
-      style={{ position: "relative", marginTop: "30px", left: "200px" }}
-    >
-      <img src="/doctors.png" alt="Doctors" style={{ width: "700px", height: "auto" }} />
-    </motion.div>
+      {/* Hero Image */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2 }}
+        className="flex-1 flex justify-center items-center"
+      >
+        <img src="/doctors.png" alt="Doctors" className="w-auto h-auto max-w-[650px]" />
+      </motion.div>
+    </div>
   </motion.div>
 );
 
