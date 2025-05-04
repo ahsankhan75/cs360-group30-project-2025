@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import BloodRequestRow from './ BloodRequestRow';
+import BloodRequestRow from './BloodRequestRow';
 import StarRating from '../components/Reviews/StarRating';
 import { useNavigate } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
@@ -142,16 +142,16 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
   };
 
   return (
-    <div className="w-full max-w-[98vw] mx-auto">
-      {/* Table layout for large screens */}
+    <div className="w-full mx-auto">
+      {/* Table layout for larger screens */}
       <div className="hidden md:block overflow-x-auto">
-        <table className="w-full min-w-[1400px] table-auto text-md text-left">
+        <table className="w-full table-auto text-xs sm:text-sm md:text-base text-left">
           <thead className="bg-gray-50 text-gray-700">
             <tr>
               {columns.map(({ key, label }) => (
                 <th
                   key={key}
-                  className="px-8 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
+                  className="px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 font-medium text-xs md:text-sm text-gray-600 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors"
                   onClick={() => handleSort(key)}
                 >
                   <div className="flex items-center">
@@ -159,11 +159,11 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                     {sortConfig.key === key && (
                       <span className="ml-1 text-teal-600">
                         {sortConfig.direction === 'asc' ? (
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M14.707 12.707a1 1 0 01-1.414 0L10 9.414l-3.293 3.293a1 1 0 01-1.414-1.414l4-4a1 1 0 011.414 0l4 4a1 1 0 010 1.414z" clipRule="evenodd" />
                           </svg>
                         ) : (
-                          <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                          <svg className="w-3 h-3 md:w-4 md:h-4" fill="currentColor" viewBox="0 0 20 20">
                             <path fillRule="evenodd" d="M5.293 7.293a1 1 0 011.414 0L10 10.586l3.293-3.293a1 1 0 111.414 1.414l-4 4a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414z" clipRule="evenodd" />
                           </svg>
                         )}
@@ -172,7 +172,7 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                   </div>
                 </th>
               ))}
-              <th className="px-8 py-4 font-medium text-sm text-gray-600 uppercase tracking-wider text-center">Action</th>
+              <th className="px-2 sm:px-3 md:px-4 lg:px-6 py-2 sm:py-3 font-medium text-xs md:text-sm text-gray-600 uppercase tracking-wider text-center">Action</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-gray-200 bg-white">
@@ -187,20 +187,20 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
         </table>
       </div>
 
-      {/* Card layout for small screens */}
-      <div className="block md:hidden space-y-4">
+      {/* Card layout for small screens - Optimized for 344x882 */}
+      <div className="block md:hidden space-y-2 sm:space-y-3">
         {paginatedData.map((req) => (
           <div
             key={req.requestId}
             className="bg-white shadow-md rounded-lg overflow-hidden border border-gray-200 hover:shadow-lg transition-shadow duration-200"
           >
-            <div className="p-4 cursor-pointer" onClick={() => handleRowClick(req.requestId)}>
+            <div className="p-2 xs:p-3 sm:p-4 cursor-pointer" onClick={() => handleRowClick(req.requestId)}>
               <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-800 mb-1">{req.hospitalName}</h3>
-                  <div className="flex items-center mb-2">
-                    <StarRating rating={req.hospitalRating || 0} />
-                    <span className="ml-2 text-sm text-gray-600">
+                <div className="flex-1 min-w-0 pr-2">
+                  <h3 className="text-sm xs:text-base font-semibold text-gray-800 mb-0.5 xs:mb-1 truncate">{req.hospitalName}</h3>
+                  <div className="flex items-center mb-1 xs:mb-2">
+                    <StarRating rating={req.hospitalRating || 0} size="small" />
+                    <span className="ml-1 xs:ml-2 text-xs text-gray-600">
                       {req.hospitalRating ? req.hospitalRating.toFixed(1) : '-'}
                     </span>
                     {req.reviewCount > 0 && (
@@ -211,36 +211,48 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${req.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                  <span className={`inline-flex items-center px-1.5 xs:px-2.5 py-0.5 rounded-full text-xs font-medium ${req.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
                     req.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
                     'bg-green-100 text-green-800'
                   }`}>
                     {req.urgencyLevel}
                   </span>
-                  <span className="mt-1 text-sm font-medium text-gray-900">{req.bloodType}</span>
+                  <span className="mt-1 text-xs xs:text-sm font-medium text-gray-900">{req.bloodType}</span>
                 </div>
               </div>
-              <div className="mt-2 text-sm text-gray-600">
+              <div className="mt-1.5 xs:mt-2 grid grid-cols-2 gap-1 xs:gap-2 text-xs text-gray-600">
                 <div className="flex items-center">
-                  <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg className="w-3 h-3 xs:w-4 xs:h-4 mr-1 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  {req.location}
+                  <span className="truncate">{req.location}</span>
                 </div>
-                <div className="flex items-center mt-1">
-                  <svg className="w-4 h-4 mr-1 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <div className="flex items-center">
+                  <svg className="w-3 h-3 xs:w-4 xs:h-4 mr-1 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                   </svg>
-                  {new Date(req.datePosted).toLocaleDateString()}
+                  <span>{new Date(req.datePosted).toLocaleDateString()}</span>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-3 h-3 xs:w-4 xs:h-4 mr-1 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
+                  </svg>
+                  <span>Units: {req.unitsNeeded}</span>
+                </div>
+                <div className="flex items-center">
+                  <svg className="w-3 h-3 xs:w-4 xs:h-4 mr-1 text-gray-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <span>ID: {req.requestId.substring(0, 8)}...</span>
                 </div>
               </div>
             </div>
-            <div className="px-4 py-3 bg-gray-50 border-t border-gray-200">
+            <div className="px-2 xs:px-4 py-2 xs:py-3 bg-gray-50 border-t border-gray-200">
               <button
                 onClick={(e) => handleAcceptRequest(e, req.requestId)}
                 disabled={req.userAccepted || acceptingRequestId === req.requestId}
-                className={`w-full px-4 py-2 rounded-md text-sm font-medium transition-colors ${req.userAccepted ? 'bg-gray-100 text-gray-500 cursor-not-allowed' :
+                className={`w-full px-3 py-1.5 xs:px-4 xs:py-2 rounded-md text-xs xs:text-sm font-medium transition-colors ${req.userAccepted ? 'bg-gray-100 text-gray-500 cursor-not-allowed' :
                   acceptingRequestId === req.requestId ? 'bg-gray-300 text-gray-700 cursor-not-allowed' :
                     'bg-teal-600 text-white hover:bg-teal-700'
                 }`}
@@ -254,39 +266,59 @@ const BloodRequestTable = ({ data, onRowClick, onAccept }) => {
         ))}
       </div>
 
-      {/* Pagination */}
+      {/* Pagination - Made responsive for small screens */}
       {totalPages > 1 && (
-        <div className="mt-4 flex justify-center">
+        <div className="mt-3 xs:mt-4 flex justify-center">
           <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
             <button
               onClick={() => setPage(p => Math.max(1, p - 1))}
               disabled={page === 1}
-              className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-1 xs:px-1.5 md:px-2 py-1 xs:py-1.5 md:py-2 rounded-l-md border border-gray-300 bg-white text-xs md:text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="sr-only">Previous</span>
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-4 w-4 xs:h-5 xs:w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z" clipRule="evenodd" />
               </svg>
             </button>
-            {Array.from({ length: totalPages }, (_, i) => i + 1).map((pageNum) => (
-                  <button
-                key={pageNum}
-                onClick={() => setPage(pageNum)}
-                className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${page === pageNum
-                  ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
-                  : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
-                    }`}
-                  >
-                {pageNum}
-                  </button>
-                ))}
+            {/* Show fewer page numbers on small screens */}
+            {Array.from({ length: totalPages }, (_, i) => i + 1)
+              .filter(pageNum => {
+                // On small screens, show only current page, first, last, and adjacent pages
+                const isSmallScreen = window.innerWidth < 640;
+                if (!isSmallScreen) return true;
+                return pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - page) <= 1;
+              })
+              .map((pageNum, index, filteredArray) => {
+                // Add ellipsis for skipped pages
+                const previousPage = index > 0 ? filteredArray[index - 1] : null;
+                const needsEllipsisBefore = previousPage && pageNum - previousPage > 1;
+                
+                return (
+                  <React.Fragment key={pageNum}>
+                    {needsEllipsisBefore && (
+                      <span className="relative inline-flex items-center px-1 xs:px-2 md:px-3 py-1 xs:py-1.5 border text-xs md:text-sm font-medium border-gray-300 bg-white text-gray-700">
+                        ...
+                      </span>
+                    )}
+                    <button
+                      onClick={() => setPage(pageNum)}
+                      className={`relative inline-flex items-center px-1.5 xs:px-2 md:px-3 py-1 xs:py-1.5 border text-xs md:text-sm font-medium ${page === pageNum
+                        ? 'z-10 bg-teal-50 border-teal-500 text-teal-600'
+                        : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                    >
+                      {pageNum}
+                    </button>
+                  </React.Fragment>
+                );
+              })}
             <button
               onClick={() => setPage(p => Math.min(totalPages, p + 1))}
               disabled={page === totalPages}
-              className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
+              className="relative inline-flex items-center px-1 xs:px-1.5 md:px-2 py-1 xs:py-1.5 md:py-2 rounded-r-md border border-gray-300 bg-white text-xs md:text-sm font-medium text-gray-500 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <span className="sr-only">Next</span>
-              <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 20 20">
+              <svg className="h-4 w-4 xs:h-5 xs:w-5" fill="currentColor" viewBox="0 0 20 20">
                 <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
               </svg>
             </button>

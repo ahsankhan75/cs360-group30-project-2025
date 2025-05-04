@@ -55,6 +55,16 @@ const getHospitalDetails = async (req, res) => {
       }
     };
     
+    // Convert medical_imaging_costs Map to Object for easier client-side handling
+    if (hospitalData.resources && hospitalData.resources.medical_imaging_costs instanceof Map) {
+      console.log('Converting medical_imaging_costs Map to Object for response in getHospitalDetails');
+      const costsObject = {};
+      hospitalData.resources.medical_imaging_costs.forEach((value, key) => {
+        costsObject[key] = value;
+      });
+      hospitalData.resources.medical_imaging_costs = costsObject;
+    }
+    
     res.status(200).json(hospitalData);
   } catch (error) {
     res.status(500).json({ error: error.message });
@@ -76,7 +86,20 @@ const getHospitalById = async (req, res) => {
       return res.status(404).json({ error: 'Hospital not found' });
     }
     
-    res.status(200).json(hospital);
+    // Convert to plain object to manipulate
+    const hospitalData = hospital.toObject();
+    
+    // Convert medical_imaging_costs Map to Object for easier client-side handling
+    if (hospitalData.resources && hospitalData.resources.medical_imaging_costs instanceof Map) {
+      console.log('Converting medical_imaging_costs Map to Object for getHospitalById response');
+      const costsObject = {};
+      hospitalData.resources.medical_imaging_costs.forEach((value, key) => {
+        costsObject[key] = value;
+      });
+      hospitalData.resources.medical_imaging_costs = costsObject;
+    }
+    
+    res.status(200).json(hospitalData);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
@@ -187,7 +210,21 @@ const getHospital = async (req, res) => {
     if (!hospital) {
       return res.status(404).json({ error: "Hospital not found" });
     }
-    res.status(200).json(hospital);
+    
+    // Convert to a plain object to manipulate before sending response
+    const hospitalData = hospital.toObject();
+    
+    // Convert medical_imaging_costs Map to Object for easier client-side handling
+    if (hospitalData.resources && hospitalData.resources.medical_imaging_costs instanceof Map) {
+      console.log('Converting medical_imaging_costs Map to Object for response');
+      const costsObject = {};
+      hospitalData.resources.medical_imaging_costs.forEach((value, key) => {
+        costsObject[key] = value;
+      });
+      hospitalData.resources.medical_imaging_costs = costsObject;
+    }
+    
+    res.status(200).json(hospitalData);
   } catch (error) {
     res.status(400).json({ error: error.message });
   }

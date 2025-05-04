@@ -373,19 +373,19 @@ const BloodRequestsPage = () => {
       {/* Header */}
 
       <div className="max-w-screen-xl mx-auto">
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 p-4 sm:p-6">
           <div>
-            <h1 className="text-3xl md:text-4xl font-bold text-center sm:text-left text-teal-600 sm:ml-4">
+            <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold text-center sm:text-left text-teal-600">
               Blood Donation Requests
             </h1>
-            <p className="mt-2 text-teal-600 text-center sm:text-left sm:ml-2">
+            <p className="mt-2 text-sm md:text-base text-teal-600 text-center sm:text-left">
               Find and respond to blood donation needs
             </p>
           </div>
           {user && user.role === "hospital-admin" && (
             <Link
               to="/hospital-admin/blood-requests/create"
-              className="px-4 py-2 bg-white text-teal-700 rounded-md hover:bg-teal-50 transition-colors font-medium shadow-sm whitespace-nowrap"
+              className="px-3 py-1.5 md:px-4 md:py-2 bg-white text-teal-700 rounded-md hover:bg-teal-50 transition-colors font-medium shadow-sm whitespace-nowrap text-sm"
             >
               Create New Request
             </Link>
@@ -394,16 +394,16 @@ const BloodRequestsPage = () => {
       </div>
 
 
-      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+      <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-3 md:py-6">
         {/* Filter Card */}
-        <div className="bg-white rounded-lg shadow-md mb-6 overflow-hidden">
-          <div className="p-4 bg-gray-50 border-b border-gray-200">
-            <h2 className="text-lg font-semibold text-gray-800">
+        <div className="bg-white rounded-lg shadow-md mb-4 md:mb-6 overflow-hidden">
+          <div className="p-3 md:p-4 bg-gray-50 border-b border-gray-200">
+            <h2 className="text-base md:text-lg font-semibold text-gray-800">
               Filter Blood Requests
             </h2>
           </div>
-          <div className="p-6">
-            <div className="grid grid-cols-1 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 gap-6">
+          <div className="p-3 md:p-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 md:gap-6">
               {/* Search Filter */}
               <div>
                 <label
@@ -589,7 +589,7 @@ const BloodRequestsPage = () => {
         </div>
 
         {/* Main Content Area */}
-        <div className="bg-white rounded-lg shadow-md overflow-hidden">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden mb-6">
           {loading ? (
             <div className="flex flex-col items-center justify-center py-16">
               <div className="w-16 h-16 border-4 border-gray-200 border-t-4 border-t-teal-500 rounded-full animate-spin mb-4"></div>
@@ -666,7 +666,7 @@ const BloodRequestsPage = () => {
         </div>
 
         {/* Info Card */}
-        <div className="mt-8 bg-gradient-to-r from-blue-50 to-teal-50 p-6 rounded-lg border border-blue-100 shadow-sm">
+        <div className="mt-6 md:mt-8 bg-gradient-to-r from-blue-50 to-teal-50 p-4 md:p-6 rounded-lg border border-blue-100 shadow-sm">
           <div className="flex items-start">
             <div className="flex-shrink-0 bg-blue-100 rounded-full p-2 mr-4">
               <svg

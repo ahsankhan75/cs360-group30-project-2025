@@ -19,7 +19,11 @@ const hospitalSchema = new Schema({
         ventilators: { type: Number, default: 0 },
         blood_bank: { type: Boolean, default: false },
         emergency_capacity: { type: Number, default: 0 },
-        medical_imaging: { type: [String], default: [] }  // Example: ["MRI", "CT", "X-Ray", "Ultrasound"]
+        medical_imaging: { type: [String], default: [] },  // Example: ["MRI", "CT", "X-Ray", "Ultrasound"]
+        medical_imaging_costs: { 
+            type: Schema.Types.Mixed,  // Changed from Map to Mixed for easier handling
+            default: {}
+        }  // Example: { "MRI": 5000, "CT": 3000, "X-Ray": 1000, "Ultrasound": 2000 }
     },
 
     contact: {

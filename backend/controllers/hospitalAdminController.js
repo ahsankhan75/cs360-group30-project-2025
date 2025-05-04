@@ -298,66 +298,143 @@ const updateHospitalProfile = async (req, res) => {
     // Destructure expected updatable fields from request body
     const { resources, contact, services, insurance_accepted, location, cityu } = req.body;
 
+    console.log('Received update request from hospital admin:', { hospitalId });
+    console.log('Resources data:', JSON.stringify(resources));
+    
+    if (resources?.medical_imaging_costs) {
+      console.log('Medical imaging costs to update (raw):', JSON.stringify(resources.medical_imaging_costs));
+      console.log('Medical imaging costs type:', typeof resources.medical_imaging_costs);
+      console.log('Medical imaging costs keys:', Object.keys(resources.medical_imaging_costs));
+      Object.entries(resources.medical_imaging_costs).forEach(([key, value]) => {
+        console.log(`Cost entry: ${key} = ${value} (type: ${typeof value})`);
+      });
+    }
+
+    // Find the hospital document first
     const hospital = await Hospital.findById(hospitalId);
     if (!hospital) return res.status(404).json({ error: 'Hospital not found' });
 
-    const updateData = { $set: {} }; // Use $set to update specific fields
-
-    // Carefully merge nested objects if they exist, using dot notation with $set
+    // Log existing costs for comparison
+    console.log('Existing medical imaging costs in DB:', hospital.resources?.medical_imaging_costs);
+    
+    // --- Update hospital fields directly on the document ---
+    
+    // Update resources
     if (resources && typeof resources === 'object') {
-        for (const key in resources) {
-            // Only update fields explicitly provided in the request
-            if (resources.hasOwnProperty(key)) {
-                updateData.$set[`resources.${key}`] = resources[key];
-            }
+        // Update medical_imaging array
+        if (resources.medical_imaging && Array.isArray(resources.medical_imaging)) {
+            hospital.resources.medical_imaging = resources.medical_imaging;
+            console.log('Setting medical_imaging to:', resources.medical_imaging);
         }
+        
+        // Update medical_imaging_costs as a regular object
+        if (resources.medical_imaging_costs && typeof resources.medical_imaging_costs === 'object') {
+            // Create a clean costs object with numeric values
+            const costsObject = {};
+            
+            // Process each imaging type from the selected imaging types
+            if (resources.medical_imaging && Array.isArray(resources.medical_imaging)) {
+                resources.medical_imaging.forEach(type => {
+                    // Get cost value from request or default to 0
+                    let costValue = 0;
+                    if (resources.medical_imaging_costs[type] !== undefined) {
+                        costValue = Number(resources.medical_imaging_costs[type]);
+                        // Check for NaN and replace with 0
+                        if (isNaN(costValue)) costValue = 0;
+                    }
+                    
+                    // Set the cost in the object
+                    costsObject[type] = costValue;
+                    console.log(`Setting cost for ${type} to ${costValue}`);
+                });
+            }
+            
+            console.log('Final costs object:', costsObject);
+            // Set the costs object directly
+            hospital.resources.medical_imaging_costs = costsObject;
+        }
+        
+        // Update other resource fields
+        if (resources.icu_beds !== undefined) hospital.resources.icu_beds = resources.icu_beds;
+        if (resources.ventilators !== undefined) hospital.resources.ventilators = resources.ventilators;
+        if (resources.blood_bank !== undefined) hospital.resources.blood_bank = resources.blood_bank;
+        if (resources.emergency_capacity !== undefined) hospital.resources.emergency_capacity = resources.emergency_capacity;
     }
+    
+    // Update contact information
     if (contact && typeof contact === 'object') {
-        for (const key in contact) {
-            if (contact.hasOwnProperty(key)) {
-                 updateData.$set[`contact.${key}`] = contact[key];
-            }
-        }
+        if (contact.phone !== undefined) hospital.contact.phone = contact.phone;
+        if (contact.email !== undefined) hospital.contact.email = contact.email;
+        if (contact.website !== undefined) hospital.contact.website = contact.website;
+        if (contact.emergency_contact !== undefined) hospital.contact.emergency_contact = contact.emergency_contact;
     }
 
     // Update location address if provided
     if (location && location.address !== undefined) {
-        updateData.$set['location.address'] = location.address;
-        // Note: Updating coordinates would require separate handling if needed
+        hospital.location.address = location.address;
     }
 
-     // Update cityu field if provided (allows setting to empty string or null)
-     if (cityu !== undefined) {
-        updateData.$set['cityu'] = cityu;
-     }
+    // Update cityu field if provided
+    if (cityu !== undefined) {
+        hospital.cityu = cityu;
+    }
 
-    // Update array fields directly if provided and are arrays
+    // Update array fields
     if (services && Array.isArray(services)) {
-        updateData.$set['services'] = services;
+        hospital.services = services;
     }
+    
     if (insurance_accepted && Array.isArray(insurance_accepted)) {
-        updateData.$set['insurance_accepted'] = insurance_accepted;
+        hospital.insurance_accepted = insurance_accepted;
     }
 
-    // Always update the last_updated timestamp
-    updateData.$set['last_updated'] = new Date();
+    // Update the last_updated timestamp
+    hospital.last_updated = new Date();
 
-    // Prevent updating if only last_updated is present (no actual data changes sent)
-     if (Object.keys(updateData.$set).length <= 1) {
-         return res.status(400).json({ error: 'No valid fields provided for update.' });
-     }
+    // Save the hospital document
+    console.log('Saving hospital document with updated fields...');
+    await hospital.save();
+    console.log('Hospital profile saved successfully');
+    
+    // Log the updated document after save
+    console.log('RAW UPDATED HOSPITAL DOCUMENT:');
+    console.log('Type:', typeof hospital);
+    console.log('Has resources?', !!hospital.resources);
+    console.log('Has medical_imaging_costs?', !!hospital.resources?.medical_imaging_costs);
+    
+    if (hospital.resources?.medical_imaging_costs) {
+      console.log('Updated medical imaging costs after save:', hospital.resources.medical_imaging_costs);
+      console.log('Type of medical_imaging_costs:', typeof hospital.resources.medical_imaging_costs);
+    } else {
+      console.log('WARNING: medical_imaging_costs NOT FOUND in updated hospital document!');
+    }
+    
+    // Convert the mongoose document to a plain JavaScript object
+    const responseData = hospital.toObject();
+    console.log('CONVERTED TO OBJECT:');
+    console.log('Has resources?', !!responseData.resources);
+    console.log('Has medical_imaging_costs?', !!responseData.resources?.medical_imaging_costs);
+    console.log('Type of medical_imaging_costs:', typeof responseData.resources?.medical_imaging_costs);
+    
+    // Ensure medical_imaging_costs is present
+    if (!responseData.resources.medical_imaging_costs) {
+      console.log('Creating missing medical_imaging_costs field in response');
+      responseData.resources.medical_imaging_costs = {};
+    }
 
-    // Perform the update using findByIdAndUpdate
-    const updatedHospital = await Hospital.findByIdAndUpdate(
-        hospitalId,
-        updateData,
-        // Options: return the updated document, run schema validators for paths being set
-        { new: true, runValidators: true, context: 'query' }
-    );
-
-    if (!updatedHospital) throw new Error('Failed to update hospital profile');
-
-    res.status(200).json(updatedHospital); // Respond with the updated hospital document
+    // Log full response data 
+    console.log('FINAL RESPONSE DATA:');
+    console.log('Keys in resources:', responseData.resources ? Object.keys(responseData.resources) : 'No resources');
+    console.log('medical_imaging_costs included:', responseData.resources?.medical_imaging_costs ? 'YES' : 'NO');
+    console.log('Final costs object in response:', JSON.stringify(responseData.resources.medical_imaging_costs));
+    
+    // Log the final JSON that will be sent to client
+    const jsonResponse = JSON.stringify(responseData);
+    console.log('JSON response length:', jsonResponse.length);
+    console.log('JSON response sample (first 200 chars):', jsonResponse.substring(0, 200) + '...');
+    console.log('Does JSON contain "medical_imaging_costs"?', jsonResponse.includes('medical_imaging_costs'));
+    
+    res.status(200).json(responseData); // Respond with the updated hospital document
   } catch (error) {
     console.error('Error updating hospital profile:', error);
     // Check for Mongoose validation errors specifically
