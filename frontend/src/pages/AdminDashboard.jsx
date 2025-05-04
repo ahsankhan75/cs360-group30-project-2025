@@ -4,6 +4,7 @@ import { useAdminAuthContext } from '../hooks/useAdminAuthContext';
 import { toast } from 'react-toastify';
 import AdminSidebar from '../components/Admin/AdminSidebar';
 import AdminHeader from '../components/Admin/AdminHeader';
+import LoadingSpinner from '../components/LoadingSpinner';
 
 const AdminDashboard = () => {
   const [loading, setLoading] = useState(true);
@@ -58,11 +59,7 @@ const AdminDashboard = () => {
   }, [admin]);
 
   if (loading) {
-    return (
-      <div className="flex justify-center items-center h-64">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-teal-500"></div>
-      </div>
-    );
+    return <LoadingSpinner fullScreen message="Loading dashboard data..." />;
   }
 
   if (error) {

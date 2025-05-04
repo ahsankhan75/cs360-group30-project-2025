@@ -357,8 +357,8 @@ const HospitalAdminBloodRequests = () => {
       // Update the request in the list
       setBloodRequests(bloodRequests.map(req =>
         req.requestId === selectedRequestId ?
-        { ...req, hospitalApproved: 'rejected', hospitalRejectionReason: rejectionReason, hospitalApprovedAt: new Date() } :
-        req
+          { ...req, hospitalApproved: 'rejected', hospitalRejectionReason: rejectionReason, hospitalApprovedAt: new Date() } :
+          req
       ));
 
       toast.success('Blood donation acceptance rejected');
@@ -610,34 +610,32 @@ const HospitalAdminBloodRequests = () => {
                                 Blood Type: {request.bloodType}
                               </span>
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
-                                  request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-green-100 text-green-800'
-                                }`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                                    request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-green-100 text-green-800'
+                                  }`}
                               >
                                 {request.urgencyLevel}
                               </span>
 
                               <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                  request.userAccepted && request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' :
-                                  request.userAccepted && request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' :
-                                  request.userAccepted ? 'bg-yellow-100 text-yellow-800' :
-                                  isExpired ? 'bg-red-100 text-red-800' :
-                                  'bg-blue-100 text-blue-800'
-                                }`}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${request.userAccepted && request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' :
+                                    request.userAccepted && request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' :
+                                      request.userAccepted ? 'bg-yellow-100 text-yellow-800' :
+                                        isExpired ? 'bg-red-100 text-red-800' :
+                                          'bg-blue-100 text-blue-800'
+                                  }`}
                               >
                                 {request.userAccepted && request.hospitalApproved === 'approved' ? 'Accepted' :
-                                 request.userAccepted && request.hospitalApproved === 'rejected' ? 'Rejected' :
-                                 request.userAccepted ? 'Pending Approval' :
-                                 isExpired ? 'Expired' : 'Available'}
+                                  request.userAccepted && request.hospitalApproved === 'rejected' ? 'Rejected' :
+                                    request.userAccepted ? 'Pending Approval' :
+                                      isExpired ? 'Expired' : 'Available'}
                               </span>
                             </div>
 
                             <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-1">
                               <p className="text-sm text-gray-500">
-                                <span className="font-medium">Posted:</span> {postedDate.toLocaleDateString()} {postedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                <span className="font-medium">Posted:</span> {postedDate.toLocaleDateString()} {postedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </p>
                               {expiryDate && (
                                 <p className="text-sm text-gray-500">
@@ -658,8 +656,8 @@ const HospitalAdminBloodRequests = () => {
                                   <div className="flex items-center mb-1">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' : request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                       {request.hospitalApproved === 'approved' ? 'Accepted' :
-                                       request.hospitalApproved === 'rejected' ? 'Rejected' :
-                                       'Pending approval'}
+                                        request.hospitalApproved === 'rejected' ? 'Rejected' :
+                                          'Pending approval'}
                                     </span>
                                   </div>
                                   <p className="text-sm">

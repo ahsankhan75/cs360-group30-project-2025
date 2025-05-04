@@ -23,11 +23,10 @@ const BloodRequestItem = ({ request }) => {
         <button
           onClick={handleAccept}
           disabled={accepted}
-          className={`px-4 py-2 rounded ${
-            accepted
+          className={`px-4 py-2 rounded ${accepted
               ? 'bg-green-300 text-white'
               : 'bg-green-500 text-white hover:bg-green-600'
-          }`}
+            }`}
         >
           {accepted ? 'Accepted' : 'Accept'}
         </button>

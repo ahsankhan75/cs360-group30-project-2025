@@ -23,9 +23,11 @@ nav {
   display: flex;
   align-items: center;
 }
+
 nav a {
   margin-left: 10px;
 }
+
 nav button {
   background: #fff;
   color: var(--primary);
@@ -38,7 +40,8 @@ nav button {
 }
 
 /* auth forms */
-form.signup, form.login {
+form.signup,
+form.login {
   max-width: 400px;
   margin: 40px auto;
   padding: 20px;
@@ -48,7 +51,8 @@ form.signup, form.login {
 
 /* adding extra code */
 /* Auth Forms - Updated */
-form.signup, form.login {
+form.signup,
+form.login {
   max-width: 400px;
   margin: 40px auto;
   padding: 30px;
@@ -57,14 +61,16 @@ form.signup, form.login {
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
 }
 
-form.signup h2, form.login h2 {
+form.signup h2,
+form.login h2 {
   text-align: center;
   margin-bottom: 20px;
   color: #333;
   font-family: 'Poppins', sans-serif;
 }
 
-form.signup label, form.login label {
+form.signup label,
+form.login label {
   display: block;
   margin: 20px 0 8px;
   color: #555;
@@ -72,7 +78,8 @@ form.signup label, form.login label {
   font-weight: 500;
 }
 
-form.signup input, form.login input {
+form.signup input,
+form.login input {
   width: 100%;
   padding: 12px;
   border: 1px solid #ddd;
@@ -82,7 +89,8 @@ form.signup input, form.login input {
   font-family: 'Poppins', sans-serif;
 }
 
-form.signup button, form.login button {
+form.signup button,
+form.login button {
   width: 100%;
   padding: 12px;
   margin-top: 20px;
@@ -97,7 +105,8 @@ form.signup button, form.login button {
   transition: background 0.3s;
 }
 
-form.signup button:hover, form.login button:hover {
+form.signup button:hover,
+form.login button:hover {
   background: #3a5bef;
 }
 
@@ -121,7 +130,8 @@ form.signup button:hover, form.login button:hover {
 
 /* Fix for fixed navbar */
 html {
-  scroll-padding-top: 80px; /* Ensures anchors aren't hidden behind navbar */
+  scroll-padding-top: 80px;
+  /* Ensures anchors aren't hidden behind navbar */
 }
 
 /* Improve scrolling experience */
@@ -141,22 +151,22 @@ body {
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
   }
-  
+
   /* Custom scrollbar for table containers */
   .responsive-table-container::-webkit-scrollbar {
     height: 6px;
   }
-  
+
   .responsive-table-container::-webkit-scrollbar-track {
     background: #f1f1f1;
     border-radius: 10px;
   }
-  
+
   .responsive-table-container::-webkit-scrollbar-thumb {
     background: #d1d1d1;
     border-radius: 10px;
   }
-  
+
   .responsive-table-container::-webkit-scrollbar-thumb:hover {
     background: #c1c1c1;
   }
@@ -217,7 +227,7 @@ input[type="range"]::-webkit-slider-thumb {
   border-radius: 50%;
   background: #0d9488;
   cursor: pointer;
-  box-shadow: 0 0 2px 0 rgba(0,0,0,0.25);
+  box-shadow: 0 0 2px 0 rgba(0, 0, 0, 0.25);
   transition: background .3s ease-in-out;
 }
 
@@ -226,4 +236,21 @@ input[type="range"]::-webkit-slider-runnable-track {
   box-shadow: none;
   border: none;
   background: transparent;
+}
+
+@keyframes gradient-move-fast {
+
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.animate-gradient {
+  background-size: 200% 200%;
+  animation: gradient-move-fast 3s ease-in-out infinite;
 }

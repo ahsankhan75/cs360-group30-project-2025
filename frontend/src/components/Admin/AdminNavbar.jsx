@@ -45,7 +45,7 @@ const AdminNavbar = () => {
       className={`bg-white p-4 md:p-6 fixed top-0 left-0 right-0 w-full z-50 transition-all duration-200 ease-in-out
                  ${scrolled ? 'shadow-md' : 'shadow-sm'}`}
     >
-      <div className="max-w-screen-xl mx-auto flex justify-between items-center">
+      <div className="w-full flex justify-between items-center">
         <div className="flex items-center">
           <Link to="/admin/dashboard" className="flex items-center mr-6">
             <img src="/kk.png" alt="EMCON Admin" className="w-16 md:w-24 h-auto" />

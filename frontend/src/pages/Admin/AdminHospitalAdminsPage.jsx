@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminAuthContext } from '../../hooks/useAdminAuthContext';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import { toast } from 'react-toastify';
+import AdminHeader from '../../components/Admin/AdminHeader';
 
 const AdminHospitalAdminsPage = () => {
   const [pendingAdmins, setPendingAdmins] = useState([]);
@@ -84,14 +85,10 @@ const AdminHospitalAdminsPage = () => {
       <AdminSidebar />
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-white shadow-sm z-10">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-semibold text-gray-800">Hospital Admin Requests</h1>
-          </div>
-        </header>
+        <AdminHeader title="Hospital Admins Management" />
 
-        <main className="flex-1 bg-gray-100 p-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-auto p-6">
+          <div className="w-full">
             <div className="bg-white shadow sm:rounded-lg">
               <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                 <div>
