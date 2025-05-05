@@ -253,13 +253,23 @@ const HeroSectionDesktop = () => (
     </div>
 
     {/* Hero Content Container - Using Tailwind Flex */}
-    <div className="flex items-center justify-between px-16 mt-16 h-[70vh]">
-      {/* Hero Text */}
+    <div className="flex items-center px-16 mt-16 h-[70vh] justify-center">
+      {/* Hero Image - On the left */}
+      <motion.div
+        initial={{ opacity: 0, y: 30 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 1.2 }}
+        className="flex justify-start items-center"
+      >
+        <img src="/doctors.png" alt="Doctors" className="w-auto h-auto max-w-[500px]" />
+      </motion.div>
+
+      {/* Hero Text - Right next to the logo */}
       <motion.div
         initial={{ opacity: 0, y: 60 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 1 }}
-        className="w-[400px] text-left z-10"
+        className="w-[400px] text-left z-10 flex flex-col justify-center ml-4"
       >
         <h1 className="font-bold text-5xl text-[#0694A2] mb-3 tracking-wider">
           EMCON
@@ -282,16 +292,6 @@ const HeroSectionDesktop = () => (
             ]}
           />
         </div>
-      </motion.div>
-
-      {/* Hero Image */}
-      <motion.div
-        initial={{ opacity: 0, y: 30 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 1.2 }}
-        className="flex-1 flex justify-center items-center"
-      >
-        <img src="/doctors.png" alt="Doctors" className="w-auto h-auto max-w-[650px]" />
       </motion.div>
     </div>
   </motion.div>
