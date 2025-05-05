@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useSignup } from "../hooks/useSignup";
 import { useNavigate } from "react-router-dom";
-import { toast }          from "react-toastify"
+import { toast } from "react-toastify"
 
 function Signup() {
   const [fullName, setFullName] = useState("");
@@ -37,9 +37,12 @@ function Signup() {
   }
 
   return (
-    <div className="relative flex flex-col min-h-screen bg-gray-100">
-      <main className="flex-1 flex justify-center items-center p-6 relative">
-        <div className="absolute left-0 top-0 h-full w-auto z-[1]">
+    <div className="relative flex flex-col min-h-screen bg-white">
+      {/* Mobile: Animated background, no SVGs, covers entire page including footer */}
+      <div className="absolute inset-0 z-0 md:hidden animate-gradient bg-gradient-to-br from-[#2a9fa7] via-[#f76700] to-[#0694a2] opacity-60" />
+      <main className="flex-1 flex justify-center items-center p-6 relative z-10">
+        {/* Desktop: SVG background shapes */}
+        <div className="absolute left-0 top-0 h-full w-auto z-[1] hidden md:block">
           <svg
             viewBox="0 0 275 667"
             fill="none"
@@ -119,7 +122,7 @@ function Signup() {
           NOTE: Changed max-w from `max-w-md` to `max-w-lg`
           and increased padding to p-8 md:p-10 for a bigger form. 
         */}
-        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full text-left">
+        <div className="bg-white p-8 md:p-10 rounded-xl shadow-lg max-w-lg w-full text-left z-10">
           <img src="/kk.png" alt="EMCON Logo" className="w-32 mx-auto mb-4" />
           <h2 className="text-xl font-bold text-[#2a9fa7] mb-4 text-center">Sign Up</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
@@ -184,13 +187,13 @@ function Signup() {
       </main>
 
       {/* FOOTER */}
-      <footer className="bg-[#2a9fa7] text-white h-64 md:h-80 lg:h-96 py-8 md:py-12 px-8 md:px-12 lg:px-16 mt-40 relative z-[10]">
+      {/* Desktop Footer */}
+      <footer className="bg-[#2a9fa7] text-white h-64 md:h-80 lg:h-96 py-8 md:py-12 px-8 md:px-12 lg:px-16 mt-40 relative z-10 hidden md:block">
         <div className="flex justify-between items-start">
           <div>
             <h1 className="text-2xl font-bold">EMCON</h1>
             <p className="mt-2">Smart healthcare navigation for everyone!</p>
           </div>
-
           <div className="flex space-x-6">
             <a href="#home" className="hover:underline">Find Hospitals</a>
             <a href="#insurance" className="hover:underline">Insurance</a>
@@ -198,6 +201,18 @@ function Signup() {
             <a href="#medical-card" className="hover:underline">Medical Card</a>
           </div>
         </div>
+      </footer>
+      {/* Mobile Footer */}
+      <footer className="bg-[#2a9fa7] text-white py-8 px-6 mt-20 flex flex-col items-center space-y-4 md:hidden z-10">
+        {/* <img src="/kk.png" alt="EMCON Logo" className="w-16 mb-2" /> */}
+        <h1 className="text-xl font-bold">EMCON</h1>
+        <nav className="flex flex-col items-center space-y-2 mt-2">
+          <a href="#home" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Find Hospitals</a>
+          <a href="#insurance" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Insurance</a>
+          <a href="#donations" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Donations</a>
+          <a href="#medical-card" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Medical Card</a>
+        </nav>
+        <p className="text-sm text-center mt-4 opacity-80">Smart healthcare navigation for everyone!</p>
       </footer>
     </div>
   );

@@ -8,7 +8,7 @@ import AdminHeader from '../../components/Admin/AdminHeader';
 const AdminAddBloodRequestPage = () => {
   const navigate = useNavigate();
   const { admin } = useAdminAuthContext();
-  
+
   // Form state
   const [hospitals, setHospitals] = useState([]);
   const [selectedHospital, setSelectedHospital] = useState('');
@@ -19,7 +19,7 @@ const AdminAddBloodRequestPage = () => {
   const [contactEmail, setContactEmail] = useState('');
   const [expiryDays, setExpiryDays] = useState(7);
   const [notes, setNotes] = useState('');
-  
+
   // UI state
   const [loading, setLoading] = useState(false);
   const [hospitalLoading, setHospitalLoading] = useState(true);
@@ -35,16 +35,16 @@ const AdminAddBloodRequestPage = () => {
     const fetchHospitals = async () => {
       try {
         setHospitalLoading(true);
-        const response = await fetch('/api/hospitals', {
+        const response = await fetch('/api/admin/hospitals', {
           headers: {
             'Authorization': `Bearer ${admin.token}`
           }
         });
-        
+
         if (!response.ok) {
           throw new Error('Failed to fetch hospitals');
         }
-        
+
         const data = await response.json();
         setHospitals(data);
       } catch (err) {
@@ -61,12 +61,12 @@ const AdminAddBloodRequestPage = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    
+
     if (!admin) {
       setError('You must be logged in as an admin to create a blood request');
       return;
     }
-    
+
     if (!selectedHospital) {
       setError('Please select a hospital');
       return;
@@ -78,11 +78,11 @@ const AdminAddBloodRequestPage = () => {
 
     try {
       const hospital = hospitals.find(h => h._id === selectedHospital);
-      
+
       if (!hospital) {
         throw new Error('Selected hospital not found');
       }
-      
+
       const newRequest = {
         hospitalId: selectedHospital,
         hospitalName: hospital.name,
@@ -96,7 +96,7 @@ const AdminAddBloodRequestPage = () => {
         notes
       };
 
-      const response = await fetch('/api/admin/blood-requests', {
+      const response = await fetch('/api/blood-requests', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -113,7 +113,7 @@ const AdminAddBloodRequestPage = () => {
 
       setSuccess(true);
       toast.success('Blood request created successfully!');
-      
+
       // Reset form
       setSelectedHospital('');
       setBloodType('A+');
@@ -123,12 +123,12 @@ const AdminAddBloodRequestPage = () => {
       setContactEmail('');
       setExpiryDays(7);
       setNotes('');
-      
+
       // Navigate back to the blood requests list after a short delay
       setTimeout(() => {
         navigate('/admin/blood-requests');
       }, 2000);
-      
+
     } catch (err) {
       setError(err.message);
       toast.error('Error creating blood request');
@@ -145,11 +145,11 @@ const AdminAddBloodRequestPage = () => {
         <AdminHeader title="Create Blood Request" />
 
         <main className="flex-1 overflow-auto p-6">
-          <div className="max-w-4xl mx-auto">
+          <div className="w-full">
             <div className="flex items-center justify-between mb-6">
               <h1 className="text-2xl font-bold text-gray-800">Create New Blood Request</h1>
-              <Link 
-                to="/admin/blood-requests" 
+              <Link
+                to="/admin/blood-requests"
                 className="text-teal-600 hover:text-teal-800 flex items-center text-sm"
               >
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
@@ -158,7 +158,7 @@ const AdminAddBloodRequestPage = () => {
                 Back to Blood Requests
               </Link>
             </div>
-            
+
             <div className="bg-white rounded-lg shadow-md p-6">
               {success ? (
                 <div className="bg-green-50 p-6 text-center rounded-lg">
@@ -167,8 +167,8 @@ const AdminAddBloodRequestPage = () => {
                   </svg>
                   <h2 className="text-xl font-semibold text-green-800 mb-2">Blood Request Created Successfully</h2>
                   <p className="text-green-700 mb-4">You're being redirected to the blood requests list.</p>
-                  <Link 
-                    to="/admin/blood-requests" 
+                  <Link
+                    to="/admin/blood-requests"
                     className="inline-block px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700"
                   >
                     Go to Blood Requests
@@ -202,7 +202,7 @@ const AdminAddBloodRequestPage = () => {
                         </select>
                       )}
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Blood Type
@@ -223,7 +223,7 @@ const AdminAddBloodRequestPage = () => {
                         <option value="O-">O-</option>
                       </select>
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Urgency Level
@@ -239,7 +239,7 @@ const AdminAddBloodRequestPage = () => {
                         <option value="Critical">Critical</option>
                       </select>
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Units Needed
@@ -253,7 +253,7 @@ const AdminAddBloodRequestPage = () => {
                         required
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Request Expiry (Days)
@@ -271,7 +271,7 @@ const AdminAddBloodRequestPage = () => {
                         Number of days this request should remain active
                       </p>
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Contact Number
@@ -284,7 +284,7 @@ const AdminAddBloodRequestPage = () => {
                         placeholder="Hospital contact number (optional)"
                       />
                     </div>
-                    
+
                     <div>
                       <label className="block text-gray-700 font-medium mb-2">
                         Contact Email
@@ -297,7 +297,7 @@ const AdminAddBloodRequestPage = () => {
                         placeholder="Contact email (optional)"
                       />
                     </div>
-                    
+
                     <div className="md:col-span-2">
                       <label className="block text-gray-700 font-medium mb-2">
                         Additional Notes
@@ -311,7 +311,7 @@ const AdminAddBloodRequestPage = () => {
                       ></textarea>
                     </div>
                   </div>
-                  
+
                   {error && (
                     <div className="bg-red-50 border-l-4 border-red-500 p-4 rounded-md">
                       <div className="flex">
@@ -326,7 +326,7 @@ const AdminAddBloodRequestPage = () => {
                       </div>
                     </div>
                   )}
-                  
+
                   <div className="flex items-center justify-end space-x-4">
                     <Link
                       to="/admin/blood-requests"

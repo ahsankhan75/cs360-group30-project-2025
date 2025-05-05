@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAdminAuthContext } from '../../hooks/useAdminAuthContext';
 import AdminSidebar from '../../components/Admin/AdminSidebar';
 import { toast } from 'react-toastify';
+import AdminHeader from '../../components/Admin/AdminHeader';
 
 const AdminHospitalAdminsPage = () => {
   const [pendingAdmins, setPendingAdmins] = useState([]);
@@ -84,14 +85,10 @@ const AdminHospitalAdminsPage = () => {
       <AdminSidebar />
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-white shadow-sm z-10">
-          <div className="max-w-7xl mx-auto py-4 px-4 sm:px-6 lg:px-8">
-            <h1 className="text-2xl font-semibold text-gray-800">Hospital Admin Requests</h1>
-          </div>
-        </header>
+        <AdminHeader title="Hospital Admins Management" />
 
-        <main className="flex-1 bg-gray-100 p-6">
-          <div className="max-w-7xl mx-auto">
+        <main className="flex-1 overflow-auto p-6">
+          <div className="w-full">
             <div className="bg-white shadow sm:rounded-lg">
               <div className="px-4 py-5 sm:px-6 flex justify-between items-center">
                 <div>
@@ -126,57 +123,59 @@ const AdminHospitalAdminsPage = () => {
                 </div>
               ) : (
                 <div>
-                  <table className="w-full table-fixed divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                          Name / Email
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                          Hospital
-                        </th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                          Request Date
-                        </th>
-                        <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider w-1/4">
-                          Actions
-                        </th>
-                      </tr>
-                    </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
-                      {pendingAdmins.map((admin) => (
-                        <tr key={admin._id}>
-                          <td className="px-6 py-4">
-                            <div className="text-sm font-medium text-gray-900">{admin.fullName}</div>
-                            <div className="text-sm text-gray-500">{admin.email}</div>
-                          </td>
-                          <td className="px-6 py-4">
-                            <div className="text-sm text-gray-900">{admin.hospitalName || "Not specified"}</div>
-                            <div className="text-sm text-gray-500">{admin.hospitalId?._id || "ID not provided"}</div>
-                          </td>
-                          <td className="px-6 py-4 text-sm text-gray-500">
-                            {new Date(admin.createdAt).toLocaleDateString()}
-                          </td>
-                          <td className="px-6 py-4 text-center text-sm font-medium">
-                            <div className="flex space-x-2 justify-center">
-                              <button
-                                onClick={() => handleStatusUpdate(admin._id, 'approved')}
-                                className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
-                              >
-                                Approve
-                              </button>
-                              <button
-                                onClick={() => handleStatusUpdate(admin._id, 'rejected')}
-                                className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm"
-                              >
-                                Reject
-                              </button>
-                            </div>
-                          </td>
+                  <div className="overflow-x-auto responsive-table-container">
+                    <table className="w-full divide-y divide-gray-200">
+                      <thead className="bg-gray-50">
+                        <tr>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Name / Email
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Hospital
+                          </th>
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Request Date
+                          </th>
+                          <th className="px-6 py-3 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Actions
+                          </th>
                         </tr>
-                      ))}
-                    </tbody>
-                  </table>
+                      </thead>
+                      <tbody className="bg-white divide-y divide-gray-200">
+                        {pendingAdmins.map((admin) => (
+                          <tr key={admin._id}>
+                            <td className="px-6 py-4 w-1/3">
+                              <div className="text-sm font-medium text-gray-900 truncate" title={admin.fullName}>{admin.fullName}</div>
+                              <div className="text-sm text-gray-500 truncate" title={admin.email}>{admin.email}</div>
+                            </td>
+                            <td className="px-6 py-4 w-1/3">
+                              <div className="text-sm text-gray-900 truncate" title={admin.hospitalName || "Not specified"}>{admin.hospitalName || "Not specified"}</div>
+                              <div className="text-sm text-gray-500 truncate" title={admin.hospitalId?._id || "ID not provided"}>{admin.hospitalId?._id || "ID not provided"}</div>
+                            </td>
+                            <td className="px-6 py-4 text-sm text-gray-500">
+                              {new Date(admin.createdAt).toLocaleDateString()}
+                            </td>
+                            <td className="px-6 py-4 text-center text-sm font-medium">
+                              <div className="flex space-x-2 justify-center">
+                                <button
+                                  onClick={() => handleStatusUpdate(admin._id, 'approved')}
+                                  className="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-md text-sm"
+                                >
+                                  Approve
+                                </button>
+                                <button
+                                  onClick={() => handleStatusUpdate(admin._id, 'rejected')}
+                                  className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-md text-sm"
+                                >
+                                  Reject
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               )}
             </div>

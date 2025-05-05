@@ -4,6 +4,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { filterRequests } from "../utils/bloodRequestFilters"; // Assuming this utility handles the 'cityu' filter key
 import { useAuthContext } from "../hooks/useAuthContext";
 import FallbackErrorComponent from "../components/FallbackErrorComponent";
+import Footer from "../components/Footer";
 
 const BloodRequestsPage = () => {
   // --- State Variables ---
@@ -64,8 +65,7 @@ const BloodRequestsPage = () => {
     // setLoading(true); // Removed from here
     setError(null); // Clear previous errors on new attempt
     console.log(
-      `Workspaceing data... Attempt ${
-        retryCount + 1
+      `Workspaceing data... Attempt ${retryCount + 1
       }, Current Loading State: ${loading}`
     ); // Log current loading state
 
@@ -195,8 +195,7 @@ const BloodRequestsPage = () => {
       console.error("Error during data fetching process:", err);
       if (retryCount < maxRetries) {
         console.log(
-          `Error encountered. Setting retry count (${
-            retryCount + 1
+          `Error encountered. Setting retry count (${retryCount + 1
           }/${maxRetries}).`
         );
         clearTimeout(mainTimeoutId); // Clear overall timeout before retry
@@ -351,32 +350,49 @@ const BloodRequestsPage = () => {
     setLoading(true);
   };
 
+  const handleAcceptRequest = (requestId, updates) => {
+    setRequests(prevRequests =>
+      prevRequests.map(req =>
+        req.requestId === requestId
+          ? { ...req, ...updates }
+          : req
+      )
+    );
+    setFilteredRequests(prevRequests =>
+      prevRequests.map(req =>
+        req.requestId === requestId
+          ? { ...req, ...updates }
+          : req
+      )
+    );
+  };
+
   // --- Rendering --- (JSX remains the same)
   return (
     <div className="min-h-screen bg-gray-50">
       {/* Header */}
-      
-        <div className="max-w-screen-xl mx-auto">
-          <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div>
+
+      <div className="max-w-screen-xl mx-auto">
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div>
             <h1 className="text-3xl md:text-4xl font-bold text-center sm:text-left text-teal-600 sm:ml-4">
               Blood Donation Requests
             </h1>
-              <p className="mt-2 text-teal-600 text-center sm:text-left sm:ml-2">
-                Find and respond to blood donation needs
-              </p>
-            </div>
-            {user && user.role === "hospital-admin" && (
-              <Link
-                to="/hospital-admin/blood-requests/create"
-                className="px-4 py-2 bg-white text-teal-700 rounded-md hover:bg-teal-50 transition-colors font-medium shadow-sm whitespace-nowrap"
-              >
-                Create New Request
-              </Link>
-            )}
+            <p className="mt-2 text-teal-600 text-center sm:text-left sm:ml-2">
+              Find and respond to blood donation needs
+            </p>
           </div>
+          {user && user.role === "hospital-admin" && (
+            <Link
+              to="/hospital-admin/blood-requests/create"
+              className="px-4 py-2 bg-white text-teal-700 rounded-md hover:bg-teal-50 transition-colors font-medium shadow-sm whitespace-nowrap"
+            >
+              Create New Request
+            </Link>
+          )}
         </div>
-      
+      </div>
+
 
       <div className="max-w-screen-xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
         {/* Filter Card */}
@@ -520,9 +536,8 @@ const BloodRequestsPage = () => {
                     />
                     <label
                       htmlFor="filterByUserBloodType"
-                      className={`ml-2 text-sm ${
-                        !userBloodType ? "text-gray-500" : "text-gray-700"
-                      }`}
+                      className={`ml-2 text-sm ${!userBloodType ? "text-gray-500" : "text-gray-700"
+                        }`}
                     >
                       {userBloodType
                         ? `My Type (${userBloodType})`
@@ -645,6 +660,7 @@ const BloodRequestsPage = () => {
             <BloodRequestTable
               data={filteredRequests}
               onRowClick={handleRowClick}
+              onAccept={handleAcceptRequest}
             />
           )}
         </div>
@@ -683,6 +699,19 @@ const BloodRequestsPage = () => {
           </div>
         </div>
       </div>
+      {/* Desktop Footer */}
+      <div className="hidden md:block"><Footer /></div>
+      {/* Mobile Footer */}
+      <footer className="bg-[#2a9fa7] text-white py-8 px-6 mt-20 flex flex-col items-center space-y-4 md:hidden z-10">
+        <h1 className="text-xl font-bold">EMCON</h1>
+        <nav className="flex flex-col items-center space-y-2 mt-2">
+          <a href="/hospitals" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Find Hospitals</a>
+          <a href="/blood-requests" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Blood Requests</a>
+          <a href="/medical-card" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Medical Card</a>
+          <a href="/reviews" className="text-base font-medium py-2 px-6 rounded-lg bg-white bg-opacity-10 hover:bg-opacity-20 transition">Reviews</a>
+        </nav>
+        <p className="text-sm text-center mt-4 opacity-80">Smart healthcare navigation for everyone!</p>
+      </footer>
     </div>
   );
 };

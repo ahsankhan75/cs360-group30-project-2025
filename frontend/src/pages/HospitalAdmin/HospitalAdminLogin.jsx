@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useHospitalAdminLogin } from '../../hooks/useHospitalAdminLogin'; // Assuming correct path
 import ErrorPage from '../../components/ErrorPage'; // Assuming correct path
+import { toast } from 'react-toastify';
 
 const HospitalAdminLogin = () => {
   const [email, setEmail] = useState('');
@@ -20,15 +21,19 @@ const HospitalAdminLogin = () => {
 
       // If login hook indicates success (user context updated)
       if (success) {
+        // No toast needed here - redirect is enough feedback
         navigate('/hospital-admin/dashboard'); // Redirect to dashboard
+      } else if (error) {
+        // Only show toast for authentication errors
+        toast.error(error);
       }
-      // If success is false, the 'error' state in the hook is likely set, which will be displayed below
     } catch (err) {
       // Catch errors not handled by the hook (e.g., network issues, server down)
       console.error('Connection or unexpected error during login:', err);
       // Distinguish between auth errors (handled by hook) and connection errors
       if (!error) { // Only set connection error if the hook didn't already report an auth error
           setConnectionError(true);
+          toast.error('Connection error. Please try again later.');
       }
     }
   };

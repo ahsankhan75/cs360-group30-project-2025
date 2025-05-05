@@ -400,7 +400,7 @@ const HospitalAdminDashboard = () => {
                     const updateData = {
                       contact: formData.contact,
                       resources: formData.resources,
-                      location: { address: formData.city }, // Send city as location.address
+                      location: { address: formData.cityu }, // Use cityu for location.address
                       cityu: formData.cityu // Send the new cityu field
                     };
 
@@ -683,11 +683,10 @@ const HospitalAdminDashboard = () => {
                           </p>
                         </div>
                         <span
-                          className={`px-2 py-1 text-xs rounded-full ${
-                            request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                          className={`px-2 py-1 text-xs rounded-full ${request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
                             request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
-                            'bg-green-100 text-green-800'
-                          }`}
+                              'bg-green-100 text-green-800'
+                            }`}
                         >
                           {request.urgencyLevel}
                         </span>

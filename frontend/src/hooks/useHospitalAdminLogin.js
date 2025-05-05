@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import { useHospitalAdminAuthContext } from './useHospitalAdminAuthContext';
-import { toast } from 'react-toastify';
 
 export const useHospitalAdminLogin = () => {
   const [error, setError] = useState(null);
@@ -38,8 +37,7 @@ export const useHospitalAdminLogin = () => {
       // Update the context
       dispatch({ type: 'LOGIN', payload: json });
 
-      // Success notification
-      toast.success('Logged in successfully');
+      // No success notification needed as the redirect is feedback enough
 
       setIsLoading(false);
       return true;
@@ -53,8 +51,7 @@ export const useHospitalAdminLogin = () => {
         setError('Network error. Please try again later.');
       }
 
-      // Rethrow the error so the component can show the error page
-      throw err;
+      return false;
     }
   };
 

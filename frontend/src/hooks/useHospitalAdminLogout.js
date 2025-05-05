@@ -1,5 +1,4 @@
 import { useHospitalAdminAuthContext } from './useHospitalAdminAuthContext';
-import { toast } from 'react-toastify';
 
 export const useHospitalAdminLogout = () => {
   const { dispatch } = useHospitalAdminAuthContext();
@@ -7,12 +6,11 @@ export const useHospitalAdminLogout = () => {
   const logout = () => {
     // Remove hospital admin from localStorage
     localStorage.removeItem('hospitalAdmin');
-    
+
     // Update the auth context
     dispatch({ type: 'LOGOUT' });
-    
-    // Notify user
-    toast.success('Logged out successfully');
+
+    // No toast notification needed
   };
 
   return { logout };

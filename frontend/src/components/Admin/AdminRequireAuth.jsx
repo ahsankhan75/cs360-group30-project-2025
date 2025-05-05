@@ -40,7 +40,7 @@ const AdminRequireAuth = ({ children }) => {
   }
 
   if (!admin) {
-    toast.error('You must be logged in as an admin to view this page');
+    // Don't show toast notification here - it's unnecessary and causes the issue
     return <Navigate to="/admin/login" />;
   }
 

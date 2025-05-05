@@ -1,7 +1,6 @@
 // File: hooks/useAdminLogin.js
 import { useState } from 'react';
 import { useAdminAuthContext } from './useAdminAuthContext';
-import { toast } from 'react-toastify';
 import { fetchWithErrorHandling } from '../utils/api';
 
 export const useAdminLogin = () => {
