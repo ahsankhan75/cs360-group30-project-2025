@@ -47,7 +47,7 @@ try:
             driver.execute_script("arguments[0].click();", accept_button)
             time.sleep(3)
 
-            status_buttons = driver.find_elements(By.XPATH, "//button[contains(text(), 'Pending') or contains(text(), 'Accepted')]")
+            status_buttons = driver.find_elements(By.XPATH, "//span[contains(normalize-space(), 'Pending') or contains(normalize-space(), 'Accepted')]")
             if any("Pending" in s.text for s in status_buttons):
                 print("✅ Request accepted successfully and marked as Pending Approval - Test Passed")
             else:
@@ -55,7 +55,7 @@ try:
             accepted = True
             break
 
-        next_btns = driver.find_elements(By.XPATH, "//button[contains(text(), 'Next')]")
+        next_btns = driver.find_elements(By.XPATH, "//button[.//span[text()='Next']]")
         if next_btns and next_btns[0].is_enabled():
             driver.execute_script("arguments[0].scrollIntoView(true);", next_btns[0])
             next_btns[0].click()
