@@ -12,11 +12,17 @@ export const useHospitalAdminLogin = () => {
     setError(null);
 
     try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
       const response = await fetch('/api/hospital-admin/login', {
         method: 'POST',
         headers: {'Content-Type': 'application/json'},
-        body: JSON.stringify({ email, password })
+        body: JSON.stringify({ email, password }),
+        signal: controller.signal
       });
+
+      clearTimeout(timeoutId);
 
       const json = await response.json();
 
@@ -40,8 +46,15 @@ export const useHospitalAdminLogin = () => {
     } catch (err) {
       console.error('Login error:', err);
       setIsLoading(false);
-      setError('Network error. Please try again later.');
-      return false;
+
+      if (err.name === 'AbortError') {
+        setError('Connection timed out. Please try again.');
+      } else {
+        setError('Network error. Please try again later.');
+      }
+
+      // Rethrow the error so the component can show the error page
+      throw err;
     }
   };
 

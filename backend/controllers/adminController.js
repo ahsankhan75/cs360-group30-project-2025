@@ -275,73 +275,63 @@ const updateBloodRequest = async (req, res) => {
 // Get hospital management data
 const getHospitals = async (req, res) => {
   try {
-    const hospitals = await Hospital.find().sort({ name: 1 })
-    res.status(200).json(hospitals)
+    const hospitals = await Hospital.find().sort({ name: 1 });
+    res.status(200).json(hospitals);
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(400).json({ error: error.message });
   }
-}
+};
 
-// Add a new hospital
+// Add new hospital
 const addHospital = async (req, res) => {
-  const { name, location, facilities } = req.body
-
   try {
-    const hospital = await Hospital.create({
+    const {
       name,
-      location,
-      facilities,
-      ratings: 0,
-      reviewCount: 0
-    })
+      city,
+      address,
+      contact,
+      resources
+    } = req.body;
 
-    res.status(201).json(hospital)
-  } catch (error) {
-    res.status(400).json({ error: error.message })
-  }
-}
-
-// Update hospital information
-const updateHospital = async (req, res) => {
-  const { hospitalId } = req.params
-  const { name, location, facilities } = req.body
-
-  try {
-    const hospital = await Hospital.findByIdAndUpdate(
-      hospitalId,
-      { name, location, facilities },
-      { new: true }
-    )
-
-    if (!hospital) {
-      return res.status(404).json({ error: 'Hospital not found' })
+    // Validate required fields
+    if (!name || !city || !address || !contact || !resources) {
+      return res.status(400).json({ error: 'Please fill in all required fields' });
     }
 
-    res.status(200).json(hospital)
+    // Create new hospital
+    const hospital = await Hospital.create({
+      name,
+      city,
+      address,
+      contact,
+      resources
+    });
+
+    res.status(201).json(hospital);
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(400).json({ error: error.message });
   }
-}
+};
 
 // Delete hospital
 const deleteHospital = async (req, res) => {
-  const { hospitalId } = req.params
-
   try {
-    const hospital = await Hospital.findByIdAndDelete(hospitalId)
+    const { id } = req.params;
 
+    // Check if hospital exists
+    const hospital = await Hospital.findById(id);
     if (!hospital) {
-      return res.status(404).json({ error: 'Hospital not found' })
+      return res.status(404).json({ error: 'Hospital not found' });
     }
 
-    // Also delete all reviews for this hospital
-    await Review.deleteMany({ hospitalId })
+    // Delete hospital
+    await Hospital.findByIdAndDelete(id);
 
-    res.status(200).json({ message: 'Hospital and associated reviews deleted successfully' })
+    res.status(200).json({ message: 'Hospital deleted successfully' });
   } catch (error) {
-    res.status(400).json({ error: error.message })
+    res.status(400).json({ error: error.message });
   }
-}
+};
 
 module.exports = {
   signupAdmin,
@@ -354,6 +344,5 @@ module.exports = {
   updateBloodRequest,
   getHospitals,
   addHospital,
-  updateHospital,
   deleteHospital
 }

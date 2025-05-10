@@ -1,8 +1,8 @@
-
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useAuthContext } from '../hooks/useAuthContext';
 import ProfileIcon from './profile-icon';
+import Chatbot from './Chatbot';
 
 const Navbar = () => {
   const { user } = useAuthContext();
@@ -65,7 +65,10 @@ const Navbar = () => {
 
         <div className="flex items-center gap-4">
           {user ? (
-            <ProfileIcon />
+            <>
+              <Chatbot />
+              <ProfileIcon />
+            </>
           ) : (
             <div className="hidden md:flex gap-3">
               <Link

@@ -55,6 +55,7 @@ export const filterRequests = (requests, filters) => {
     search = '', 
     bloodType = '', 
     urgency = '',
+    cityu = '',        // Add cityu filter parameter
     nearMe = false, 
     userLocation = null, 
     maxDistance = 50,  // default 50km radius
@@ -75,6 +76,20 @@ export const filterRequests = (requests, filters) => {
     
     // Urgency level filter
     if (urgency && req.urgencyLevel !== urgency) {
+      return false;
+    }
+    
+    // CityU filter - changed to case-insensitive partial match
+    if (cityu && req.cityu) {
+      const requestCityu = req.cityu.toLowerCase();
+      const searchCityu = cityu.toLowerCase();
+      
+      // Check if the request's cityu contains the search term
+      if (!requestCityu.includes(searchCityu)) {
+        return false;
+      }
+    } else if (cityu && !req.cityu) {
+      // If cityu filter is provided but request doesn't have cityu field
       return false;
     }
     

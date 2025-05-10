@@ -15,8 +15,8 @@ const BloodTypeFilter = ({ selectedBloodType, onChange }) => {
       </label>
       <select
         id="bloodType"
-        value={selectedBloodType}
-        onChange={(e) => onChange(e.target.value)}
+        value={selectedBloodType || ''}
+        onChange={(e) => onChange(e.target.value === '' ? '' : e.target.value)}
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500"
       >
         {bloodTypes.map((type) => (
@@ -45,7 +45,7 @@ const StatusFilter = ({ selectedStatus, onChange }) => {
       </label>
       <select
         id="status"
-        value={selectedStatus}
+        value={selectedStatus || ''}
         onChange={(e) => onChange(e.target.value)}
         className="w-full p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-teal-500 focus:border-teal-500"
       >
@@ -86,6 +86,9 @@ const HospitalAdminBloodRequests = () => {
 
   const navigate = useNavigate();
 
+  // Add state for retry functionality
+  const [retryCount, setRetryCount] = useState(0);
+
   useEffect(() => {
     if (!hospitalAdmin) {
       navigate('/hospital-admin/login');
@@ -94,18 +97,21 @@ const HospitalAdminBloodRequests = () => {
 
     fetchBloodRequests();
 
-    // Set a timeout to stop loading if it takes too long
-    const timeoutId = setTimeout(() => {
-      if (loading) {
-        setLoading(false);
-        setError('Request timed out. Please refresh the page or try again later.');
-      }
-    }, 15000); // 15 seconds timeout
+    // No need for the additional timeout since we have one in fetchBloodRequests
 
-    return () => clearTimeout(timeoutId);
-  }, [hospitalAdmin, navigate, bloodType, status]); // Removed loading from dependencies
+    // Cleanup function
+    return () => {
+      // Nothing to clean up here since timeouts are handled in fetchBloodRequests
+    };
+  }, [hospitalAdmin, navigate, bloodType, status, retryCount]); // Added retryCount to dependencies
+
+
 
   const fetchBloodRequests = async () => {
+    // Create an AbortController to handle timeouts
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
+
     try {
       setLoading(true);
       let url = `/api/hospital-admin/blood-requests`;
@@ -122,9 +128,20 @@ const HospitalAdminBloodRequests = () => {
 
       const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${hospitalAdmin.token}`
-        }
+          'Authorization': `Bearer ${hospitalAdmin.token}`,
+          'Cache-Control': 'no-cache',
+          'Accept': 'application/json'
+        },
+        signal: controller.signal // Add the abort signal
       });
+
+      // Clear the timeout since the request completed
+      clearTimeout(timeoutId);
+
+      // Handle HTTP status codes
+      if (response.status === 408) {
+        throw new Error('Request timed out. Please try again later.');
+      }
 
       const data = await response.json();
 
@@ -137,10 +154,18 @@ const HospitalAdminBloodRequests = () => {
       setError(null);
     } catch (err) {
       console.error('Error fetching blood requests:', err);
-      setError('Failed to load blood requests. Please try again later.');
+
+      // Handle abort/timeout errors specifically
+      if (err.name === 'AbortError') {
+        setError('Request timed out. Please refresh the page or try again later.');
+      } else {
+        setError(err.message || 'Failed to load blood requests. Please try again later.');
+      }
+
       toast.error('Error loading blood requests');
     } finally {
       setLoading(false);
+      clearTimeout(timeoutId); // Ensure timeout is cleared in all cases
     }
   };
 
@@ -243,7 +268,7 @@ const HospitalAdminBloodRequests = () => {
         throw new Error('Failed to approve acceptance');
       }
 
-      const updatedRequest = await response.json();
+      await response.json(); // Read the response but we don't need to use it
 
       // Update the request in the list
       setBloodRequests(bloodRequests.map(req =>
@@ -327,13 +352,13 @@ const HospitalAdminBloodRequests = () => {
         throw new Error('Failed to reject acceptance');
       }
 
-      const updatedRequest = await response.json();
+      await response.json(); // Read the response but we don't need to use it
 
       // Update the request in the list
       setBloodRequests(bloodRequests.map(req =>
         req.requestId === selectedRequestId ?
-        { ...req, hospitalApproved: 'rejected', hospitalRejectionReason: rejectionReason, hospitalApprovedAt: new Date() } :
-        req
+          { ...req, hospitalApproved: 'rejected', hospitalRejectionReason: rejectionReason, hospitalApprovedAt: new Date() } :
+          req
       ));
 
       toast.success('Blood donation acceptance rejected');
@@ -381,8 +406,25 @@ const HospitalAdminBloodRequests = () => {
                   <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
                 </svg>
               </div>
-              <div className="ml-3">
+              <div className="ml-3 flex-1">
                 <p className="text-sm text-red-700">{error}</p>
+                <div className="mt-2 flex space-x-2">
+                  <button
+                    onClick={() => {
+                      setRetryCount(prev => prev + 1);
+                      setError(null);
+                    }}
+                    className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+                  >
+                    Try Again
+                  </button>
+                  <button
+                    onClick={() => window.location.reload()}
+                    className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+                  >
+                    Refresh Page
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -523,6 +565,8 @@ const HospitalAdminBloodRequests = () => {
                 onClick={() => {
                   setBloodType('');
                   setStatus('');
+                  // Trigger a refetch after clearing filters
+                  setRetryCount(prev => prev + 1);
                 }}
                 className="w-full mt-2 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-teal-500"
               >
@@ -534,7 +578,10 @@ const HospitalAdminBloodRequests = () => {
           <div className="lg:col-span-3">
             {/* Pending Blood Acceptances Section */}
             <div className="mb-6">
-              <PendingBloodAcceptances />
+              <PendingBloodAcceptances
+                bloodTypeFilter={bloodType}
+                statusFilter={status}
+              />
             </div>
 
             {/* Blood Requests Section */}
@@ -563,34 +610,32 @@ const HospitalAdminBloodRequests = () => {
                                 Blood Type: {request.bloodType}
                               </span>
                               <span
-                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                                  request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
-                                  request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
-                                  'bg-green-100 text-green-800'
-                                }`}
+                                className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.urgencyLevel === 'Critical' ? 'bg-red-100 text-red-800' :
+                                    request.urgencyLevel === 'Urgent' ? 'bg-yellow-100 text-yellow-800' :
+                                      'bg-green-100 text-green-800'
+                                  }`}
                               >
                                 {request.urgencyLevel}
                               </span>
 
                               <span
-                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${
-                                  request.userAccepted && request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' :
-                                  request.userAccepted && request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' :
-                                  request.userAccepted ? 'bg-yellow-100 text-yellow-800' :
-                                  isExpired ? 'bg-red-100 text-red-800' :
-                                  'bg-blue-100 text-blue-800'
-                                }`}
+                                className={`inline-flex items-center px-3 py-1 rounded-full text-xs font-medium ${request.userAccepted && request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' :
+                                    request.userAccepted && request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' :
+                                      request.userAccepted ? 'bg-yellow-100 text-yellow-800' :
+                                        isExpired ? 'bg-red-100 text-red-800' :
+                                          'bg-blue-100 text-blue-800'
+                                  }`}
                               >
                                 {request.userAccepted && request.hospitalApproved === 'approved' ? 'Accepted' :
-                                 request.userAccepted && request.hospitalApproved === 'rejected' ? 'Rejected' :
-                                 request.userAccepted ? 'Pending Approval' :
-                                 isExpired ? 'Expired' : 'Available'}
+                                  request.userAccepted && request.hospitalApproved === 'rejected' ? 'Rejected' :
+                                    request.userAccepted ? 'Pending Approval' :
+                                      isExpired ? 'Expired' : 'Available'}
                               </span>
                             </div>
 
                             <div className="mt-2 grid grid-cols-1 md:grid-cols-2 gap-1">
                               <p className="text-sm text-gray-500">
-                                <span className="font-medium">Posted:</span> {postedDate.toLocaleDateString()} {postedDate.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}
+                                <span className="font-medium">Posted:</span> {postedDate.toLocaleDateString()} {postedDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                               </p>
                               {expiryDate && (
                                 <p className="text-sm text-gray-500">
@@ -611,8 +656,8 @@ const HospitalAdminBloodRequests = () => {
                                   <div className="flex items-center mb-1">
                                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${request.hospitalApproved === 'approved' ? 'bg-green-100 text-green-800' : request.hospitalApproved === 'rejected' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}`}>
                                       {request.hospitalApproved === 'approved' ? 'Accepted' :
-                                       request.hospitalApproved === 'rejected' ? 'Rejected' :
-                                       'Pending approval'}
+                                        request.hospitalApproved === 'rejected' ? 'Rejected' :
+                                          'Pending approval'}
                                     </span>
                                   </div>
                                   <p className="text-sm">

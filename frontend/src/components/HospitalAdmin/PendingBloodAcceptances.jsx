@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { toast } from 'react-toastify';
-import { useAuthContext } from '../../hooks/useAuthContext';
+import { useHospitalAdminAuthContext } from '../../hooks/useHospitalAdminAuthContext';
 import { Link } from 'react-router-dom';
 
-const PendingBloodAcceptances = () => {
+const PendingBloodAcceptances = ({ bloodTypeFilter = '', statusFilter = '' }) => {
   const [pendingAcceptances, setPendingAcceptances] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -15,23 +15,22 @@ const PendingBloodAcceptances = () => {
   const [rejectionReason, setRejectionReason] = useState('');
   const [showRejectionModal, setShowRejectionModal] = useState(false);
   const [selectedRequestId, setSelectedRequestId] = useState(null);
-  const { hospitalAdmin } = useAuthContext();
+  const { hospitalAdmin } = useHospitalAdminAuthContext();
+
+  // Add state for retry functionality
+  const [retryCount, setRetryCount] = useState(0);
 
   useEffect(() => {
     if (hospitalAdmin) {
       fetchPendingAcceptances();
 
-      // Set a timeout to stop loading if it takes too long
-      const timeoutId = setTimeout(() => {
-        if (loading) {
-          setLoading(false);
-          setError('Request timed out. Please refresh the page.');
-        }
-      }, 10000); // 10 seconds timeout
+      // No need for additional timeout since we have one in fetchPendingAcceptances
 
-      return () => clearTimeout(timeoutId);
+      return () => {
+        // Nothing to clean up here
+      };
     }
-  }, [hospitalAdmin]); // Removed loading from dependencies
+  }, [hospitalAdmin, retryCount, bloodTypeFilter, statusFilter]); // Added filters to dependencies
 
   const fetchPendingAcceptances = async () => {
     if (!hospitalAdmin) {
@@ -39,14 +38,44 @@ const PendingBloodAcceptances = () => {
       return;
     }
 
+    // Create an AbortController to handle timeouts
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
+
     try {
       setLoading(true);
+      setError(null);
       console.log('Fetching pending acceptances with token:', hospitalAdmin.token);
-      const response = await fetch('/api/hospital-admin/blood-requests/pending-acceptances', {
+
+      // Build the URL with query parameters for filtering
+      let url = '/api/hospital-admin/blood-requests/pending-acceptances';
+      const queryParams = [];
+
+      if (bloodTypeFilter) {
+        queryParams.push(`bloodType=${bloodTypeFilter}`);
+      }
+
+      if (statusFilter) {
+        queryParams.push(`status=${statusFilter}`);
+      }
+
+      if (queryParams.length > 0) {
+        url += `?${queryParams.join('&')}`;
+      }
+
+      console.log('Fetching from URL:', url);
+
+      const response = await fetch(url, {
         headers: {
-          'Authorization': `Bearer ${hospitalAdmin.token}`
-        }
+          'Authorization': `Bearer ${hospitalAdmin.token}`,
+          'Cache-Control': 'no-cache',
+          'Accept': 'application/json'
+        },
+        signal: controller.signal // Add the abort signal
       });
+
+      // Clear the timeout since the request completed
+      clearTimeout(timeoutId);
 
       if (!response.ok) {
         throw new Error('Failed to fetch pending acceptances');
@@ -57,10 +86,18 @@ const PendingBloodAcceptances = () => {
       setPendingAcceptances(data);
     } catch (err) {
       console.error('Error fetching pending acceptances:', err);
-      setError('Failed to load pending acceptances');
+
+      // Handle abort/timeout errors specifically
+      if (err.name === 'AbortError') {
+        setError('Request timed out. Please try again.');
+      } else {
+        setError('Failed to load pending acceptances. ' + err.message);
+      }
+
       toast.error('Failed to load pending acceptances');
     } finally {
       setLoading(false);
+      clearTimeout(timeoutId); // Ensure timeout is cleared in all cases
     }
   };
 
@@ -184,22 +221,45 @@ const PendingBloodAcceptances = () => {
     return (
       <div className="bg-red-50 p-4 rounded-md text-red-700">
         <p>{error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="mt-2 px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
-        >
-          Refresh Page
-        </button>
+        <div className="mt-2 flex space-x-2">
+          <button
+            onClick={() => setRetryCount(prev => prev + 1)}
+            className="px-3 py-1 bg-red-600 text-white text-sm rounded hover:bg-red-700"
+          >
+            Try Again
+          </button>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-3 py-1 bg-gray-600 text-white text-sm rounded hover:bg-gray-700"
+          >
+            Refresh Page
+          </button>
+        </div>
       </div>
     );
   }
 
-  if (pendingAcceptances.length === 0) {
+  // Apply client-side filtering for immediate response
+  const filteredAcceptances = pendingAcceptances.filter(request => {
+    // Filter by blood type if specified
+    if (bloodTypeFilter && request.bloodType !== bloodTypeFilter) {
+      return false;
+    }
+
+    // Status filtering is already handled on the server for pending acceptances
+    // but we could add more status filters here if needed
+
+    return true;
+  });
+
+  if (filteredAcceptances.length === 0) {
     return (
       <div className="bg-gray-50 p-6 rounded-lg shadow-sm">
         <h3 className="text-lg font-semibold text-gray-800 mb-2">Pending Blood Donation Acceptances</h3>
         <p className="text-gray-600">
-          There are no pending blood donation acceptances at this time.
+          {pendingAcceptances.length === 0
+            ? "There are no pending blood donation acceptances at this time."
+            : "No pending acceptances match the current filters."}
         </p>
       </div>
     );
@@ -210,7 +270,7 @@ const PendingBloodAcceptances = () => {
       <h3 className="text-lg font-semibold text-gray-800 mb-4">Pending Blood Donation Acceptances</h3>
 
       <div className="space-y-6">
-        {pendingAcceptances.map((request) => (
+        {filteredAcceptances.map((request) => (
           <div
             key={request.requestId}
             className="border border-gray-200 rounded-md p-4 hover:shadow-md transition-shadow"

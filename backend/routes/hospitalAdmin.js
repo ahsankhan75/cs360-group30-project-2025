@@ -30,10 +30,23 @@ router.post('/signup', signupHospitalAdmin);
 router.post('/forgot-password', hospitalAdminForgotPassword);
 router.post('/reset-password/:token', resetPassword);
 
-// Health check endpoint
+// Public health check endpoint
 router.get('/health', (req, res) => {
   res.status(200).json({
     status: 'Hospital Admin API is available',
+    time: new Date().toISOString()
+  });
+});
+
+// Protected health check endpoint for token validation
+router.get('/auth-check', requireHospitalAdminAuth, (req, res) => {
+  res.status(200).json({
+    status: 'authenticated',
+    hospitalAdmin: {
+      email: req.hospitalAdmin.email,
+      fullName: req.hospitalAdmin.fullName,
+      hospitalId: req.hospitalAdmin.hospitalId
+    },
     time: new Date().toISOString()
   });
 });

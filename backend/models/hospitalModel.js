@@ -11,6 +11,9 @@ const hospitalSchema = new Schema({
         address: { type: String, required: true }
     },
 
+    // Add the new cityu field
+    cityu: { type: String, required: false, trim: true },
+
     resources: {
         icu_beds: { type: Number, default: 0 },
         ventilators: { type: Number, default: 0 },

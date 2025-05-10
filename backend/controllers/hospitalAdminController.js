@@ -3,10 +3,10 @@ const Hospital = require('../models/hospitalModel');
 const BloodRequest = require('../models/blood_request');
 const Review = require('../models/reviewModel');
 const MedicalCard = require('../models/medicalCardModel');
-const crypto     = require('crypto');
-const validator = require('validator');
-const bcrypt = require('bcrypt');
-const nodemailer = require('nodemailer');
+const crypto = require('crypto'); // Added for password reset
+const validator = require('validator'); // Added for password reset validation
+const bcrypt = require('bcrypt'); // Added for password hashing in reset
+const nodemailer = require('nodemailer'); // Added for sending reset email
 const jwt = require('jsonwebtoken');
 const mongoose = require('mongoose');
 
@@ -29,6 +29,12 @@ const loginHospitalAdmin = async (req, res) => {
 
   try {
     const hospitalAdmin = await HospitalAdmin.login(email, password);
+    // Ensure hospitalAdmin exists and has hospitalId before proceeding
+    if (!hospitalAdmin || !hospitalAdmin.hospitalId) {
+        // This case should ideally be handled within HospitalAdmin.login
+        // but adding a check here for robustness.
+        return res.status(404).json({ error: 'Admin account details incomplete.' });
+    }
     const hospital = await Hospital.findById(hospitalAdmin.hospitalId);
     const token = createToken(hospitalAdmin._id);
 
@@ -36,7 +42,7 @@ const loginHospitalAdmin = async (req, res) => {
       email: hospitalAdmin.email,
       fullName: hospitalAdmin.fullName,
       hospitalId: hospitalAdmin.hospitalId,
-      // Provide a default name if hospital somehow isn't found, although validation should prevent this
+      // Provide a default name if hospital somehow isn't found
       hospitalName: hospital ? hospital.name : 'Unknown Hospital',
       permissions: hospitalAdmin.permissions,
       token
@@ -56,31 +62,34 @@ const signupHospitalAdmin = async (req, res) => {
     return res.status(400).json({ error: 'All fields (email, password, fullName, hospitalId) are required.' });
   }
 
-  // Optional: Validate if hospitalId is a valid ObjectId and exists
+  // Validate if hospitalId is a valid ObjectId format
   if (!mongoose.Types.ObjectId.isValid(hospitalId)) {
       return res.status(400).json({ error: 'Invalid Hospital ID format.' });
   }
 
   try {
+      // Check if the provided hospitalId actually exists
       const hospitalExists = await Hospital.findById(hospitalId);
       if (!hospitalExists) {
           return res.status(404).json({ error: 'Selected hospital does not exist.' });
       }
 
+      // Perform signup using the static method on the model
       const hospitalAdmin = await HospitalAdmin.signup(email, password, fullName, hospitalId);
 
+      // Respond with success message and basic details
       res.status(201).json({
         email: hospitalAdmin.email,
         fullName: hospitalAdmin.fullName,
         hospitalId: hospitalAdmin.hospitalId,
-        // Use the fetched hospital name directly
-        hospitalName: hospitalExists.name,
+        hospitalName: hospitalExists.name, // Use the name from the found hospital
         status: hospitalAdmin.status, // Should be 'pending' initially
         message: 'Registration successful. Your account is pending approval by a superadmin.'
       });
   } catch (error) {
     // Log the error for debugging on the server
     console.error("Signup Error:", error.message);
+    // Send back specific error message from the signup method (e.g., "Email already in use")
     res.status(400).json({ error: error.message });
   }
 };
@@ -158,61 +167,47 @@ const getHospitalBloodRequests = async (req, res) => {
     }
     console.log('Getting blood requests for hospital ID:', hospitalId);
 
-    // Fetch hospital details (optional, could rely on ID only)
+    // Fetch hospital details (needed for name in the $or query)
     const hospital = await Hospital.findById(hospitalId);
     if (!hospital) return res.status(404).json({ error: 'Hospital not found for this admin' });
 
     const { status, bloodType } = req.query;
 
-    // Build the base query using the reliable hospitalId
-    const queryById = { hospitalId: new mongoose.Types.ObjectId(hospitalId) };
-    if (status === 'pending') queryById.accepted = false;
-    if (status === 'accepted') queryById.accepted = true;
-    if (bloodType) queryById.bloodType = bloodType;
+    // Build a query that checks for matching hospitalId OR hospitalName (for robustness with potential old data)
+    const query = {
+      $or: [
+        { hospitalId: new mongoose.Types.ObjectId(hospitalId) }, // Match by ID (preferred)
+        { hospitalName: hospital.name } // Match by name (fallback)
+      ]
+    };
 
-    console.log('Blood request query:', JSON.stringify(queryById));
+    // Add filters if provided
+    if (status === 'pending') query.accepted = false;
+    if (status === 'accepted') query.accepted = true;
+    if (bloodType) query.bloodType = bloodType;
 
-    // Execute the query
-    const bloodRequests = await BloodRequest.find(queryById)
-      .populate('acceptedBy', 'email fullName profilePicture') // Populate user details if accepted
-      .sort({ datePosted: -1 }); // Sort by most recent
+    console.log('Blood request query:', JSON.stringify(query));
 
-    console.log(`Found ${bloodRequests.length} blood requests matching criteria.`);
+    // Use a single query with a timeout and lean for performance
+    const bloodRequests = await BloodRequest.find(query)
+      .populate('acceptedBy', 'email fullName profilePicture') // Populate details of user who accepted
+      .sort({ datePosted: -1 }) // Sort by most recent
+      .maxTimeMS(10000) // 10 second timeout for the database query
+      .lean(); // Use lean() for better performance on read-heavy operations
 
-    // No need to combine results from name query as hospitalId is more reliable and direct.
-    // Keep the name query logic commented out unless specifically needed as a fallback.
-    /*
-    // Find by hospital name as a potential fallback (less reliable)
-    const queryByName = { hospitalName: hospital.name };
-    if (status === 'pending') queryByName.accepted = false;
-    if (status === 'accepted') queryByName.accepted = true;
-    if (bloodType) queryByName.bloodType = bloodType;
+    console.log(`Found ${bloodRequests.length} blood requests`);
 
-    const bloodRequestsByName = await BloodRequest.find(queryByName)
-      .populate('acceptedBy', 'email fullName profilePicture')
-      .sort({ datePosted: -1 });
-    console.log(`Found ${bloodRequestsByName.length} blood requests by hospitalName (fallback)`);
-
-    // Combine results, removing duplicates (if using both queries)
-    const combinedRequests = [...bloodRequests]; // Start with ID results
-    const requestIds = new Set(bloodRequests.map(r => r._id.toString()));
-
-    bloodRequestsByName.forEach(request => {
-      if (!requestIds.has(request._id.toString())) {
-        combinedRequests.push(request);
-        requestIds.add(request._id.toString());
-      }
-    });
-    // Sort combined results if needed
-    combinedRequests.sort((a, b) => new Date(b.datePosted) - new Date(a.datePosted));
-    console.log(`Returning ${combinedRequests.length} total unique blood requests after potential fallback`);
-    res.status(200).json(combinedRequests);
-    */
-
+    // Return the results directly
     res.status(200).json(bloodRequests);
-
   } catch (error) {
     console.error('Error getting hospital blood requests:', error);
+
+    // Check if it's a timeout error from Mongoose
+    if (error.name === 'MongooseError' && error.message.includes('timeout')) {
+      return res.status(408).json({ error: 'Database query timed out. Please try again later.' });
+    }
+
+    // General error handling
     res.status(500).json({ error: error.message || 'Failed to get blood requests' });
   }
 };
@@ -261,15 +256,16 @@ const createBloodRequest = async (req, res) => {
       bloodType,
       urgencyLevel: finalUrgency,
       unitsNeeded: finalUnits,
-      // Use hospital's address and coordinates as default location info
-      location: hospital.location?.address || 'Address not available',
-      latitude: hospital.location?.coordinates?.[1] || null,
-      longitude: hospital.location?.coordinates?.[0] || null,
+      // Location details from hospital record
+      location: hospital.location?.address || 'Address not available', // Main address string
+      cityu: hospital.cityu || null, // City/Urban unit if available on hospital model
+      latitude: hospital.location?.coordinates?.[1] || null, // Geo Coordinates
+      longitude: hospital.location?.coordinates?.[0] || null, // Geo Coordinates
       datePosted: now,
       expiryDate: expiryDate,
-      // Use provided contact details or fallback to admin's email
-      contactNumber: contactNumber || hospital.contact?.phone || 'Contact number not provided',
-      email: contactEmail || req.hospitalAdmin.email, // Use admin's email as fallback
+      // Contact details
+      contactNumber: contactNumber || hospital.contact?.phone || 'Contact number not provided', // Use provided, then hospital's, then default
+      email: contactEmail || req.hospitalAdmin.email, // Use provided or admin's email
       accepted: false, // New requests are not accepted initially
       acceptedBy: null // Ensure acceptedBy is null initially
     };
@@ -299,17 +295,18 @@ const updateHospitalProfile = async (req, res) => {
         return res.status(400).json({ error: 'Invalid or missing hospital ID in token' });
     }
 
-    // It's safer to explicitly define which fields can be updated
-    const { resources, contact, services, insurance_accepted } = req.body;
+    // Destructure expected updatable fields from request body
+    const { resources, contact, services, insurance_accepted, location, cityu } = req.body;
 
     const hospital = await Hospital.findById(hospitalId);
     if (!hospital) return res.status(404).json({ error: 'Hospital not found' });
 
     const updateData = { $set: {} }; // Use $set to update specific fields
 
-    // Carefully merge nested objects if they exist
+    // Carefully merge nested objects if they exist, using dot notation with $set
     if (resources && typeof resources === 'object') {
         for (const key in resources) {
+            // Only update fields explicitly provided in the request
             if (resources.hasOwnProperty(key)) {
                 updateData.$set[`resources.${key}`] = resources[key];
             }
@@ -322,7 +319,19 @@ const updateHospitalProfile = async (req, res) => {
             }
         }
     }
-    // Update arrays directly
+
+    // Update location address if provided
+    if (location && location.address !== undefined) {
+        updateData.$set['location.address'] = location.address;
+        // Note: Updating coordinates would require separate handling if needed
+    }
+
+     // Update cityu field if provided (allows setting to empty string or null)
+     if (cityu !== undefined) {
+        updateData.$set['cityu'] = cityu;
+     }
+
+    // Update array fields directly if provided and are arrays
     if (services && Array.isArray(services)) {
         updateData.$set['services'] = services;
     }
@@ -333,28 +342,31 @@ const updateHospitalProfile = async (req, res) => {
     // Always update the last_updated timestamp
     updateData.$set['last_updated'] = new Date();
 
-    // Prevent updating if no valid fields were provided
-     if (Object.keys(updateData.$set).length <= 1) { // Only contains last_updated potentially
+    // Prevent updating if only last_updated is present (no actual data changes sent)
+     if (Object.keys(updateData.$set).length <= 1) {
          return res.status(400).json({ error: 'No valid fields provided for update.' });
      }
 
-    // Perform the update
+    // Perform the update using findByIdAndUpdate
     const updatedHospital = await Hospital.findByIdAndUpdate(
         hospitalId,
         updateData,
-        // Return the updated document, run schema validators for paths being set
+        // Options: return the updated document, run schema validators for paths being set
         { new: true, runValidators: true, context: 'query' }
     );
 
     if (!updatedHospital) throw new Error('Failed to update hospital profile');
 
-    res.status(200).json(updatedHospital);
+    res.status(200).json(updatedHospital); // Respond with the updated hospital document
   } catch (error) {
     console.error('Error updating hospital profile:', error);
-    // Check for validation errors specifically
+    // Check for Mongoose validation errors specifically
     if (error instanceof mongoose.Error.ValidationError) {
-        return res.status(400).json({ error: "Validation failed: " + error.message });
+        // Construct a user-friendly error message from validation errors
+        const messages = Object.values(error.errors).map(val => val.message);
+        return res.status(400).json({ error: "Validation failed: " + messages.join('. ') });
     }
+    // General error response
     res.status(500).json({ error: 'Failed to update hospital profile. ' + error.message });
   }
 };
@@ -363,7 +375,7 @@ const updateHospitalProfile = async (req, res) => {
 
 // Get pending hospital admin registrations
 const getPendingHospitalAdmins = async (req, res) => {
-  // This should be protected by a superadmin role check middleware
+  // This route should be protected by a superadmin role check middleware
   try {
     const pendingAdmins = await HospitalAdmin.find({ status: 'pending' })
       .populate('hospitalId', 'name location') // Populate hospital name and location
@@ -384,7 +396,7 @@ const getPendingHospitalAdmins = async (req, res) => {
 
 // Update status of a hospital admin (approve/reject)
 const updateHospitalAdminStatus = async (req, res) => {
-  // This should be protected by a superadmin role check middleware
+  // This route should be protected by a superadmin role check middleware
   try {
     const { id } = req.params; // Admin ID to update
     const { status } = req.body; // New status ('approved' or 'rejected')
@@ -397,23 +409,22 @@ const updateHospitalAdminStatus = async (req, res) => {
       return res.status(400).json({ error: 'Invalid status value. Must be "approved" or "rejected".' });
     }
 
-    // Find and update the admin's status
-    // Optionally add permissions if approving
+    // Prepare update object
     const update = { status };
     if (status === 'approved') {
-        // Define default permissions for approved admins
+        // Define default permissions for newly approved admins
         update.permissions = ['manage_requests', 'view_dashboard', 'update_profile'];
     } else {
-        // Optionally clear permissions if rejecting
+        // Clear permissions if rejecting (optional, depends on requirements)
         update.permissions = [];
     }
 
-
+    // Find and update the admin's status and permissions
     const hospitalAdmin = await HospitalAdmin.findByIdAndUpdate(id, update, { new: true });
 
     if (!hospitalAdmin) return res.status(404).json({ error: 'Hospital admin account not found.' });
 
-    // TODO: Optionally send an email notification to the admin about the status change
+    // TODO: Optionally send an email notification to the admin about the status change using nodemailer
 
     res.status(200).json(hospitalAdmin); // Return the updated admin document
   } catch (error) {
@@ -511,7 +522,7 @@ const getAcceptedUserMedicalCard = async (req, res) => {
     }
 
     // Fetch the medical card using the email of the user who accepted
-    // Note: MedicalCard model likely uses 'email' as a key field based on schema design assumption
+    // Note: MedicalCard model likely uses 'email' as a key field
     const medicalCard = await MedicalCard.findOne({ email: bloodRequest.acceptedBy.email });
 
     if (!medicalCard) {
@@ -520,9 +531,9 @@ const getAcceptedUserMedicalCard = async (req, res) => {
     }
 
     // Return the relevant medical card details
-    // Be mindful of sensitive information - only return what's necessary for the hospital
+    // Be mindful of sensitive information - only return what's necessary for the hospital context
     res.status(200).json({
-        fullName: medicalCard.fullName, // Or from populated acceptedBy user
+        fullName: medicalCard.fullName || bloodRequest.acceptedBy.fullName, // Use card or user profile name
         bloodType: medicalCard.bloodType,
         dateOfBirth: medicalCard.dateOfBirth,
         // Include other relevant fields as needed, e.g., allergies, conditions
@@ -537,91 +548,135 @@ const getAcceptedUserMedicalCard = async (req, res) => {
   }
 };
 
+// --- Password Reset Functionality ---
 
+// Initiate password reset process
 const hospitalAdminForgotPassword = async (req, res) => {
   try {
     const { email } = req.body;
+    if (!email || !validator.isEmail(email)) {
+        return res.status(400).json({ error: 'Please provide a valid email address.' });
+    }
+
     const user = await HospitalAdmin.findOne({ email });
-    if (!user) return res.status(404).json({ error: 'No user with that email' });
+    if (!user) {
+        // Important: Do not reveal if the user exists or not for security
+        console.log(`Password reset attempt for non-existent email: ${email}`);
+        return res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+    }
 
+    // Generate a random, unguessable token
     const resetToken = crypto.randomBytes(32).toString('hex');
-    const hashed = crypto.createHash('sha256').update(resetToken).digest('hex');
+    // Hash the token before saving it to the database
+    const hashedToken = crypto.createHash('sha256').update(resetToken).digest('hex');
 
-    user.passwordResetToken = hashed;
-    user.passwordResetExpires = Date.now() + 3600 * 1000;
+    // Set token and expiry on the user document
+    user.passwordResetToken = hashedToken;
+    user.passwordResetExpires = Date.now() + 3600 * 1000; // Token valid for 1 hour (3600 seconds * 1000 ms)
     await user.save();
 
-    const resetURL = `http://localhost:3000/hospital-admin/reset-password/${resetToken}`;
-    // if (user.isAdmin) {
-    //   resetURL = `http://localhost:3000/admin/reset-password/${resetToken}`;
-    // }// else {
-    //   const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-    // }
-    // const resetURL = `http://localhost:3000/reset-password/${resetToken}`;
-    const transporter = nodemailer.createTransport({
-      // host: process.env.SMTP_HOST,
-      // port: Number(process.env.SMTP_PORT),
-      host: 'smtp.gmail.com', 
-      port: 587,
-      secure: false,
+    // Construct the reset URL (use environment variables for base URL in production)
+    const resetURL = `${process.env.FRONTEND_URL || 'http://localhost:3000'}/hospital-admin/reset-password/${resetToken}`;
+
+    // Configure nodemailer transporter (use environment variables for credentials)
+     const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || 'smtp.gmail.com',
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: (process.env.SMTP_PORT || 587) === 465, // true for 465, false for other ports
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS
       }
     });
+
+     if (!process.env.SMTP_USER || !process.env.SMTP_PASS) {
+        console.error("SMTP credentials are not set in environment variables.");
+        return res.status(500).json({ error: 'Email configuration error. Cannot send reset link.' });
+     }
+
+    // Send the email
     await transporter.sendMail({
-      to: user.email,
-      subject: 'Your password reset link (valid 1 hour)',
-      html: `<p>Please click <a href="${resetURL}">here</a> to reset your password.</p>`
+      from: `"BloodLink Support" <${process.env.SMTP_USER}>`, // Sender address
+      to: user.email, // User's email
+      subject: 'Your BloodLink Hospital Admin Password Reset Link (Valid 1 Hour)', // Subject line
+      // Plain text body (optional)
+      // text: `You requested a password reset. Please click the following link, or paste it into your browser to complete the process: ${resetURL}\n\nIf you did not request this, please ignore this email and your password will remain unchanged.\n`,
+      // HTML body
+      html: `<p>You requested a password reset for your BloodLink Hospital Admin account associated with ${user.email}.</p>
+             <p>Please click the link below to set a new password:</p>
+             <p><a href="${resetURL}" target="_blank" style="background-color: #0d9488; color: white; padding: 10px 15px; text-decoration: none; border-radius: 5px;">Reset Your Password</a></p>
+             <p>This link is valid for 1 hour. If you did not request this password reset, please ignore this email.</p>
+             <p>Link: ${resetURL}</p><hr><p>Thank you,<br>The BloodLink Team</p>`
     });
 
-    res.status(200).json({ message: 'Token sent to email' });
+    // Send generic success message regardless of whether user existed
+    res.status(200).json({ message: 'If an account with that email exists, a password reset link has been sent.' });
+
   } catch (err) {
-    console.error('hospitalAdminForgotPassword error:', err)
-    return res
-      .status(500)
-      .json({ error: 'Unable to send reset link. Please try again later.' })
+    console.error('hospitalAdminForgotPassword error:', err);
+    // Avoid exposing internal errors to the client
+    res.status(500).json({ error: 'An error occurred while attempting to send the password reset link. Please try again later.' });
   }
 };
 
+// Handle the actual password reset using the token
 const resetPassword = async (req, res) => {
   try {
-    const { token } = req.params;
-    const { password } = req.body;
+    const { token } = req.params; // The raw token from the URL
+    const { password } = req.body; // The new password
 
+    // Validate the incoming password
     if (!password) {
-      return res.status(400).json({ error: 'Password is required' });
+      return res.status(400).json({ error: 'New password is required.' });
     }
-
     if (!validator.isStrongPassword(password)) {
       return res.status(400).json({
-        error:
-          'Password not strong enough. ' +
-          'It must be at least 8 characters long and include lowercase, uppercase, numbers and symbols.'
+        error: 'Password not strong enough. It must be at least 8 characters long and include lowercase, uppercase, numbers, and symbols.'
       });
     }
 
-    const hashed = crypto.createHash('sha256').update(token).digest('hex');
-    const user = await HospitalAdmin.findOne({
-      passwordResetToken: hashed,
-      passwordResetExpires: { $gt: Date.now() }
-    });
-    if (!user) return res.status(400).json({ error: 'Token invalid or expired' });
+    // Hash the token received from the URL to match the one stored in the database
+    const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
 
-    user.password = await bcrypt.hash(password, await bcrypt.genSalt(10));
+    // Find the user by the hashed token and check if the token is still valid (not expired)
+    const user = await HospitalAdmin.findOne({
+      passwordResetToken: hashedToken,
+      passwordResetExpires: { $gt: Date.now() } // Check if expiry date is greater than current time
+    });
+
+    // If no user found or token expired
+    if (!user) {
+        console.log(`Password reset attempt with invalid/expired token hash: ${hashedToken}`);
+        return res.status(400).json({ error: 'Password reset token is invalid or has expired.' });
+    }
+
+    // --- Token is valid, proceed to reset password ---
+
+    // Hash the new password
+    const salt = await bcrypt.genSalt(10);
+    user.password = await bcrypt.hash(password, salt);
+
+    // Clear the reset token fields
     user.passwordResetToken = undefined;
     user.passwordResetExpires = undefined;
+
+    // Save the updated user document
     await user.save();
 
-    res.status(200).json({ message: 'Password has been reset.' });
+    // TODO: Optionally log the user in immediately by creating a new JWT token
+    // const loginToken = createToken(user._id);
+    // res.status(200).json({ message: 'Password has been reset successfully.', token: loginToken, /* other user details */ });
+
+    // Respond with success message
+    res.status(200).json({ message: 'Your password has been reset successfully.' });
+
   } catch (err) {
-    console.error('resetPassword error:', err)
-    return res
-      .status(500)
-      .json({ error: 'Unable to reset password. Please try again later.' })
+    console.error('resetPassword error:', err);
+    res.status(500).json({ error: 'An error occurred while resetting the password. Please try again later.' });
   }
 };
-// ForgotResetPassword
+
+// Export all controller functions including password reset
 module.exports = {
   loginHospitalAdmin,
   signupHospitalAdmin,
@@ -633,6 +688,6 @@ module.exports = {
   updateHospitalAdminStatus, // Superadmin
   getHospitalReviews,
   getAcceptedUserMedicalCard,
-  resetPassword,
-  hospitalAdminForgotPassword
+  resetPassword, // Added
+  hospitalAdminForgotPassword // Added
 };

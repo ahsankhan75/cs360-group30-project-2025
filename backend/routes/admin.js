@@ -1,17 +1,16 @@
 const express = require('express');
 const router = express.Router();
-const requireAuth = require('../middleware/requireAuth');
-const requireAdmin = require('../middleware/requireAdmin');
+const requireAdminAuth = require('../middleware/requireAdminAuth');
 const { loginAdmin, signupAdmin, adminForgotPassword, resetPassword, verifyEmail } = require('../controllers/userController');
-const { getDashboardStats, getAllUsers } = require('../controllers/adminController');
+const { getDashboardStats, getAllUsers, getHospitals, addHospital, deleteHospital, deleteUser } = require('../controllers/adminController');
 const { getPendingHospitalAdmins, updateHospitalAdminStatus } = require('../controllers/hospitalAdminController');
 
 // Public admin routes
 router.post('/login', loginAdmin);
 router.post('/signup', signupAdmin);
-router.post('/forgot-password', adminForgotPassword)
-router.post('/reset-password/:token', resetPassword)
-router.get('/verify-email/:token', verifyEmail)
+router.post('/forgot-password', adminForgotPassword);
+router.post('/reset-password/:token', resetPassword);
+router.get('/verify-email/:token', verifyEmail);
 
 // Health check endpoint
 router.get('/health', (req, res) => {
@@ -22,11 +21,17 @@ router.get('/health', (req, res) => {
 });
 
 // Protected admin routes
-router.get('/dashboard', requireAuth, requireAdmin, getDashboardStats);
-router.get('/users', requireAuth, requireAdmin, getAllUsers);
+router.get('/dashboard', requireAdminAuth, getDashboardStats);
+router.get('/users', requireAdminAuth, getAllUsers);
+router.delete('/users/:userId', requireAdminAuth, deleteUser);
+
+// Hospital management routes
+router.get('/hospitals', requireAdminAuth, getHospitals);
+router.post('/hospitals', requireAdminAuth, addHospital);
+router.delete('/hospitals/:id', requireAdminAuth, deleteHospital);
 
 // Hospital admin management routes
-router.get('/hospital-admins/pending', requireAuth, requireAdmin, getPendingHospitalAdmins);
-router.patch('/hospital-admins/:id/status', requireAuth, requireAdmin, updateHospitalAdminStatus);
+router.get('/hospital-admins/pending', requireAdminAuth, getPendingHospitalAdmins);
+router.patch('/hospital-admins/:id/status', requireAdminAuth, updateHospitalAdminStatus);
 
 module.exports = router;

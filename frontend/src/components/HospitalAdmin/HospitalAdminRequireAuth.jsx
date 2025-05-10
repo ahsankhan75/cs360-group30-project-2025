@@ -1,12 +1,13 @@
-import { Navigate } from 'react-router-dom';
+import { Navigate, useLocation } from 'react-router-dom';
 import { useHospitalAdminAuthContext } from '../../hooks/useHospitalAdminAuthContext';
 
 const HospitalAdminRequireAuth = ({ children }) => {
   const { hospitalAdmin } = useHospitalAdminAuthContext();
+  const location = useLocation();
 
+  // Simple check - if no hospital admin in context, redirect to login
   if (!hospitalAdmin) {
-    // Redirect to login if not authenticated
-    return <Navigate to="/hospital-admin/login" replace />;
+    return <Navigate to="/hospital-admin/login" replace state={{ from: location }} />;
   }
 
   // Render child components if authenticated
